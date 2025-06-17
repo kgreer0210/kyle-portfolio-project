@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll } from "motion/react";
 import { useEffect, useState } from "react";
 
 export default function ScrollHeader() {
@@ -15,8 +15,6 @@ export default function ScrollHeader() {
 
     return () => unsubscribe();
   }, [scrollY]);
-
-  const headerY = useTransform(scrollY, [0, 100], [-100, 0]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
