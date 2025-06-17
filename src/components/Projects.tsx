@@ -48,17 +48,6 @@ export default function Projects() {
       githubUrl: "https://github.com/kgreer0210/tacos-and-mariscos-ofelia",
       status: "in-progress",
     },
-    {
-      id: "project-three",
-      title: "Your Third Project",
-      description:
-        "Add details about your third project here. What technologies did you use? What challenges did you overcome?",
-      image: "/placeholder-project-3.png", // Add your image to public folder
-      technologies: ["Vue.js", "Python", "Django", "AWS"],
-      liveUrl: "https://placeholder.com/",
-      githubUrl: "https://github.com/yourusername/project-three",
-      status: "planned",
-    },
   ];
 
   return (

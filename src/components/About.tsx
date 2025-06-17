@@ -10,7 +10,7 @@ export default function About() {
     },
     {
       title: "Backend",
-      skills: "Node.js, Express, PostgreSQL",
+      skills: "Node.js, Express, PostgreSQL, Vite",
     },
     {
       title: "Infrastructure & Tools",
