@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Custom Color Palette */
+  --color-rich-black: #040f16;
+  --color-oxford-blue: #000022;
+  --color-penn-blue: #001242;
+  --color-lapis-lazuli: #005e7c;
+  --color-blue-ncs: #0094c6;
+  --color-text-primary: #e0e6f0;
+  --color-text-secondary: #a8b2d1;
+  --color-text-headings: #ffffff;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Font families */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Global Styles */
+:root {
+  /* Main Backgrounds */
+  --rich-black: #040f16;
+  --oxford-blue: #000022;
+
+  /* UI & Interactive Colors */
+  --penn-blue: #001242;
+  --lapis-lazuli: #005e7c;
+  --blue-ncs: #0094c6;
+
+  /* Text Colors */
+  --text-primary: #e0e6f0;
+  --text-secondary: #a8b2d1;
+  --text-headings: #ffffff;
+}
+
+/* Base body styles */
+body {
+  background: var(--rich-black);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-headings);
+}
+
+h1 {
+  color: var(--blue-ncs);
+}
+
+p {
+  color: var(--text-primary);
+}
+
+/* Links */
+a {
+  color: var(--blue-ncs);
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--blue-ncs);
+  color: var(--text-headings);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--lapis-lazuli);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--blue-ncs);
+  color: var(--blue-ncs);
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--penn-blue);
+  color: var(--text-headings);
+}
+
+/* Form inputs */
+input,
+textarea {
+  background-color: var(--rich-black);
+  color: var(--text-primary);
+  border: 1px solid var(--penn-blue);
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  border: 2px solid var(--blue-ncs);
+  outline: none;
+}
+
+/* Cards and containers */
+.card {
+  background-color: var(--oxford-blue);
+  border: 1px solid var(--penn-blue);
+}
+
+/* Header and footer */
+header,
+footer {
+  background-color: var(--oxford-blue);
+}
+
+/* Navigation */
+.nav-link {
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  color: var(--blue-ncs);
+}
+
+/* Particles and backdrop effects */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Ensure backdrop blur works properly */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(10px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(0, 0, 34, 0.9);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--rich-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--penn-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--blue-ncs);
 }
