@@ -44,7 +44,7 @@ export default function Contact() {
           viewport={{ once: true }}
         >
           <motion.a
-            href="mailto:kyle@example.com"
+            href="mailto:kylegreer.kg@gmail.com"
             className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-(--color-lapis-lazuli) transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
@@ -53,7 +53,7 @@ export default function Contact() {
             Send Email
           </motion.a>
           <motion.a
-            href="https://linkedin.com/in/kyle"
+            href="https://www.linkedin.com/in/kyle-greer-9201a3115/"
             className="btn-secondary px-8 py-4 rounded-lg font-medium text-lg border border-(--color-blue-ncs) hover:bg-(--color-penn-blue) hover:text-(--color-text-headings) transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
