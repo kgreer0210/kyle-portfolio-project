@@ -1,9 +1,65 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
+
+// Define the project data structure
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  technologies: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  status?: "completed" | "in-progress" | "planned";
+}
 
 export default function Projects() {
-  const projects = [1, 2, 3];
+  // Replace this array with your actual project data
+  const projects: Project[] = [
+    {
+      id: "moneyquest",
+      title: "MoneyQuest",
+      description:
+        "A financial management application that helps users track expenses, set budgets, and achieve their financial goals with an intuitive interface. Adds a gamified experience to help users stay motivated and engaged.",
+      image: "/moneyQuestScreenshot.png",
+      technologies: ["React", "TypeScript", "Node.js", "Vite", "Convex"],
+      liveUrl: "https://money-quest-budgeting.vercel.app/",
+      githubUrl: "https://github.com/kgreer0210/money-quest-budgeting",
+      status: "in-progress",
+    },
+    {
+      id: "tacosAndMariscosOfelia",
+      title: "Tacos and Mariscos Ofelia",
+      description:
+        "A website for a local restaurant that allows customers to view the menu, place orders, and view the restaurant's information. This project was a collaboration with a local restaurant owner to create a website that would help them reach more customers and increase their sales.",
+      image: "/tacosAndMariscosOfeliaScreenshot.png",
+      technologies: [
+        "Next.js",
+        "Tailwind CSS",
+        "Convex",
+        "Motion",
+        "Vercel",
+        "React",
+        "TypeScript",
+      ],
+      liveUrl: "https://tacos-and-mariscos-ofelia.vercel.app/",
+      githubUrl: "https://github.com/kgreer0210/tacos-and-mariscos-ofelia",
+      status: "in-progress",
+    },
+    {
+      id: "project-three",
+      title: "Your Third Project",
+      description:
+        "Add details about your third project here. What technologies did you use? What challenges did you overcome?",
+      image: "/placeholder-project-3.png", // Add your image to public folder
+      technologies: ["Vue.js", "Python", "Django", "AWS"],
+      liveUrl: "https://placeholder.com/",
+      githubUrl: "https://github.com/yourusername/project-three",
+      status: "planned",
+    },
+  ];
 
   return (
     <motion.section
@@ -32,8 +88,8 @@ export default function Projects() {
       >
         {projects.map((project, index) => (
           <motion.div
-            key={project}
-            className="card bg-(--color-oxford-blue)/90 backdrop-blur-sm border border-(--color-penn-blue) rounded-2xl overflow-hidden shadow-xl"
+            key={project.id}
+            className="card bg-(--color-oxford-blue)/90 backdrop-blur-sm border border-(--color-penn-blue) rounded-2xl overflow-hidden shadow-xl flex flex-col"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             whileHover={{
@@ -51,82 +107,116 @@ export default function Projects() {
             viewport={{ once: true }}
           >
             <motion.div
-              className="h-48 bg-(--color-penn-blue)/50 backdrop-blur-sm flex items-center justify-center"
+              className="h-48 bg-(--color-penn-blue)/50 backdrop-blur-sm relative overflow-hidden"
               whileHover={{ backgroundColor: "rgba(0, 18, 66, 0.7)" }}
             >
-              <motion.span
-                className="text-(--color-text-secondary)"
-                whileHover={{ scale: 1.1, color: "#e0e6f0" }}
-              >
-                Project Image
-              </motion.span>
+              {project.image ? (
+                <Image
+                  src={project.image}
+                  alt={`${project.title} screenshot`}
+                  fill
+                  className="object-cover transition-transform duration-300 hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              ) : (
+                <motion.div className="h-full flex items-center justify-center">
+                  <motion.span
+                    className="text-(--color-text-secondary)"
+                    whileHover={{ scale: 1.1, color: "#e0e6f0" }}
+                  >
+                    Project Image
+                  </motion.span>
+                </motion.div>
+              )}
+              {project.status && (
+                <div className="absolute top-2 right-2">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      project.status === "completed"
+                        ? "bg-green-500/80 text-white"
+                        : project.status === "in-progress"
+                        ? "bg-yellow-500/80 text-white"
+                        : "bg-blue-500/80 text-white"
+                    }`}
+                  >
+                    {project.status === "in-progress"
+                      ? "In Progress"
+                      : project.status === "completed"
+                      ? "Completed"
+                      : "Planned"}
+                  </span>
+                </div>
+              )}
             </motion.div>
-            <div className="p-6">
+            <div className="p-6 flex flex-col flex-grow">
               <motion.h3
                 className="text-xl font-semibold text-(--color-text-headings) mb-3"
                 whileHover={{ color: "#0094c6" }}
               >
-                Project {project}
+                {project.title}
               </motion.h3>
-              <motion.p
-                className="text-(--color-text-secondary) mb-4"
+              <motion.div
+                className="relative group flex-grow"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 + index * 0.2 }}
                 viewport={{ once: true }}
               >
-                A brief description of this amazing project and the technologies
-                used to build it.
-              </motion.p>
+                <motion.p className="text-(--color-text-secondary) mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                  {project.description}
+                </motion.p>
+              </motion.div>
               <motion.div
-                className="flex gap-2 mb-4"
+                className="flex flex-wrap gap-2 mb-4"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 1.0 + index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <motion.span
-                  className="px-3 py-1 bg-(--color-penn-blue)/70 backdrop-blur-sm text-(--color-text-primary) text-sm rounded-full"
-                  whileHover={{
-                    scale: 1.1,
-                    backgroundColor: "rgba(0, 148, 198, 0.3)",
-                  }}
-                >
-                  React
-                </motion.span>
-                <motion.span
-                  className="px-3 py-1 bg-(--color-penn-blue)/70 backdrop-blur-sm text-(--color-text-primary) text-sm rounded-full"
-                  whileHover={{
-                    scale: 1.1,
-                    backgroundColor: "rgba(0, 148, 198, 0.3)",
-                  }}
-                >
-                  TypeScript
-                </motion.span>
+                {project.technologies.map((tech, techIndex) => (
+                  <motion.span
+                    key={techIndex}
+                    className="px-3 py-1 bg-(--color-penn-blue)/70 backdrop-blur-sm text-(--color-text-primary) text-sm rounded-full"
+                    whileHover={{
+                      scale: 1.1,
+                      backgroundColor: "rgba(0, 148, 198, 0.3)",
+                    }}
+                  >
+                    {tech}
+                  </motion.span>
+                ))}
               </motion.div>
               <motion.div
-                className="flex gap-3"
+                className="flex gap-3 mt-auto"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1.2 + index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <motion.a
-                  href="#"
-                  className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
-                  whileHover={{ scale: 1.1, x: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Live Demo
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
-                  whileHover={{ scale: 1.1, x: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  GitHub
-                </motion.a>
+                {project.liveUrl && (
+                  <motion.a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                    whileHover={{ scale: 1.1, x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Live Demo
+                  </motion.a>
+                )}
+                {project.githubUrl && (
+                  <motion.a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                    whileHover={{ scale: 1.1, x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    GitHub
+                  </motion.a>
+                )}
               </motion.div>
             </div>
           </motion.div>
