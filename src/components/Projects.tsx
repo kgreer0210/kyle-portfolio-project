@@ -49,6 +49,7 @@ export default function Projects() {
         "Vercel",
         "React",
         "TypeScript",
+        "Convex",
       ],
       liveUrl: "https://lexis-fresh-slate-cleanings.vercel.app/",
       githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleanings",
@@ -197,7 +198,7 @@ export default function Projects() {
                     whileHover={{ scale: 1.1, x: 5 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Live Demo
+                    View Site
                   </motion.a>
                 )}
                 {project.githubUrl && (
@@ -209,7 +210,7 @@ export default function Projects() {
                     whileHover={{ scale: 1.1, x: 5 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    GitHub
+                    View Code
                   </motion.a>
                 )}
               </motion.div>
