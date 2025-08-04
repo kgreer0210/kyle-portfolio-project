@@ -51,8 +51,8 @@ export default function Projects() {
         "TypeScript",
         "Convex",
       ],
-      liveUrl: "https://lexis-fresh-slate-cleanings.vercel.app/",
-      githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleanings",
+      liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
+      githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleaning",
       status: "in-progress",
     },
   ];
