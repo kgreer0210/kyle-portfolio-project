@@ -19,17 +19,6 @@ export default function Projects() {
   // Replace this array with your actual project data
   const projects: Project[] = [
     {
-      id: "moneyquest",
-      title: "MoneyQuest",
-      description:
-        "A financial management application that helps users track expenses, set budgets, and achieve their financial goals with an intuitive interface. Adds a gamified experience to help users stay motivated and engaged.",
-      image: "/moneyQuestScreenshot.png",
-      technologies: ["React", "TypeScript", "Node.js", "Vite", "Convex"],
-      liveUrl: "https://money-quest-budgeting.vercel.app/",
-      githubUrl: "https://github.com/kgreer0210/money-quest-budgeting",
-      status: "in-progress",
-    },
-    {
       id: "tacosAndMariscosOfelia",
       title: "Tacos and Mariscos Ofelia",
       description:
@@ -46,6 +35,23 @@ export default function Projects() {
       ],
       liveUrl: "https://tacos-and-mariscos-ofelia.vercel.app/",
       githubUrl: "https://github.com/kgreer0210/tacos-and-mariscos-ofelia",
+      status: "in-progress",
+    },
+    {
+      id: "lexisFreshSlateCleanings",
+      title: "Lexis Fresh Slate Cleanings",
+      description:
+        "A website for a local cleaning company that allows customers to view the services they offer, view the company's information, and contact the company.",
+      image: "/lexisFreshSlateCleaningsScreenshot.png",
+      technologies: [
+        "Next.js",
+        "Tailwind CSS",
+        "Vercel",
+        "React",
+        "TypeScript",
+      ],
+      liveUrl: "https://lexis-fresh-slate-cleanings.vercel.app/",
+      githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleanings",
       status: "in-progress",
     },
   ];
