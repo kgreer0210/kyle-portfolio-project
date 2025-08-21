@@ -4,6 +4,14 @@ import { motion } from "motion/react";
 import Image from "next/image";
 
 // Define the project data structure
+interface Screenshot {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  features: string[];
+}
+
 interface Project {
   id: string;
   title: string;
@@ -13,6 +21,11 @@ interface Project {
   liveUrl?: string;
   githubUrl?: string;
   status?: "completed" | "in-progress" | "planned";
+  backendShowcase?: {
+    available: boolean;
+    description: string;
+    screenshots: Screenshot[];
+  };
 }
 
 export default function Projects() {
@@ -35,7 +48,125 @@ export default function Projects() {
       ],
       liveUrl: "https://tacos-and-mariscos-ofelia.vercel.app/",
       githubUrl: "https://github.com/kgreer0210/tacos-and-mariscos-ofelia",
-      status: "in-progress",
+      status: "completed",
+      backendShowcase: {
+        available: true,
+        description:
+          "Backend architecture for Tacos and Mariscos Ofelia, showcasing menu management, order processing, kitchen display, and administrative systems.",
+        screenshots: [
+          {
+            id: "admin-dashboard",
+            title: "Admin Dashboard",
+            description:
+              "Central command center for restaurant management with real-time analytics, order tracking, and system overview.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Admin Dashboard.png",
+            features: [
+              "Real-time order tracking",
+              "Revenue analytics",
+              "Staff performance metrics",
+              "System health monitoring",
+              "Quick access to all modules",
+            ],
+          },
+          {
+            id: "menu-management",
+            title: "Menu Management Dashboard",
+            description:
+              "Comprehensive interface for managing menu items, categories, pricing, and availability in real-time.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Menu Management Dashboard.png",
+            features: [
+              "Dynamic menu updates",
+              "Category management",
+              "Real-time price adjustments",
+              "Item availability controls",
+              "Bulk editing operations",
+              "Menu analytics and reporting",
+            ],
+          },
+          {
+            id: "orders-dashboard",
+            title: "Orders Dashboard",
+            description:
+              "Complete order management system with real-time order tracking, status updates, and customer communication.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Orders Dashboard.png",
+            features: [
+              "Real-time order processing",
+              "Order status management",
+              "Customer communication",
+              "Payment processing integration",
+              "Order history and analytics",
+              "Priority queue management",
+            ],
+          },
+          {
+            id: "kitchen-display",
+            title: "Kitchen Display System",
+            description:
+              "Real-time order management system designed specifically for kitchen efficiency and order tracking.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Kitchen Display System.png",
+            features: [
+              "Real-time order notifications",
+              "Order prioritization",
+              "Preparation time tracking",
+              "Multiple station views",
+              "Order completion tracking",
+              "Performance metrics",
+            ],
+          },
+          {
+            id: "dine-in-ordering",
+            title: "Dine In Server Ordering",
+            description:
+              "Intuitive ordering interface for restaurant servers to manage table orders efficiently.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Dine In Server Ordering.png",
+            features: [
+              "Table management",
+              "Server-specific order tracking",
+              "Real-time order submission",
+              "Customer preference notes",
+              "Split billing capabilities",
+              "Integration with kitchen display",
+            ],
+          },
+          {
+            id: "user-management",
+            title: "User Management Dashboard",
+            description:
+              "Comprehensive user and staff management system with role-based access control.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/User Management Dashboard.png",
+            features: [
+              "Role-based access control",
+              "Staff scheduling",
+              "User permissions management",
+              "Activity logging",
+              "Account management",
+              "Security settings",
+            ],
+          },
+          {
+            id: "restaurant-settings",
+            title: "Restaurant Settings Dashboard",
+            description:
+              "Central configuration hub for restaurant settings, business rules, and system preferences.",
+            image:
+              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Restaurant Settings Dashboard.png",
+            features: [
+              "Business hours management",
+              "Payment gateway configuration",
+              "Tax and fee settings",
+              "Notification preferences",
+              "System customization",
+              "Integration settings",
+            ],
+          },
+        ],
+      },
     },
     {
       id: "lexisFreshSlateCleanings",
@@ -213,6 +344,17 @@ export default function Projects() {
                     View Code
                   </motion.a>
                 )}
+                {project.backendShowcase &&
+                  project.backendShowcase.available && (
+                    <motion.a
+                      href={`/projects/${project.id}/backend`}
+                      className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                      whileHover={{ scale: 1.1, x: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      View Backend
+                    </motion.a>
+                  )}
               </motion.div>
             </div>
           </motion.div>
