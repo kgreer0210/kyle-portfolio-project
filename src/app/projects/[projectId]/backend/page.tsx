@@ -125,36 +125,94 @@ const backendShowcaseData: ProjectBackendData = {
       },
     ],
   },
-  "lexis-fresh-slate-cleanings": {
+  lexisFreshSlateCleanings: {
     title: "Lexis Fresh Slate Cleanings",
     screenshots: [
       {
-        id: "service-management",
-        title: "Service Management Dashboard",
+        id: "admin-portal-dashboard",
+        title: "Admin Portal Dashboard",
         description:
-          "Comprehensive interface for managing cleaning services, pricing, and availability.",
+          "Central administrative dashboard providing comprehensive overview of business operations, key metrics, and quick access to all management modules.",
         image:
-          "/projects/lexis-fresh-slate-cleanings/backend-screenshots/01-service-management-dashboard.png",
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Portal Dashboard.png",
         features: [
-          "Service category management",
-          "Pricing adjustments",
-          "Availability controls",
-          "Bulk operations",
-          "Analytics",
+          "Business performance metrics",
+          "Quick access navigation",
+          "Real-time notifications",
+          "Client Invite Management",
+          "Revenue analytics",
         ],
       },
       {
-        id: "booking-interface",
-        title: "Customer Booking Interface",
+        id: "admin-services-management",
+        title: "Admin Services Management",
         description:
-          "Intuitive interface for customers to book cleaning services and view their history.",
+          "Complete service catalog management interface for configuring cleaning services, pricing tiers, and service availability.",
         image:
-          "/projects/lexis-fresh-slate-cleanings/backend-screenshots/02-booking-interface.png",
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Services Management.png",
         features: [
-          "Real-time booking availability",
-          "Customer booking history",
-          "Service customization options",
-          "Payment processing",
+          "Service creation and editing",
+          "Dynamic pricing management",
+          "Service availability controls",
+          "Category organization",
+          "Bulk operations",
+        ],
+      },
+      {
+        id: "admin-client-management",
+        title: "Admin Client Management",
+        description:
+          "Comprehensive client relationship management system with detailed profiles, booking history, and communication tracking.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Client Management.png",
+        features: [
+          "Client profile management",
+          "Booking history tracking",
+          "Communication logs",
+          "Client preferences",
+        ],
+      },
+      {
+        id: "admin-calendar",
+        title: "Admin Calendar Management",
+        description:
+          "Advanced scheduling interface for managing appointments, staff assignments, and resource allocation across all locations.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Calendar.png",
+        features: [
+          "Drag-and-drop scheduling",
+          "Staff assignment optimization",
+          "Multi-location management",
+          "Service Schedule Management",
+          "Service Image Management",
+        ],
+      },
+      {
+        id: "admin-cleaning-add-ons",
+        title: "Admin Cleaning Add-Ons Management",
+        description:
+          "Specialized interface for managing additional cleaning services, premium options, and custom service packages.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Cleaning Add On Management.png",
+        features: [
+          "Add-on service configuration",
+          "Pricing strategy management",
+          "Add-on service management",
+          "Add-on service pricing management",
+        ],
+      },
+      {
+        id: "admin-business-settings",
+        title: "Admin Business Settings Management",
+        description:
+          "Centralized business configuration hub for managing operational settings, business rules, and system preferences.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Business Settings Management.png",
+        features: [
+          "Business hours management",
+          "Operational policies",
+          "Notification preferences",
+          "System customization",
         ],
       },
     ],
@@ -184,7 +242,7 @@ export default function BackendShowcasePage() {
           </p>
           <motion.a
             href="/"
-            className="inline-block px-6 py-3 bg-(--color-blue-ncs) text-white rounded-lg hover:bg-(--color-lapis-lazuli) transition-colors shadow-lg"
+            className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-(--color-lapis-lazuli) transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

@@ -185,6 +185,87 @@ export default function Projects() {
       liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
       githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleaning",
       status: "in-progress",
+      backendShowcase: {
+        available: true,
+        description:
+          "Backend architecture for Lexis Fresh Slate Cleanings, showcasing service management, booking system, staff management, and customer portal.",
+        screenshots: [
+          {
+            id: "service-management",
+            title: "Service Management Dashboard",
+            description:
+              "Comprehensive interface for managing cleaning services, pricing, and availability.",
+            image:
+              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/01-service-management-dashboard.png",
+            features: [
+              "Service category management",
+              "Pricing adjustments",
+              "Availability controls",
+              "Bulk operations",
+              "Analytics",
+            ],
+          },
+          {
+            id: "booking-interface",
+            title: "Customer Booking Interface",
+            description:
+              "Intuitive interface for customers to book cleaning services and view their history.",
+            image:
+              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/02-booking-interface.png",
+            features: [
+              "Real-time booking availability",
+              "Customer booking history",
+              "Service customization options",
+              "Payment processing",
+            ],
+          },
+          {
+            id: "staff-management",
+            title: "Staff Management Dashboard",
+            description:
+              "Complete staff scheduling and management system with performance tracking.",
+            image:
+              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/03-staff-management-dashboard.png",
+            features: [
+              "Staff scheduling",
+              "Performance metrics",
+              "Task assignment",
+              "Time tracking",
+              "Communication tools",
+            ],
+          },
+          {
+            id: "inventory-tracking",
+            title: "Inventory & Equipment Tracking",
+            description:
+              "Real-time inventory management for cleaning supplies and equipment maintenance.",
+            image:
+              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/04-inventory-tracking.png",
+            features: [
+              "Supply inventory tracking",
+              "Equipment maintenance scheduling",
+              "Low stock alerts",
+              "Vendor management",
+              "Usage analytics",
+            ],
+          },
+          {
+            id: "customer-portal",
+            title: "Customer Management Portal",
+            description:
+              "Comprehensive customer relationship management with booking history and preferences.",
+            image:
+              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/05-customer-portal.png",
+            features: [
+              "Customer profiles",
+              "Booking history",
+              "Service preferences",
+              "Communication logs",
+              "Satisfaction tracking",
+            ],
+          },
+        ],
+      },
     },
   ];
 
@@ -194,14 +275,14 @@ export default function Projects() {
       className="py-20 mb-20"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 0.6 }}
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.h2
         className="text-3xl font-bold text-(--color-text-headings) mb-8 text-center drop-shadow-lg"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
         viewport={{ once: true }}
       >
         Featured Projects
@@ -210,7 +291,7 @@ export default function Projects() {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
         viewport={{ once: true }}
       >
         {projects.map((project, index) => (
@@ -226,7 +307,7 @@ export default function Projects() {
               boxShadow: "0 25px 50px -12px rgba(0, 148, 198, 0.25)",
             }}
             transition={{
-              duration: 0.6,
+              duration: 0.5,
               type: "spring",
               stiffness: 300,
               damping: 30,
@@ -286,7 +367,7 @@ export default function Projects() {
                 className="relative group flex-grow"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.8 + index * 0.2 }}
+                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                 viewport={{ once: true }}
               >
                 <motion.p className="text-(--color-text-secondary) mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
@@ -297,7 +378,7 @@ export default function Projects() {
                 className="flex flex-wrap gap-2 mb-4"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 1.0 + index * 0.2 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
                 viewport={{ once: true }}
               >
                 {project.technologies.map((tech, techIndex) => (
@@ -317,7 +398,7 @@ export default function Projects() {
                 className="flex gap-3 mt-auto"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 + index * 0.2 }}
+                transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
                 viewport={{ once: true }}
               >
                 {project.liveUrl && (

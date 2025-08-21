@@ -15,21 +15,21 @@ export default function Hero() {
       className="min-h-screen flex flex-col justify-center items-center text-center px-6"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.6 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
     >
       {/* Main heading section */}
       <motion.div
         className="flex-1 flex flex-col justify-center items-center"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
       >
         {/* Name */}
         <motion.h1
           className="text-5xl md:text-7xl font-bold text-(--color-text-headings) mb-8 drop-shadow-lg"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
         >
           Kyle Greer
         </motion.h1>
@@ -39,7 +39,7 @@ export default function Hero() {
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.8 }} // 0.8 (name delay) + 1.5 (wait time)
+          transition={{ duration: 0.6, delay: 0.9 }} // Faster timing
         >
           <motion.pre
             className="text-2xl md:text-3xl font-mono text-(--color-blue-ncs) bg-(--color-background-secondary) px-6 py-3 rounded-lg border border-(--color-blue-ncs)/20 shadow-lg"
@@ -52,7 +52,7 @@ export default function Hero() {
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 2.0 }}
+              transition={{ duration: 0.2, delay: 1.0 }}
             >
               {"{ "}
             </motion.span>
@@ -60,14 +60,14 @@ export default function Hero() {
               className="text-(--color-text-secondary)"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 2.5 }}
+              transition={{ duration: 0.2, delay: 1.2 }}
             >
               title:
             </motion.span>
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 2.8 }}
+              transition={{ duration: 0.2, delay: 1.3 }}
             >
               {' "'}
             </motion.span>
@@ -75,7 +75,7 @@ export default function Hero() {
               className="text-(--color-lapis-lazuli) font-semibold"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 3.0 }}
+              transition={{ duration: 0.3, delay: 1.4 }}
               whileHover={{ scale: 1.05 }}
             >
               Software Developer
@@ -83,7 +83,7 @@ export default function Hero() {
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 3.2 }}
+              transition={{ duration: 0.2, delay: 1.6 }}
             >
               {'" }'}
             </motion.span>
@@ -94,7 +94,7 @@ export default function Hero() {
           className="text-xl text-(--color-text-secondary) mb-8 max-w-2xl mx-auto drop-shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 3.4 }}
+          transition={{ duration: 0.6, delay: 1.8 }}
         >
           Full-stack developer passionate about creating modern, responsive web
           applications with cutting-edge technologies.
@@ -106,7 +106,7 @@ export default function Hero() {
         className="flex gap-4 justify-center flex-col sm:flex-row mb-16"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 3.6 }}
+        transition={{ duration: 0.6, delay: 2.0 }}
       >
         <motion.button
           onClick={() => scrollToSection("projects")}
@@ -133,7 +133,7 @@ export default function Hero() {
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 4.0 }}
+        transition={{ duration: 0.6, delay: 2.2 }}
       >
         <motion.div
           className="w-6 h-10 border-2 border-(--color-blue-ncs) rounded-full flex justify-center"
