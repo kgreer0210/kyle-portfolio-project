@@ -19,7 +19,6 @@ interface Project {
   image: string;
   technologies: string[];
   liveUrl?: string;
-  githubUrl?: string;
   status?: "completed" | "in-progress" | "planned";
   backendShowcase?: {
     available: boolean;
@@ -46,7 +45,6 @@ export default function Projects() {
         "Convex",
       ],
       liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
-      githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleaning",
       status: "completed",
       backendShowcase: {
         available: true,
@@ -219,7 +217,7 @@ export default function Projects() {
                 </div>
               )}
             </motion.div>
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col grow">
               <motion.h3
                 className="text-xl font-semibold text-text-headings mb-3"
                 whileHover={{ color: "#0094c6" }}
@@ -227,7 +225,7 @@ export default function Projects() {
                 {project.title}
               </motion.h3>
               <motion.div
-                className="relative group flex-grow"
+                className="relative group grow"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
@@ -274,18 +272,6 @@ export default function Projects() {
                     whileTap={{ scale: 0.95 }}
                   >
                     View Site
-                  </motion.a>
-                )}
-                {project.githubUrl && (
-                  <motion.a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-ncs hover:text-lapis-lazuli transition-colors duration-300 font-medium"
-                    whileHover={{ scale: 1.1, x: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    View Code
                   </motion.a>
                 )}
                 {project.backendShowcase &&
