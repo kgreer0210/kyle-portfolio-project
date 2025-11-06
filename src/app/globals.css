@@ -33,12 +33,24 @@
   --text-headings: #ffffff;
 }
 
-/* Base body styles */
+/* Base html and body styles */
+html {
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--rich-black);
   color: var(--text-primary);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 /* Typography */
@@ -157,9 +169,17 @@ footer {
   }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Mobile-specific fixes */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Custom scrollbar */

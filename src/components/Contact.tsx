@@ -144,12 +144,12 @@ export default function Contact() {
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.div
-        className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue p-8 rounded-2xl shadow-xl max-w-3xl mx-auto"
+        className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl max-w-3xl mx-auto w-full overflow-x-hidden"
         whileHover={{ scale: 1.01 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <motion.h2
-          className="text-3xl font-bold text-text-headings mb-6 drop-shadow-lg text-center"
+          className="text-2xl sm:text-3xl font-bold text-text-headings mb-6 drop-shadow-lg text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -158,7 +158,7 @@ export default function Contact() {
           Let&apos;s Work Together
         </motion.h2>
         <motion.p
-          className="text-text-secondary text-lg mb-8 text-center"
+          className="text-text-secondary text-base sm:text-lg mb-8 text-center px-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -190,7 +190,7 @@ export default function Contact() {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 max-w-full"
               placeholder="Your name"
               disabled={isSubmitting}
             />
@@ -218,7 +218,7 @@ export default function Contact() {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 max-w-full"
               placeholder="your.email@example.com"
               disabled={isSubmitting}
             />
@@ -246,7 +246,7 @@ export default function Contact() {
               name="subject"
               value={formData.subject}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 max-w-full"
               placeholder="What's this about?"
               disabled={isSubmitting}
             />
@@ -274,7 +274,7 @@ export default function Contact() {
               value={formData.message}
               onChange={handleInputChange}
               rows={6}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 resize-y"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 resize-y max-w-full"
               placeholder="Tell me about your project..."
               disabled={isSubmitting}
             />

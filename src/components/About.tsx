@@ -28,12 +28,12 @@ export default function About() {
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.div
-        className="card p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl"
+        className="card p-4 sm:p-6 md:p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl w-full overflow-x-hidden"
         whileHover={{ scale: 1.02, y: -5 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <motion.h2
-          className="text-3xl font-bold text-text-headings mb-6"
+          className="text-2xl sm:text-3xl font-bold text-text-headings mb-6"
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -49,7 +49,7 @@ export default function About() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             Running a business in Middle Georgia is demanding. You&apos;re an
             expert in your field, but maybe the digital side of things feels
             like a whole other job you didn&apos;t sign up for. You know you
@@ -58,7 +58,7 @@ export default function About() {
             streamlines your operations.
           </p>
 
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             That&apos;s where I come in. My name is Kyle, and I run a software
             consulting business focused on helping businesses like yours succeed
             through custom software development, automation solutions, and
@@ -68,7 +68,7 @@ export default function About() {
             business.
           </p>
 
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             Whether you need a custom web application, automation to streamline
             repetitive tasks, or mobile app development, I approach every
             project with a focus on solving real problems. We&apos;ll start by

@@ -43,9 +43,9 @@ export default function BackendShowcase({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full overflow-x-hidden">
         <motion.h1
-          className="text-4xl font-bold text-text-headings mb-8 text-center"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-headings mb-8 text-center px-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -54,7 +54,7 @@ export default function BackendShowcase({
         </motion.h1>
 
         <motion.p
-          className="text-lg text-text-secondary mb-12 text-center max-w-3xl mx-auto"
+          className="text-base sm:text-lg text-text-secondary mb-12 text-center max-w-3xl mx-auto px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -122,7 +122,7 @@ export default function BackendShowcase({
             onClick={() => setSelectedScreenshot(null)}
           >
             <motion.div
-              className="bg-oxford-blue/95 backdrop-blur-sm border border-penn-blue rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-oxford-blue/95 backdrop-blur-sm border border-penn-blue rounded-2xl w-full max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-4"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               onClick={(e) => e.stopPropagation()}
@@ -199,7 +199,7 @@ export default function BackendShowcase({
             onClick={closeImageModal}
           >
             <motion.div
-              className="relative max-w-7xl max-h-[90vh] w-full"
+              className="relative w-full max-w-[95vw] sm:max-w-7xl max-h-[90vh] mx-2 sm:mx-4"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               onClick={(e) => e.stopPropagation()}

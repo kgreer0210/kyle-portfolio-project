@@ -12,7 +12,7 @@ export default function Hero() {
 
   return (
     <motion.section
-      className="min-h-screen flex flex-col justify-center items-center text-center px-6"
+      className="min-h-screen flex flex-col justify-center items-center text-center px-4 sm:px-6 w-full overflow-x-hidden"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
@@ -26,7 +26,7 @@ export default function Hero() {
       >
         {/* Name */}
         <motion.h1
-          className="text-5xl md:text-7xl font-bold text-text-headings mb-8 drop-shadow-lg"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold text-text-headings mb-8 drop-shadow-lg px-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -36,13 +36,13 @@ export default function Hero() {
 
         {/* JSON Developer title */}
         <motion.div
-          className="mb-8"
+          className="mb-8 w-full max-w-full px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }} // Faster timing
         >
           <motion.pre
-            className="text-2xl md:text-3xl font-mono text-blue-ncs bg-background-secondary px-6 py-3 rounded-lg border border-blue-ncs/20 shadow-lg"
+            className="text-base sm:text-xl md:text-2xl lg:text-3xl font-mono text-blue-ncs bg-background-secondary px-3 sm:px-4 md:px-6 py-3 rounded-lg border border-blue-ncs/20 shadow-lg overflow-x-auto max-w-full w-full"
             whileHover={{
               scale: 1.02,
               boxShadow: "0 10px 25px rgba(0, 94, 124, 0.2)",
@@ -91,7 +91,7 @@ export default function Hero() {
         </motion.div>
 
         <motion.p
-          className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto drop-shadow-md"
+          className="text-base sm:text-lg md:text-xl text-text-secondary mb-8 max-w-2xl mx-auto drop-shadow-md px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.8 }}
@@ -104,14 +104,14 @@ export default function Hero() {
 
       {/* Button section */}
       <motion.div
-        className="flex gap-4 justify-center flex-col sm:flex-row mb-16"
+        className="flex gap-4 justify-center flex-col sm:flex-row mb-16 w-full px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 2.0 }}
       >
         <motion.button
           onClick={() => scrollToSection("projects")}
-          className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -120,7 +120,7 @@ export default function Hero() {
         </motion.button>
         <motion.button
           onClick={() => scrollToSection("contact")}
-          className="btn-secondary px-8 py-4 rounded-lg font-medium text-lg border border-blue-ncs hover:bg-penn-blue hover:text-text-headings transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="btn-secondary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg border border-blue-ncs hover:bg-penn-blue hover:text-text-headings transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}

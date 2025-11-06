@@ -13,7 +13,7 @@ export default function Footer() {
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
     >
-      <div className="max-w-6xl mx-auto px-6 text-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center w-full overflow-x-hidden">
         <motion.p
           className="text-text-secondary"
           initial={{ opacity: 0 }}

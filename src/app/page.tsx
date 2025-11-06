@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <motion.div
-      className="min-h-screen bg-rich-black text-text-primary relative"
+      className="min-h-screen bg-rich-black text-text-primary relative w-full overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -75,7 +75,7 @@ export default function Home() {
         </div>
 
         {/* Main Content Sections */}
-        <main className="max-w-6xl mx-auto px-6 pointer-events-auto">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 pointer-events-auto w-full">
           <About />
           <Projects />
           <Testimonials />
