@@ -45,7 +45,7 @@ export default function BackendShowcase({
     >
       <div className="max-w-6xl mx-auto px-6">
         <motion.h1
-          className="text-4xl font-bold text-(--color-text-headings) mb-8 text-center"
+          className="text-4xl font-bold text-text-headings mb-8 text-center"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -54,7 +54,7 @@ export default function BackendShowcase({
         </motion.h1>
 
         <motion.p
-          className="text-lg text-(--color-text-secondary) mb-12 text-center max-w-3xl mx-auto"
+          className="text-lg text-text-secondary mb-12 text-center max-w-3xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -68,14 +68,14 @@ export default function BackendShowcase({
           {screenshots.map((screenshot, index) => (
             <motion.div
               key={screenshot.id}
-              className="card bg-(--color-oxford-blue)/90 backdrop-blur-sm border border-(--color-penn-blue) rounded-2xl overflow-hidden shadow-xl cursor-pointer"
+              className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue rounded-2xl overflow-hidden shadow-xl cursor-pointer"
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ scale: 1.05, y: -10 }}
               onClick={() => setSelectedScreenshot(screenshot)}
             >
-              <div className="h-48 bg-(--color-penn-blue)/50 relative overflow-hidden">
+              <div className="h-48 bg-penn-blue/50 relative overflow-hidden">
                 <Image
                   src={screenshot.image}
                   alt={screenshot.title}
@@ -85,10 +85,10 @@ export default function BackendShowcase({
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-(--color-text-headings) mb-2">
+                <h3 className="text-xl font-semibold text-text-headings mb-2">
                   {screenshot.title}
                 </h3>
-                <p className="text-(--color-text-secondary) mb-4 line-clamp-3">
+                <p className="text-text-secondary mb-4 line-clamp-3">
                   {screenshot.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -97,13 +97,13 @@ export default function BackendShowcase({
                     .map((feature, featureIndex) => (
                       <span
                         key={featureIndex}
-                        className="px-2 py-1 bg-(--color-penn-blue)/70 text-xs rounded-full text-(--color-text-primary)"
+                        className="px-2 py-1 bg-penn-blue/70 text-xs rounded-full text-text-primary"
                       >
                         {feature}
                       </span>
                     ))}
                   {screenshot.features.length > 3 && (
-                    <span className="px-2 py-1 bg-(--color-penn-blue)/70 text-xs rounded-full text-(--color-text-primary)">
+                    <span className="px-2 py-1 bg-penn-blue/70 text-xs rounded-full text-text-primary">
                       +{screenshot.features.length - 3} more
                     </span>
                   )}
@@ -122,19 +122,19 @@ export default function BackendShowcase({
             onClick={() => setSelectedScreenshot(null)}
           >
             <motion.div
-              className="bg-(--color-oxford-blue)/95 backdrop-blur-sm border border-(--color-penn-blue) rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-oxford-blue/95 backdrop-blur-sm border border-penn-blue rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-(--color-text-headings)">
+                  <h2 className="text-2xl font-bold text-text-headings">
                     {selectedScreenshot.title}
                   </h2>
                   <button
                     onClick={() => setSelectedScreenshot(null)}
-                    className="text-(--color-text-secondary) hover:text-white text-2xl"
+                    className="text-text-secondary hover:text-white text-2xl"
                   >
                     ×
                   </button>
@@ -161,12 +161,12 @@ export default function BackendShowcase({
                     </div>
                   </div>
                   <div>
-                    <p className="text-(--color-text-secondary) mb-6">
+                    <p className="text-text-secondary mb-6">
                       {selectedScreenshot.description}
                     </p>
 
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-(--color-text-headings) mb-3">
+                      <h3 className="text-lg font-semibold text-text-headings mb-3">
                         Key Features
                       </h3>
                       <ul className="space-y-2">
@@ -174,11 +174,9 @@ export default function BackendShowcase({
                           (feature, featureIndex) => (
                             <li
                               key={featureIndex}
-                              className="flex items-center text-(--color-text-secondary)"
+                              className="flex items-center text-text-secondary"
                             >
-                              <span className="text-(--color-blue-ncs) mr-2">
-                                ✓
-                              </span>
+                              <span className="text-blue-ncs mr-2">✓</span>
                               {feature}
                             </li>
                           )

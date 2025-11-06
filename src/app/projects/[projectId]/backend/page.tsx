@@ -23,108 +23,6 @@ interface ProjectBackendData {
 
 // Sample backend data - in a real app, this would come from a database or API
 const backendShowcaseData: ProjectBackendData = {
-  tacosAndMariscosOfelia: {
-    title: "Tacos and Mariscos Ofelia",
-    screenshots: [
-      {
-        id: "admin-dashboard",
-        title: "Admin Dashboard",
-        description:
-          "Central command center for restaurant management with real-time analytics, order tracking, and system overview.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Admin Dashboard.png",
-        features: [
-          "Real-time order tracking",
-          "System health monitoring",
-          "Quick access to all modules",
-        ],
-      },
-      {
-        id: "menu-management",
-        title: "Menu Management Dashboard",
-        description:
-          "Comprehensive interface for managing menu items, categories, pricing, and availability in real-time.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Menu Management Dashboard.png",
-        features: [
-          "Dynamic menu updates",
-          "Category management",
-          "Real-time price adjustments",
-          "Item availability controls",
-          "Menu analytics and reporting",
-        ],
-      },
-      {
-        id: "orders-dashboard",
-        title: "Orders Dashboard",
-        description:
-          "Complete order management system with real-time order tracking, status updates, and customer communication.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Orders Dashboard.png",
-        features: [
-          "Real-time order processing",
-          "Order status management",
-          "Priority queue management",
-        ],
-      },
-      {
-        id: "kitchen-display",
-        title: "Kitchen Display System",
-        description:
-          "Real-time order management system designed specifically for kitchen efficiency and order tracking.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Kitchen Display System.png",
-        features: [
-          "Real-time order notifications",
-          "Order prioritization",
-          "Preparation time tracking",
-          "Order completion tracking",
-        ],
-      },
-      {
-        id: "dine-in-ordering",
-        title: "Dine In Server Ordering",
-        description:
-          "Intuitive ordering interface for restaurant servers to manage table orders efficiently.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Dine In Server Ordering.png",
-        features: [
-          "Table management",
-          "Server-specific order tracking",
-          "Real-time order submission",
-          "Customer preference notes",
-          "Integration with kitchen display",
-        ],
-      },
-      {
-        id: "user-management",
-        title: "User Management Dashboard",
-        description:
-          "Comprehensive user and staff management system with role-based access control.",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/User Management Dashboard.png",
-        features: [
-          "Role-based access control",
-          "User permissions management",
-          "Activity logging",
-        ],
-      },
-      {
-        id: "restaurant-settings",
-        title: "Restaurant Settings Dashboard",
-        description:
-          "Central configuration hub for restaurant settings, business rules, and system preferences. **Information displayed is not real and is for demonstration purposes only**",
-        image:
-          "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Restaurant Settings Dashboard.png",
-        features: [
-          "Business hours management",
-          "Tax and fee settings",
-          "System customization",
-          "Integration settings",
-        ],
-      },
-    ],
-  },
   lexisFreshSlateCleanings: {
     title: "Lexis Fresh Slate Cleanings",
     screenshots: [
@@ -215,6 +113,85 @@ const backendShowcaseData: ProjectBackendData = {
           "System customization",
         ],
       },
+      {
+        id: "admin-employee-management",
+        title: "Admin Employee Management",
+        description:
+          "Comprehensive employee management system allowing Lexi to oversee all aspects of employee operations including time tracking, point system management, time off requests, and point reward approvals.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Employee Management.png",
+        features: [
+          "Employee profile management",
+          "Time tracking and attendance oversight",
+          "Point system administration",
+          "Time off request approval",
+          "Point reward request approval",
+          "Employee performance tracking",
+        ],
+      },
+      {
+        id: "admin-estimate-request-management",
+        title: "Admin Estimate Request Management",
+        description:
+          "Streamlined interface for managing customer estimate requests with real-time notifications. Features a notification icon that alerts Lexi when new estimate requests are available, ensuring prompt response to potential customers.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Estimate Request Management.png",
+        features: [
+          "Real-time estimate request notifications",
+          "Notification icon indicator",
+          "Request status management",
+          "Customer communication tracking",
+          "Quote generation and management",
+        ],
+      },
+      {
+        id: "admin-sms-reminder",
+        title: "Admin SMS Reminder System",
+        description:
+          "Integrated Twilio SMS system for automated communications. Enables sending weekly SMS reminders for upcoming appointments, new employee invites, and customer invitations to keep everyone informed and engaged.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin SMS Reminder.png",
+        features: [
+          "Weekly SMS appointment reminders",
+          "Automated employee invite system",
+          "Automated customer invite system",
+          "Twilio integration",
+          "Message customization",
+          "Delivery status tracking",
+        ],
+      },
+      {
+        id: "employee-portal",
+        title: "Employee Portal",
+        description:
+          "Comprehensive self-service portal for employees to manage their work schedule, track time, request time off, and manage their reward points. Features a detailed calendar view of upcoming appointments with full details.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Employee Portal.png",
+        features: [
+          "Clock in/out functionality",
+          "Time off request submission",
+          "Point balance viewing and spending",
+          "Calendar view of assigned appointments",
+          "Appointment details and notes",
+          "Point reward request submission",
+        ],
+      },
+      {
+        id: "customer-portal",
+        title: "Customer Portal",
+        description:
+          "Self-service customer portal allowing clients to manage their appointments, update their profile information, edit service addresses, and customize their notification preferences for a personalized experience.",
+        image:
+          "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Customer Portal.png",
+        features: [
+          "Upcoming appointments view",
+          "Profile information editing",
+          "Service address management",
+          "Notification preferences customization",
+          "Appointment history access",
+          "Account settings management",
+        ],
+      },
     ],
   },
 };
@@ -228,21 +205,21 @@ export default function BackendShowcasePage() {
   if (!projectData) {
     return (
       <motion.div
-        className="min-h-screen bg-(--color-rich-black) text-(--color-text-primary) relative flex items-center justify-center"
+        className="min-h-screen bg-rich-black text-text-primary relative flex items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-(--color-text-headings) mb-4">
+          <h1 className="text-4xl font-bold text-text-headings mb-4">
             Backend Showcase Not Found
           </h1>
-          <p className="text-(--color-text-secondary) mb-8">
+          <p className="text-text-secondary mb-8">
             The backend showcase for this project is not available yet.
           </p>
           <motion.a
             href="/"
-            className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-(--color-lapis-lazuli) transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -255,7 +232,7 @@ export default function BackendShowcasePage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-(--color-rich-black) text-(--color-text-primary) relative"
+      className="min-h-screen bg-rich-black text-text-primary relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -290,7 +267,7 @@ export default function BackendShowcasePage() {
         <div className="fixed top-6 left-6 z-20">
           <motion.a
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-(--color-oxford-blue)/90 backdrop-blur-sm border border-(--color-penn-blue) text-(--color-text-primary) rounded-lg hover:bg-(--color-penn-blue)/70 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue text-text-primary rounded-lg hover:bg-penn-blue/70 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

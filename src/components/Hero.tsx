@@ -26,7 +26,7 @@ export default function Hero() {
       >
         {/* Name */}
         <motion.h1
-          className="text-5xl md:text-7xl font-bold text-(--color-text-headings) mb-8 drop-shadow-lg"
+          className="text-5xl md:text-7xl font-bold text-text-headings mb-8 drop-shadow-lg"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -42,7 +42,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.9 }} // Faster timing
         >
           <motion.pre
-            className="text-2xl md:text-3xl font-mono text-(--color-blue-ncs) bg-(--color-background-secondary) px-6 py-3 rounded-lg border border-(--color-blue-ncs)/20 shadow-lg"
+            className="text-2xl md:text-3xl font-mono text-blue-ncs bg-background-secondary px-6 py-3 rounded-lg border border-blue-ncs/20 shadow-lg"
             whileHover={{
               scale: 1.02,
               boxShadow: "0 10px 25px rgba(0, 94, 124, 0.2)",
@@ -57,7 +57,7 @@ export default function Hero() {
               {"{ "}
             </motion.span>
             <motion.span
-              className="text-(--color-text-secondary)"
+              className="text-text-secondary"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2, delay: 1.2 }}
@@ -72,13 +72,13 @@ export default function Hero() {
               {' "'}
             </motion.span>
             <motion.span
-              className="text-(--color-lapis-lazuli) font-semibold"
+              className="text-lapis-lazuli font-semibold"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 1.4 }}
               whileHover={{ scale: 1.05 }}
             >
-              Software Developer
+              Software Consultant & Developer
             </motion.span>
             <motion.span
               initial={{ opacity: 0 }}
@@ -91,13 +91,14 @@ export default function Hero() {
         </motion.div>
 
         <motion.p
-          className="text-xl text-(--color-text-secondary) mb-8 max-w-2xl mx-auto drop-shadow-md"
+          className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto drop-shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.8 }}
         >
-          Full-stack developer passionate about creating modern, responsive web
-          applications with cutting-edge technologies.
+          Helping businesses grow through custom software solutions, automation
+          consulting, and modern web applications built with purpose and
+          excellence.
         </motion.p>
       </motion.div>
 
@@ -110,7 +111,7 @@ export default function Hero() {
       >
         <motion.button
           onClick={() => scrollToSection("projects")}
-          className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-(--color-lapis-lazuli) transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -119,7 +120,7 @@ export default function Hero() {
         </motion.button>
         <motion.button
           onClick={() => scrollToSection("contact")}
-          className="btn-secondary px-8 py-4 rounded-lg font-medium text-lg border border-(--color-blue-ncs) hover:bg-(--color-penn-blue) hover:text-(--color-text-headings) transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="btn-secondary px-8 py-4 rounded-lg font-medium text-lg border border-blue-ncs hover:bg-penn-blue hover:text-text-headings transition-all duration-300 shadow-lg hover:shadow-xl"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -136,12 +137,12 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 2.2 }}
       >
         <motion.div
-          className="w-6 h-10 border-2 border-(--color-blue-ncs) rounded-full flex justify-center"
+          className="w-6 h-10 border-2 border-blue-ncs rounded-full flex justify-center"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
           <motion.div
-            className="w-1 h-3 bg-(--color-blue-ncs) rounded-full mt-2"
+            className="w-1 h-3 bg-blue-ncs rounded-full mt-2"
             animate={{ opacity: [1, 0, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />

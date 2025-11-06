@@ -27,7 +27,7 @@ export default function ScrollHeader() {
 
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-50 bg-(--color-oxford-blue)/90 backdrop-blur-md border-b border-(--color-penn-blue) shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/90 backdrop-blur-md border-b border-penn-blue shadow-lg"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -100, opacity: 0 }}
@@ -36,11 +36,11 @@ export default function ScrollHeader() {
       <nav className="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
         <motion.button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="text-xl font-bold text-(--color-blue-ncs) hover:text-(--color-text-primary) transition-colors duration-300"
+          className="text-xl font-bold text-blue-ncs hover:text-text-primary transition-colors duration-300"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Kyle&apos;s Portfolio
+          KYGR Solutions
         </motion.button>
         <motion.div
           className="flex gap-6"
@@ -50,7 +50,7 @@ export default function ScrollHeader() {
         >
           <motion.button
             onClick={() => scrollToSection("about")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -58,7 +58,7 @@ export default function ScrollHeader() {
           </motion.button>
           <motion.button
             onClick={() => scrollToSection("projects")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -66,7 +66,7 @@ export default function ScrollHeader() {
           </motion.button>
           <motion.button
             onClick={() => scrollToSection("contact")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >

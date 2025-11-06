@@ -9,6 +9,7 @@ import {
   Hero,
   About,
   Projects,
+  Testimonials,
   Contact,
   Footer,
 } from "../components";
@@ -31,7 +32,7 @@ export default function Home() {
 
   return (
     <motion.div
-      className="min-h-screen bg-(--color-rich-black) text-(--color-text-primary) relative"
+      className="min-h-screen bg-rich-black text-text-primary relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -77,6 +78,7 @@ export default function Home() {
         <main className="max-w-6xl mx-auto px-6 pointer-events-auto">
           <About />
           <Projects />
+          <Testimonials />
           <Contact />
         </main>
 

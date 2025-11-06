@@ -32,147 +32,10 @@ export default function Projects() {
   // Replace this array with your actual project data
   const projects: Project[] = [
     {
-      id: "tacosAndMariscosOfelia",
-      title: "Tacos and Mariscos Ofelia",
-      description:
-        "A website for a local restaurant that allows customers to view the menu, place orders, and view the restaurant's information. This project was a collaboration with a local restaurant owner to create a website that would help them reach more customers and increase their sales.",
-      image: "/tacosAndMariscosOfeliaScreenshot.png",
-      technologies: [
-        "Next.js",
-        "Tailwind CSS",
-        "Convex",
-        "Motion",
-        "Vercel",
-        "React",
-        "TypeScript",
-      ],
-      liveUrl: "https://tacos-and-mariscos-ofelia.vercel.app/",
-      githubUrl: "https://github.com/kgreer0210/tacos-and-mariscos-ofelia",
-      status: "completed",
-      backendShowcase: {
-        available: true,
-        description:
-          "Backend architecture for Tacos and Mariscos Ofelia, showcasing menu management, order processing, kitchen display, and administrative systems.",
-        screenshots: [
-          {
-            id: "admin-dashboard",
-            title: "Admin Dashboard",
-            description:
-              "Central command center for restaurant management with real-time analytics, order tracking, and system overview.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Admin Dashboard.png",
-            features: [
-              "Real-time order tracking",
-              "Revenue analytics",
-              "Staff performance metrics",
-              "System health monitoring",
-              "Quick access to all modules",
-            ],
-          },
-          {
-            id: "menu-management",
-            title: "Menu Management Dashboard",
-            description:
-              "Comprehensive interface for managing menu items, categories, pricing, and availability in real-time.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Menu Management Dashboard.png",
-            features: [
-              "Dynamic menu updates",
-              "Category management",
-              "Real-time price adjustments",
-              "Item availability controls",
-              "Bulk editing operations",
-              "Menu analytics and reporting",
-            ],
-          },
-          {
-            id: "orders-dashboard",
-            title: "Orders Dashboard",
-            description:
-              "Complete order management system with real-time order tracking, status updates, and customer communication.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Orders Dashboard.png",
-            features: [
-              "Real-time order processing",
-              "Order status management",
-              "Customer communication",
-              "Payment processing integration",
-              "Order history and analytics",
-              "Priority queue management",
-            ],
-          },
-          {
-            id: "kitchen-display",
-            title: "Kitchen Display System",
-            description:
-              "Real-time order management system designed specifically for kitchen efficiency and order tracking.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Kitchen Display System.png",
-            features: [
-              "Real-time order notifications",
-              "Order prioritization",
-              "Preparation time tracking",
-              "Multiple station views",
-              "Order completion tracking",
-              "Performance metrics",
-            ],
-          },
-          {
-            id: "dine-in-ordering",
-            title: "Dine In Server Ordering",
-            description:
-              "Intuitive ordering interface for restaurant servers to manage table orders efficiently.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Dine In Server Ordering.png",
-            features: [
-              "Table management",
-              "Server-specific order tracking",
-              "Real-time order submission",
-              "Customer preference notes",
-              "Split billing capabilities",
-              "Integration with kitchen display",
-            ],
-          },
-          {
-            id: "user-management",
-            title: "User Management Dashboard",
-            description:
-              "Comprehensive user and staff management system with role-based access control.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/User Management Dashboard.png",
-            features: [
-              "Role-based access control",
-              "Staff scheduling",
-              "User permissions management",
-              "Activity logging",
-              "Account management",
-              "Security settings",
-            ],
-          },
-          {
-            id: "restaurant-settings",
-            title: "Restaurant Settings Dashboard",
-            description:
-              "Central configuration hub for restaurant settings, business rules, and system preferences.",
-            image:
-              "/projects/tacos-and-mariscos-ofelia/backend-screenshots/Restaurant Settings Dashboard.png",
-            features: [
-              "Business hours management",
-              "Payment gateway configuration",
-              "Tax and fee settings",
-              "Notification preferences",
-              "System customization",
-              "Integration settings",
-            ],
-          },
-        ],
-      },
-    },
-    {
       id: "lexisFreshSlateCleanings",
       title: "Lexis Fresh Slate Cleanings",
       description:
-        "A website for a local cleaning company that allows customers to view the services they offer, view the company's information, and contact the company.",
+        "A comprehensive web application for a local cleaning company featuring customer and employee portals, an admin dashboard with service management, booking system, staff scheduling, client management, estimate requests, and automated SMS reminders.",
       image: "/lexisFreshSlateCleaningsScreenshot.png",
       technologies: [
         "Next.js",
@@ -184,7 +47,7 @@ export default function Projects() {
       ],
       liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
       githubUrl: "https://github.com/kgreer0210/lexis-fresh-slate-cleaning",
-      status: "in-progress",
+      status: "completed",
       backendShowcase: {
         available: true,
         description:
@@ -272,14 +135,14 @@ export default function Projects() {
   return (
     <motion.section
       id="projects"
-      className="py-20 mb-20"
+      className="mb-20"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.h2
-        className="text-3xl font-bold text-(--color-text-headings) mb-8 text-center drop-shadow-lg"
+        className="text-3xl font-bold text-text-headings mb-8 text-center drop-shadow-lg"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -297,7 +160,7 @@ export default function Projects() {
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
-            className="card bg-(--color-oxford-blue)/90 backdrop-blur-sm border border-(--color-penn-blue) rounded-2xl overflow-hidden shadow-xl flex flex-col"
+            className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue rounded-2xl overflow-hidden shadow-xl flex flex-col"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             whileHover={{
@@ -315,7 +178,7 @@ export default function Projects() {
             viewport={{ once: true }}
           >
             <motion.div
-              className="h-48 bg-(--color-penn-blue)/50 backdrop-blur-sm relative overflow-hidden"
+              className="h-48 bg-penn-blue/50 backdrop-blur-sm relative overflow-hidden"
               whileHover={{ backgroundColor: "rgba(0, 18, 66, 0.7)" }}
             >
               {project.image ? (
@@ -329,7 +192,7 @@ export default function Projects() {
               ) : (
                 <motion.div className="h-full flex items-center justify-center">
                   <motion.span
-                    className="text-(--color-text-secondary)"
+                    className="text-text-secondary"
                     whileHover={{ scale: 1.1, color: "#e0e6f0" }}
                   >
                     Project Image
@@ -358,7 +221,7 @@ export default function Projects() {
             </motion.div>
             <div className="p-6 flex flex-col flex-grow">
               <motion.h3
-                className="text-xl font-semibold text-(--color-text-headings) mb-3"
+                className="text-xl font-semibold text-text-headings mb-3"
                 whileHover={{ color: "#0094c6" }}
               >
                 {project.title}
@@ -370,7 +233,7 @@ export default function Projects() {
                 transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <motion.p className="text-(--color-text-secondary) mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                <motion.p className="text-text-secondary mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                   {project.description}
                 </motion.p>
               </motion.div>
@@ -384,7 +247,7 @@ export default function Projects() {
                 {project.technologies.map((tech, techIndex) => (
                   <motion.span
                     key={techIndex}
-                    className="px-3 py-1 bg-(--color-penn-blue)/70 backdrop-blur-sm text-(--color-text-primary) text-sm rounded-full"
+                    className="px-3 py-1 bg-penn-blue/70 backdrop-blur-sm text-text-primary text-sm rounded-full"
                     whileHover={{
                       scale: 1.1,
                       backgroundColor: "rgba(0, 148, 198, 0.3)",
@@ -406,7 +269,7 @@ export default function Projects() {
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                    className="text-blue-ncs hover:text-lapis-lazuli transition-colors duration-300 font-medium"
                     whileHover={{ scale: 1.1, x: 5 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -418,7 +281,7 @@ export default function Projects() {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                    className="text-blue-ncs hover:text-lapis-lazuli transition-colors duration-300 font-medium"
                     whileHover={{ scale: 1.1, x: 5 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -429,7 +292,7 @@ export default function Projects() {
                   project.backendShowcase.available && (
                     <motion.a
                       href={`/projects/${project.id}/backend`}
-                      className="text-(--color-blue-ncs) hover:text-(--color-lapis-lazuli) transition-colors duration-300 font-medium"
+                      className="text-blue-ncs hover:text-lapis-lazuli transition-colors duration-300 font-medium"
                       whileHover={{ scale: 1.1, x: 5 }}
                       whileTap={{ scale: 0.95 }}
                     >

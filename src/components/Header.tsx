@@ -12,14 +12,14 @@ export default function Header() {
 
   return (
     <motion.header
-      className="bg-(--color-rich-black)/80 backdrop-blur-sm border-b border-(--color-penn-blue) p-6"
+      className="bg-rich-black/80 backdrop-blur-sm border-b border-penn-blue p-6"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.2 }}
     >
       <nav className="max-w-6xl mx-auto flex justify-between items-center">
         <motion.h1
-          className="text-2xl font-bold text-(--color-blue-ncs)"
+          className="text-2xl font-bold text-blue-ncs"
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -35,7 +35,7 @@ export default function Header() {
         >
           <motion.button
             onClick={() => scrollToSection("about")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -43,7 +43,7 @@ export default function Header() {
           </motion.button>
           <motion.button
             onClick={() => scrollToSection("projects")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -51,7 +51,7 @@ export default function Header() {
           </motion.button>
           <motion.button
             onClick={() => scrollToSection("contact")}
-            className="nav-link hover:text-(--color-text-primary) transition-all duration-300"
+            className="nav-link hover:text-text-primary transition-all duration-300"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
