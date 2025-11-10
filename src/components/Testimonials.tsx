@@ -8,7 +8,7 @@ export default function Testimonials() {
     {
       id: 1,
       name: "Alexis Baker",
-      role: "Owner, Lexis Fresh Slate Cleanings",
+      role: "Owner",
       quote: [
         "Working with Kyle Greer on my company's customized website has truly transformed the way I run my business. The website he created didn't just improve our online presence—it completely streamlined our daily operations. Kyle designed a platform that includes simple, effective protocols for everyday production, making it easier for my team to stay organized and productive.",
         'Since implementing the site, I\'ve been able to step back from the constant "busy work" and focus more on the strategic side of my business. Tasks that once demanded my personal presence are now handled efficiently through the systems Kyle put in place. This has given me the freedom to dedicate more time to background work and business growth—something I never imagined possible before.',
