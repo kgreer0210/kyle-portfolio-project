@@ -113,9 +113,9 @@ export default function Testimonials() {
         transition={{ duration: 0.8, delay: 0.3 }}
         viewport={{ once: true }}
       >
-        <div className="relative w-full max-w-3xl mx-auto">
+        <div className="relative w-full max-w-3xl mx-auto px-12 md:px-0">
           {/* Carousel Container */}
-          <div className="relative overflow-hidden min-h-[400px] md:min-h-[450px]">
+          <div className="relative overflow-hidden min-h-[350px] sm:min-h-[400px] md:min-h-[450px]">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentIndex}
@@ -129,7 +129,7 @@ export default function Testimonials() {
                   opacity: { duration: 0.3 },
                   scale: { duration: 0.3 },
                 }}
-                className="card p-6 md:p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl flex flex-col"
+                className="card p-4 sm:p-6 md:p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl flex flex-col"
               >
                 {/* Quote Icon */}
                 <motion.div
@@ -229,11 +229,11 @@ export default function Testimonials() {
               {/* Previous Button */}
               <button
                 onClick={prevSlide}
-                className="absolute left-0 md:-left-12 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-oxford-blue/80 backdrop-blur-sm border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="absolute left-2 md:-left-12 top-1/2 -translate-y-1/2 z-10 p-2 md:p-3 rounded-full bg-oxford-blue/80 backdrop-blur-sm border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-all duration-300 shadow-lg hover:shadow-xl min-w-[44px] min-h-[44px] flex items-center justify-center"
                 aria-label="Previous testimonial"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-5 h-5 md:w-6 md:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -250,11 +250,11 @@ export default function Testimonials() {
               {/* Next Button */}
               <button
                 onClick={nextSlide}
-                className="absolute right-0 md:-right-12 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-oxford-blue/80 backdrop-blur-sm border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="absolute right-2 md:-right-12 top-1/2 -translate-y-1/2 z-10 p-2 md:p-3 rounded-full bg-oxford-blue/80 backdrop-blur-sm border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-all duration-300 shadow-lg hover:shadow-xl min-w-[44px] min-h-[44px] flex items-center justify-center"
                 aria-label="Next testimonial"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-5 h-5 md:w-6 md:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

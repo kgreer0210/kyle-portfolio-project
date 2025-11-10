@@ -137,19 +137,19 @@ export default function Contact() {
   return (
     <motion.section
       id="contact"
-      className="py-20"
+      className="py-12 md:py-20"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.div
-        className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue p-8 rounded-2xl shadow-xl max-w-3xl mx-auto"
+        className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl max-w-3xl mx-auto"
         whileHover={{ scale: 1.01 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <motion.h2
-          className="text-3xl font-bold text-text-headings mb-6 drop-shadow-lg text-center"
+          className="text-2xl sm:text-3xl font-bold text-text-headings mb-4 md:mb-6 drop-shadow-lg text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -158,7 +158,7 @@ export default function Contact() {
           Let&apos;s Work Together
         </motion.h2>
         <motion.p
-          className="text-text-secondary text-lg mb-8 text-center"
+          className="text-text-secondary text-base sm:text-lg mb-6 md:mb-8 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -170,7 +170,7 @@ export default function Contact() {
           together.
         </motion.p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           {/* Name Field */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -180,7 +180,7 @@ export default function Contact() {
           >
             <label
               htmlFor="name"
-              className="block text-text-primary mb-2 font-medium"
+              className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
             >
               Name <span className="text-blue-ncs">*</span>
             </label>
@@ -190,7 +190,7 @@ export default function Contact() {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
               placeholder="Your name"
               disabled={isSubmitting}
             />
@@ -208,7 +208,7 @@ export default function Contact() {
           >
             <label
               htmlFor="email"
-              className="block text-text-primary mb-2 font-medium"
+              className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
             >
               Email <span className="text-blue-ncs">*</span>
             </label>
@@ -218,7 +218,7 @@ export default function Contact() {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
               placeholder="your.email@example.com"
               disabled={isSubmitting}
             />
@@ -236,7 +236,7 @@ export default function Contact() {
           >
             <label
               htmlFor="subject"
-              className="block text-text-primary mb-2 font-medium"
+              className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
             >
               Subject <span className="text-blue-ncs">*</span>
             </label>
@@ -246,7 +246,7 @@ export default function Contact() {
               name="subject"
               value={formData.subject}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
               placeholder="What's this about?"
               disabled={isSubmitting}
             />
@@ -264,7 +264,7 @@ export default function Contact() {
           >
             <label
               htmlFor="message"
-              className="block text-text-primary mb-2 font-medium"
+              className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
             >
               Message <span className="text-blue-ncs">*</span>
             </label>
@@ -274,7 +274,7 @@ export default function Contact() {
               value={formData.message}
               onChange={handleInputChange}
               rows={6}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 resize-y"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 resize-y text-base"
               placeholder="Tell me about your project..."
               disabled={isSubmitting}
             />
@@ -308,7 +308,7 @@ export default function Contact() {
             <motion.button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-[44px]"
               whileHover={!isSubmitting ? { scale: 1.05, y: -3 } : {}}
               whileTap={!isSubmitting ? { scale: 0.95 } : {}}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}

@@ -21,19 +21,19 @@ export default function About() {
   return (
     <motion.section
       id="about"
-      className="py-20 mb-20"
+      className="py-12 md:py-20 mb-12 md:mb-20"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true, margin: "-100px" }}
     >
       <motion.div
-        className="card p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl"
+        className="card p-4 sm:p-6 md:p-8 rounded-2xl bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue shadow-xl"
         whileHover={{ scale: 1.02, y: -5 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <motion.h2
-          className="text-3xl font-bold text-text-headings mb-6"
+          className="text-2xl sm:text-3xl font-bold text-text-headings mb-4 md:mb-6"
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -43,13 +43,13 @@ export default function About() {
         </motion.h2>
 
         <motion.div
-          className="space-y-6 mb-8"
+          className="space-y-4 md:space-y-6 mb-6 md:mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             Running a business in Middle Georgia is demanding. You&apos;re an
             expert in your field, but maybe the digital side of things feels
             like a whole other job you didn&apos;t sign up for. You know you
@@ -58,7 +58,7 @@ export default function About() {
             streamlines your operations.
           </p>
 
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             That&apos;s where I come in. My name is Kyle, and I run a software
             consulting business focused on helping businesses like yours succeed
             through custom software development, automation solutions, and
@@ -68,7 +68,7 @@ export default function About() {
             business.
           </p>
 
-          <p className="text-text-primary text-lg leading-relaxed">
+          <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             Whether you need a custom web application, automation to streamline
             repetitive tasks, or mobile app development, I approach every
             project with a focus on solving real problems. We&apos;ll start by
@@ -79,7 +79,7 @@ export default function About() {
         </motion.div>
 
         <motion.h3
-          className="text-2xl font-semibold text-blue-ncs mb-4"
+          className="text-xl sm:text-2xl font-semibold text-blue-ncs mb-3 md:mb-4"
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -89,7 +89,7 @@ export default function About() {
         </motion.h3>
 
         <motion.p
-          className="text-text-primary text-lg leading-relaxed mb-6"
+          className="text-text-primary text-base sm:text-lg leading-relaxed mb-4 md:mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
@@ -99,14 +99,14 @@ export default function About() {
         </motion.p>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
         >
           <motion.div
-            className="text-center p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
+            className="text-center p-3 sm:p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.05, y: -5 }}
@@ -114,17 +114,17 @@ export default function About() {
             viewport={{ once: true }}
           >
             <motion.h4
-              className="text-xl font-semibold text-blue-ncs mb-2"
+              className="text-lg sm:text-xl font-semibold text-blue-ncs mb-2"
               whileHover={{ scale: 1.1 }}
             >
               Web Development
             </motion.h4>
-            <p className="text-text-secondary text-sm">
+            <p className="text-text-secondary text-xs sm:text-sm">
               Custom websites and web applications built to drive results
             </p>
           </motion.div>
           <motion.div
-            className="text-center p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
+            className="text-center p-3 sm:p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.05, y: -5 }}
@@ -132,17 +132,17 @@ export default function About() {
             viewport={{ once: true }}
           >
             <motion.h4
-              className="text-xl font-semibold text-blue-ncs mb-2"
+              className="text-lg sm:text-xl font-semibold text-blue-ncs mb-2"
               whileHover={{ scale: 1.1 }}
             >
               App Development
             </motion.h4>
-            <p className="text-text-secondary text-sm">
+            <p className="text-text-secondary text-xs sm:text-sm">
               Mobile and desktop applications that solve real business problems
             </p>
           </motion.div>
           <motion.div
-            className="text-center p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
+            className="text-center p-3 sm:p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.05, y: -5 }}
@@ -150,19 +150,19 @@ export default function About() {
             viewport={{ once: true }}
           >
             <motion.h4
-              className="text-xl font-semibold text-blue-ncs mb-2"
+              className="text-lg sm:text-xl font-semibold text-blue-ncs mb-2"
               whileHover={{ scale: 1.1 }}
             >
               Automation Consulting
             </motion.h4>
-            <p className="text-text-secondary text-sm">
+            <p className="text-text-secondary text-xs sm:text-sm">
               Identify and automate repetitive processes to save time and money
             </p>
           </motion.div>
         </motion.div>
 
         <motion.h3
-          className="text-2xl font-semibold text-blue-ncs mb-4"
+          className="text-xl sm:text-2xl font-semibold text-blue-ncs mb-3 md:mb-4"
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
@@ -172,7 +172,7 @@ export default function About() {
         </motion.h3>
 
         <motion.p
-          className="text-text-primary text-lg leading-relaxed mb-6"
+          className="text-text-primary text-base sm:text-lg leading-relaxed mb-4 md:mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.3 }}
@@ -183,7 +183,7 @@ export default function About() {
         </motion.p>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
@@ -192,7 +192,7 @@ export default function About() {
           {skills.map((skill, index) => (
             <motion.div
               key={skill.title}
-              className="text-center p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
+              className="text-center p-3 sm:p-4 rounded-2xl bg-rich-black/30 backdrop-blur-sm"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05, y: -5 }}
@@ -203,18 +203,18 @@ export default function About() {
               viewport={{ once: true }}
             >
               <motion.h3
-                className="text-xl font-semibold text-blue-ncs mb-2"
+                className="text-lg sm:text-xl font-semibold text-blue-ncs mb-2"
                 whileHover={{ scale: 1.1 }}
               >
                 {skill.title}
               </motion.h3>
-              <p className="text-text-secondary">{skill.skills}</p>
+              <p className="text-text-secondary text-sm sm:text-base">{skill.skills}</p>
             </motion.div>
           ))}
         </motion.div>
 
         <motion.p
-          className="text-text-primary text-lg leading-relaxed"
+          className="text-text-primary text-base sm:text-lg leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.6 }}

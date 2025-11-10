@@ -210,16 +210,16 @@ export default function BackendShowcasePage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-text-headings mb-4">
+        <div className="text-center px-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-headings mb-4">
             Backend Showcase Not Found
           </h1>
-          <p className="text-text-secondary mb-8">
+          <p className="text-text-secondary text-sm sm:text-base mb-8">
             The backend showcase for this project is not available yet.
           </p>
           <motion.a
             href="/"
-            className="btn-primary px-8 py-4 rounded-lg font-medium text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl inline-block min-h-[44px]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -264,10 +264,10 @@ export default function BackendShowcasePage() {
       {/* Content Layer */}
       <div className="relative z-10">
         {/* Back to Home Button */}
-        <div className="fixed top-6 left-6 z-20">
+        <div className="fixed top-4 left-4 sm:top-6 sm:left-6 z-20">
           <motion.a
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue text-text-primary rounded-lg hover:bg-penn-blue/70 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue text-text-primary rounded-lg hover:bg-penn-blue/70 transition-all duration-300 text-sm sm:text-base min-h-[44px]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -283,7 +283,8 @@ export default function BackendShowcasePage() {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Back to Home
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
           </motion.a>
         </div>
 

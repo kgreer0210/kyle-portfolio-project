@@ -75,7 +75,7 @@ export default function Home() {
         </div>
 
         {/* Main Content Sections */}
-        <main className="max-w-6xl mx-auto px-6 pointer-events-auto">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 pointer-events-auto">
           <About />
           <Projects />
           <Testimonials />
