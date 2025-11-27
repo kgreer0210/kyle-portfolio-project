@@ -34,7 +34,7 @@ export default function Projects() {
       id: "mise-ai",
       title: "Mise AI",
       description:
-        "A modern SaaS application that solves the eternal \"What's for dinner?\" problem. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.",
+        'A modern SaaS application that solves the eternal "What\'s for dinner?" problem. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
       image: "/mise-ai-screenshot.png",
       technologies: [
         "Next.js 16",
@@ -45,7 +45,7 @@ export default function Projects() {
         "Zustand",
         "Motion",
       ],
-      liveUrl: "https://recipe-gen-app.vercel.app/",
+      liveUrl: "https://mise-ai.app/",
       status: "completed",
       backendShowcase: {
         available: false,
@@ -223,18 +223,19 @@ export default function Projects() {
               {project.status && (
                 <div className="absolute top-2 right-2">
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${project.status === "completed"
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      project.status === "completed"
                         ? "bg-green-500/80 text-white"
                         : project.status === "in-progress"
-                          ? "bg-yellow-500/80 text-white"
-                          : "bg-blue-500/80 text-white"
-                      }`}
+                        ? "bg-yellow-500/80 text-white"
+                        : "bg-blue-500/80 text-white"
+                    }`}
                   >
                     {project.status === "in-progress"
                       ? "In Progress"
                       : project.status === "completed"
-                        ? "Completed"
-                        : "Planned"}
+                      ? "Completed"
+                      : "Planned"}
                   </span>
                 </div>
               )}
