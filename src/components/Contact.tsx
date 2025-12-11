@@ -33,6 +33,8 @@ export default function Contact() {
     message: string;
   }>({ type: null, message: "" });
 
+  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -110,7 +112,9 @@ export default function Contact() {
 
       setSubmitStatus({
         type: "success",
-        message: data.message || "Thank you for your message! I'll get back to you soon.",
+        message:
+          data.message ||
+          "Thank you for your message! I'll get back to you soon.",
       });
 
       // Reset form
@@ -164,13 +168,42 @@ export default function Contact() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Ready to take your business to the next level? Let&apos;s discuss how custom
-          software solutions, automation, or web development can help you achieve your
-          goals. I&apos;d love to hear about your project and explore how we can work
-          together.
+          Ready to take your business to the next level? You can{" "}
+          <a
+            href={consultLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
+          >
+            book a quick call
+          </a>{" "}
+          or send details through this form—whatever is easiest. I focus on
+          custom websites, web/mobile apps, and automations for local service
+          businesses.
         </motion.p>
 
-        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+        <motion.div
+          className="bg-rich-black/30 border border-blue-ncs/20 rounded-xl p-4 sm:p-5 mb-6 md:mb-8 text-text-primary text-sm sm:text-base"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <p className="font-semibold text-blue-ncs mb-2">What to include:</p>
+          <ul className="list-disc list-inside space-y-2 text-text-secondary">
+            <li>Your goal and the problem to solve</li>
+            <li>Timeline or launch window</li>
+            <li>Budget range and any must-have tools</li>
+          </ul>
+        </motion.div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 md:space-y-6"
+          // Prevent password managers (e.g., LastPass) from injecting extra DOM before hydration
+          data-lpignore="true"
+          autoComplete="off"
+        >
           {/* Name Field */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -284,7 +317,15 @@ export default function Contact() {
           </motion.div>
 
           {/* Honeypot Field - Hidden from users, visible to bots */}
-          <div style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }} aria-hidden="true">
+          <div
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+            aria-hidden="true"
+          >
             <label htmlFor="website">Website</label>
             <input
               type="text"

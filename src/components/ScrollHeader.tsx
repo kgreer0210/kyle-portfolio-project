@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, AnimatePresence } from "motion/react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ScrollHeader() {
@@ -39,13 +40,20 @@ export default function ScrollHeader() {
         <nav className="max-w-6xl mx-auto flex justify-between items-center px-4 md:px-6 py-3 md:py-4">
           <motion.button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="text-lg md:text-xl font-bold text-blue-ncs hover:text-text-primary transition-colors duration-300"
+            className="flex items-center text-lg md:text-xl font-bold text-blue-ncs hover:text-text-primary transition-colors duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            KYGR Solutions
+            <Image
+              src="/logo.svg"
+              alt="KYGR Solutions logo"
+              width={150}
+              height={150}
+              className="object-contain drop-shadow-sm"
+              priority
+            />
           </motion.button>
-          
+
           {/* Desktop Navigation */}
           <motion.div
             className="hidden md:flex gap-6"
@@ -124,7 +132,7 @@ export default function ScrollHeader() {
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
             />
-            
+
             {/* Menu Drawer */}
             <motion.div
               className="fixed top-0 right-0 h-full w-64 bg-oxford-blue/95 backdrop-blur-md border-l border-penn-blue z-50 md:hidden shadow-2xl"

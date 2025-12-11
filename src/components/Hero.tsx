@@ -3,12 +3,20 @@
 import { motion } from "motion/react";
 
 export default function Hero() {
+  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const serviceChips = [
+    "Conversion-focused websites",
+    "Web & mobile apps",
+    "Automation & integrations",
+  ];
 
   return (
     <motion.section
@@ -26,13 +34,23 @@ export default function Hero() {
       >
         {/* Name */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-7xl font-bold text-text-headings mb-6 md:mb-8 drop-shadow-lg px-2"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold text-text-headings mb-4 md:mb-5 drop-shadow-lg px-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           Kyle Greer
         </motion.h1>
+
+        <motion.p
+          className="text-lg sm:text-xl md:text-2xl text-blue-ncs font-semibold mb-4 md:mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          Websites, web & mobile apps, and automations for local service
+          businesses
+        </motion.p>
 
         {/* JSON Developer title */}
         <motion.div
@@ -90,15 +108,32 @@ export default function Hero() {
           </motion.pre>
         </motion.div>
 
+        {/* Quick service chips */}
+        <motion.div
+          className="flex flex-wrap justify-center gap-2 mb-6 md:mb-8 px-2"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+        >
+          {serviceChips.map((chip) => (
+            <span
+              key={chip}
+              className="px-3 py-2 rounded-full bg-penn-blue/60 text-text-primary text-xs sm:text-sm border border-blue-ncs/30"
+            >
+              {chip}
+            </span>
+          ))}
+        </motion.div>
+
         <motion.p
           className="text-base sm:text-lg md:text-xl text-text-secondary mb-6 md:mb-8 max-w-2xl mx-auto drop-shadow-md px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.8 }}
         >
-          Helping businesses grow through custom software solutions, automation
-          consulting, and modern web applications built with purpose and
-          excellence.
+          I help local service businesses convert more visitors, streamline
+          operations, and reclaim time with custom websites, modern web/mobile
+          apps, and practical automations.
         </motion.p>
       </motion.div>
 
@@ -109,15 +144,17 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 2.0 }}
       >
-        <motion.button
-          onClick={() => scrollToSection("projects")}
-          className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
+        <motion.a
+          href={consultLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto text-center"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          View My Work
-        </motion.button>
+          Book a 15-min call
+        </motion.a>
         <motion.button
           onClick={() => scrollToSection("contact")}
           className="btn-secondary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg border border-blue-ncs hover:bg-penn-blue hover:text-text-headings transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
@@ -125,7 +162,7 @@ export default function Hero() {
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          Get In Touch
+          Start with the contact form
         </motion.button>
       </motion.div>
 

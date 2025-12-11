@@ -16,6 +16,14 @@ export default function Testimonials() {
       ],
       company: "Lexis Fresh Slate Cleanings",
     },
+    {
+      id: 2,
+      name: "Service Business Owner",
+      role: "Owner",
+      quote:
+        "Short testimonial placeholder. Want to speak with a client? I can arrange an intro so you can hear about their results firsthand.",
+      company: "(New testimonial scheduling)",
+    },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -101,8 +109,9 @@ export default function Testimonials() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Don&apos;t just take my word for it. Here&apos;s what clients have to
-          say about working with me.
+          Don&apos;t just take my word for it. Here&apos;s what local service
+          businesses say about partnering together—more stories available on a
+          call if you want details.
         </motion.p>
       </motion.div>
 

@@ -20,6 +20,8 @@ interface Project {
   technologies: string[];
   liveUrl?: string;
   status?: "completed" | "in-progress" | "planned";
+  role?: string;
+  outcome?: string;
   backendShowcase?: {
     available: boolean;
     description: string;
@@ -47,6 +49,9 @@ export default function Projects() {
       ],
       liveUrl: "https://mise-ai.app/",
       status: "completed",
+      role: "Product design, UX, and full-stack development",
+      outcome:
+        "Reduces meal-planning friction with AI recipes, weekly planners, and smart grocery lists households actually use.",
       backendShowcase: {
         available: false,
         description: "",
@@ -69,6 +74,9 @@ export default function Projects() {
       ],
       liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
       status: "completed",
+      role: "Product discovery, UX/UI, and full-stack development",
+      outcome:
+        "Streamlined scheduling, client communication, and staff coordination for a growing cleaning company; less back-office busywork.",
       backendShowcase: {
         available: true,
         description:
@@ -258,6 +266,27 @@ export default function Projects() {
                   {project.description}
                 </motion.p>
               </motion.div>
+              {project.outcome && (
+                <motion.div
+                  className="mb-3 sm:mb-4 p-3 rounded-xl bg-rich-black/30 border border-blue-ncs/20 text-left"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <p className="text-blue-ncs text-xs sm:text-sm font-semibold mb-1">
+                    Outcome
+                  </p>
+                  <p className="text-text-primary text-sm sm:text-base leading-relaxed">
+                    {project.outcome}
+                  </p>
+                </motion.div>
+              )}
+              {project.role && (
+                <p className="text-text-secondary text-xs sm:text-sm mb-3 sm:mb-4">
+                  Role: {project.role}
+                </p>
+              )}
               <motion.div
                 className="flex flex-wrap gap-2 mb-3 sm:mb-4"
                 initial={{ opacity: 0, x: -20 }}
