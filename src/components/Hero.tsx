@@ -68,42 +68,13 @@ export default function Hero() {
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 1.0 }}
-            >
-              {"{ "}
-            </motion.span>
-            <motion.span
-              className="text-text-secondary"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 1.2 }}
-            >
-              title:
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 1.3 }}
-            >
-              {' "'}
-            </motion.span>
-            <motion.span
               className="text-lapis-lazuli font-semibold"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 1.4 }}
               whileHover={{ scale: 1.05 }}
             >
-              Software Consultant & Developer
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: 1.6 }}
-            >
-              {'" }'}
+              Owner and Developer for KYGR Solutions
             </motion.span>
           </motion.pre>
         </motion.div>
@@ -153,7 +124,7 @@ export default function Hero() {
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          Book a 15-min call
+          Book a 30-min call
         </motion.a>
         <motion.button
           onClick={() => scrollToSection("contact")}
@@ -162,7 +133,7 @@ export default function Hero() {
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          Start with the contact form
+          Send us an email
         </motion.button>
       </motion.div>
 

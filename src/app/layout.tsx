@@ -15,17 +15,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
   description:
-    "KYGR Solutions builds conversion-focused websites, web and mobile apps, and automations for local service businesses—helping them win more leads and streamline operations.",
+    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local service businesses—helping you win more leads, streamline operations, and reclaim time.",
   keywords: [
     "KYGR Solutions",
-    "local service businesses",
+    "local service business",
     "website development",
-    "web apps",
-    "mobile apps",
+    "web app",
+    "mobile app",
     "automation",
-    "integrations",
+    "integration",
     "Next.js",
-    "React",
     "TypeScript",
   ],
   authors: [{ name: "Kyle Greer" }],
