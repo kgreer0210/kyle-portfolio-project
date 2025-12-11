@@ -13,18 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kyle's Portfolio - Full Stack Developer",
+  title: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
   description:
-    "Portfolio of Kyle, a passionate full-stack developer specializing in modern web applications with React, Next.js, and TypeScript.",
+    "KYGR Solutions builds conversion-focused websites, web and mobile apps, and automations for local service businesses—helping them win more leads and streamline operations.",
   keywords: [
-    "portfolio",
-    "web developer",
-    "full stack",
-    "React",
+    "KYGR Solutions",
+    "local service businesses",
+    "website development",
+    "web apps",
+    "mobile apps",
+    "automation",
+    "integrations",
     "Next.js",
+    "React",
     "TypeScript",
   ],
-  authors: [{ name: "Kyle" }],
+  authors: [{ name: "Kyle Greer" }],
 };
 
 export const viewport: Viewport = {
