@@ -72,9 +72,9 @@ export default function ProjectDetailPage() {
               <h2 className="text-3xl font-bold text-text-headings mb-6">The Challenge & Role</h2>
               <div className="text-lg text-text-primary space-y-4">
                 <p>Role: {project.role}</p>
-                <p>
-                  As the primary developer on this project, I was responsible for transforming the client&apos;s vision into a high-performance digital solution. The main challenge was to create a system that was both powerful for the business owner and intuitive for the end-users.
-                </p>
+                {project.challenge && (
+                  <p>{project.challenge}</p>
+                )}
               </div>
             </section>
 

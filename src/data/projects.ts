@@ -5,7 +5,7 @@ export const projects: Project[] = [
     id: "mise-ai",
     title: "Mise AI",
     description:
-      'A modern SaaS application that solves the eternal "What\'s for dinner?" problem. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
+      'A modern SaaS application built to solve the eternal "What\'s for dinner?" problem for my household. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
     image: "/mise-ai-screenshot.png",
     technologies: [
       "Next.js 16",
@@ -19,6 +19,8 @@ export const projects: Project[] = [
     liveUrl: "https://mise-ai.app/",
     status: "completed",
     role: "Product design, UX, and full-stack development",
+    challenge:
+      "Built out of a personal desire to see an actual AI recipe generation app that did exactly what my wife and I needed. The challenge was to create a seamless flow from AI inspiration to a practical, organized grocery list that actually works for a busy household.",
     outcome:
       "Reduces meal-planning friction with AI recipes, weekly planners, and smart grocery lists households actually use.",
     backendShowcase: {
@@ -44,6 +46,8 @@ export const projects: Project[] = [
     liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
     status: "completed",
     role: "Product discovery, UX/UI, and full-stack development",
+    challenge:
+      "As the primary developer on this project, I was responsible for transforming the client's vision into a high-performance digital solution. The main challenge was to create a system that was both powerful for the business owner and intuitive for the end-users.",
     outcome:
       "Streamlined scheduling, client communication, and staff coordination for a growing cleaning company; less back-office busywork.",
     backendShowcase: {

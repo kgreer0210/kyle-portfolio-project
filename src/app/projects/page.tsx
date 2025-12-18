@@ -21,7 +21,7 @@ export default function ProjectsPage() {
             Case <span className="text-blue-ncs">Studies</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
-            A look at the strategic solutions I&apos;ve built to help local businesses streamline operations and grow.
+            A look at the strategic solutions I&apos;ve built, from personal passion projects to business tools that streamline operations.
           </p>
         </motion.div>
 

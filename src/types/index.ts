@@ -15,6 +15,7 @@ export interface Project {
   liveUrl?: string;
   status?: "completed" | "in-progress" | "planned";
   role?: string;
+  challenge?: string;
   outcome?: string;
   backendShowcase?: {
     available: boolean;
