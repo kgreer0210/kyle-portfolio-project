@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { navItems } from "../data/navigation";
 
@@ -27,8 +28,8 @@ export default function Header() {
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-rich-black/80 backdrop-blur-md border-b border-penn-blue py-3 md:py-4" 
+        isScrolled
+          ? "bg-rich-black/80 backdrop-blur-md border-b border-penn-blue py-3 md:py-4"
           : "bg-transparent py-4 md:py-6"
       }`}
       initial={{ y: -100, opacity: 0 }}
@@ -36,15 +37,23 @@ export default function Header() {
       transition={{ duration: 0.6 }}
     >
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center">
-        <Link href="/">
-          <motion.h1
-            className="text-xl md:text-2xl font-bold text-blue-ncs cursor-pointer"
+        <Link href="/" className="flex items-center">
+          <motion.div
+            className="cursor-pointer"
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            KYGR Solutions
-          </motion.h1>
+            <Image
+              src="/logo.svg"
+              alt="KYGR Solutions Logo"
+              width={282}
+              height={120}
+              className="w-auto h-12 md:h-[60px] brightness-0 invert"
+              priority
+            />
+          </motion.div>
         </Link>
-        
+
         {/* Desktop Navigation */}
         <div className="hidden md:flex gap-8 items-center">
           {navItems.map((item) => (
@@ -114,7 +123,7 @@ export default function Header() {
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
             />
-            
+
             <motion.div
               className="fixed top-0 right-0 h-full w-72 bg-oxford-blue/95 backdrop-blur-xl border-l border-penn-blue z-50 md:hidden shadow-2xl"
               initial={{ x: "100%" }}
@@ -127,7 +136,9 @@ export default function Header() {
                   <Link key={item.href} href={item.href}>
                     <motion.span
                       className={`text-xl font-semibold block py-2 ${
-                        pathname === item.href ? "text-blue-ncs" : "text-text-primary"
+                        pathname === item.href
+                          ? "text-blue-ncs"
+                          : "text-text-primary"
                       }`}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
