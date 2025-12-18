@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Particles from "../Particles/Particles";
+import { Header, Footer, BackToTop } from "../components";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,10 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
   description:
-    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local service businesses—helping you win more leads, streamline operations, and reclaim time.",
+    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local businesses—helping you win more leads, streamline operations, and reclaim time.",
   keywords: [
     "KYGR Solutions",
-    "local service business",
+    "local business",
     "website development",
     "web app",
     "mobile app",
@@ -41,11 +43,43 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-rich-black text-text-primary min-h-screen relative`}
       >
-        {children}
+        {/* Animated Particles Background */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <Particles
+            particleCount={1000}
+            particleSpread={22}
+            speed={1}
+            particleColors={[
+              "#0094c6", // blue-ncs (main accent)
+              "#005e7c", // lapis-lazuli (secondary accent)
+              "#001242", // penn-blue (subtle)
+              "#e0e6f0", // text-primary (subtle white)
+              "#a8b2d1", // text-secondary (muted)
+            ]}
+            moveParticlesOnHover={true}
+            particleHoverFactor={1}
+            alphaParticles={true}
+            particleBaseSize={500}
+            sizeRandomness={0.8}
+            cameraDistance={25}
+            disableRotation={true}
+            className="opacity-50 pointer-events-auto"
+          />
+        </div>
+
+        <Header />
+        
+        {/* Main Content */}
+        <div className="relative z-10">
+          {children}
+          <Footer />
+        </div>
+
+        <BackToTop />
       </body>
     </html>
   );

@@ -22,8 +22,7 @@ export default function Footer() {
           viewport={{ once: true }}
           whileHover={{ color: "#e0e6f0" }}
         >
-          © {currentYear} Kyle&apos;s Portfolio. Built with Next.js, Motion, and
-          Tailwind CSS.
+          © {currentYear} KYGR Solutions
         </motion.p>
         <motion.div
           className="flex justify-center mt-3 sm:mt-4"
@@ -36,7 +35,7 @@ export default function Footer() {
             href="https://www.linkedin.com/in/kyle-greer-9201a3115/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}

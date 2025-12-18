@@ -1,16 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
 
 export default function Hero() {
   const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   const serviceChips = [
     "Conversion-focused websites",
@@ -20,26 +14,26 @@ export default function Hero() {
 
   return (
     <motion.section
-      className="min-h-screen flex flex-col justify-center items-center text-center px-4 sm:px-6"
+      className="min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-32 pb-20"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
     >
       {/* Main heading section */}
       <motion.div
-        className="flex-1 flex flex-col justify-center items-center w-full"
+        className="flex flex-col justify-center items-center w-full mb-12"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
-        {/* Name */}
+        {/* Company Name */}
         <motion.h1
           className="text-4xl sm:text-5xl md:text-7xl font-bold text-text-headings mb-4 md:mb-5 drop-shadow-lg px-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          Kyle Greer
+          KYGR Solutions
         </motion.h1>
 
         <motion.p
@@ -48,11 +42,10 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          Websites, web & mobile apps, and automations for local service
-          businesses
+          Websites, web & mobile apps, and automations for local businesses
         </motion.p>
 
-        {/* JSON Developer title */}
+        {/* Strategic Tagline */}
         <motion.div
           className="mb-6 md:mb-8 w-full px-2 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
@@ -74,7 +67,7 @@ export default function Hero() {
               transition={{ duration: 0.3, delay: 1.4 }}
               whileHover={{ scale: 1.05 }}
             >
-              Owner and Developer for KYGR Solutions
+              Strategic Software & Automation Partner
             </motion.span>
           </motion.pre>
         </motion.div>
@@ -102,9 +95,9 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.8 }}
         >
-          I help local service businesses convert more visitors, streamline
-          operations, and reclaim time with custom websites, modern web/mobile
-          apps, and practical automations.
+          We help local businesses convert more visitors, streamline operations,
+          and reclaim time with custom websites, modern web/mobile apps, and
+          practical automations.
         </motion.p>
       </motion.div>
 
@@ -115,46 +108,31 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 2.0 }}
       >
-        <motion.a
+        <Link
           href={consultLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto text-center"
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="w-full sm:w-auto"
         >
-          Book a 30-min call
-        </motion.a>
-        <motion.button
-          onClick={() => scrollToSection("contact")}
-          className="btn-secondary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg border border-blue-ncs hover:bg-penn-blue hover:text-text-headings transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        >
-          Send us an email
-        </motion.button>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 2.2 }}
-      >
-        <motion.div
-          className="w-6 h-10 border-2 border-blue-ncs rounded-full flex justify-center"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <motion.div
-            className="w-1 h-3 bg-blue-ncs rounded-full mt-2"
-            animate={{ opacity: [1, 0, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
+          <motion.button
+            className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-blue-ncs text-white rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl text-center"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            Book a 30-min call
+          </motion.button>
+        </Link>
+        <Link href="/contact" className="w-full sm:w-auto">
+          <motion.button
+            className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-blue-ncs text-blue-ncs hover:bg-penn-blue hover:text-white rounded-lg font-medium text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            Send us an email
+          </motion.button>
+        </Link>
       </motion.div>
     </motion.section>
   );

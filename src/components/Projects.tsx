@@ -2,164 +2,9 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
-
-// Define the project data structure
-interface Screenshot {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  features: string[];
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  technologies: string[];
-  liveUrl?: string;
-  status?: "completed" | "in-progress" | "planned";
-  role?: string;
-  outcome?: string;
-  backendShowcase?: {
-    available: boolean;
-    description: string;
-    screenshots: Screenshot[];
-  };
-}
+import { projects } from "../data/projects";
 
 export default function Projects() {
-  // Replace this array with your actual project data
-  const projects: Project[] = [
-    {
-      id: "mise-ai",
-      title: "Mise AI",
-      description:
-        'A modern SaaS application that solves the eternal "What\'s for dinner?" problem. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
-      image: "/mise-ai-screenshot.png",
-      technologies: [
-        "Next.js 16",
-        "TypeScript",
-        "Tailwind CSS",
-        "Supabase",
-        "OpenAI API",
-        "Zustand",
-        "Motion",
-      ],
-      liveUrl: "https://mise-ai.app/",
-      status: "completed",
-      role: "Product design, UX, and full-stack development",
-      outcome:
-        "Reduces meal-planning friction with AI recipes, weekly planners, and smart grocery lists households actually use.",
-      backendShowcase: {
-        available: false,
-        description: "",
-        screenshots: [],
-      },
-    },
-    {
-      id: "lexisFreshSlateCleanings",
-      title: "Lexis Fresh Slate Cleanings",
-      description:
-        "A comprehensive web application for a local cleaning company featuring customer and employee portals, an admin dashboard with service management, booking system, staff scheduling, client management, estimate requests, and automated SMS reminders.",
-      image: "/lexisFreshSlateCleaningsScreenshot.png",
-      technologies: [
-        "Next.js",
-        "Tailwind CSS",
-        "Vercel",
-        "React",
-        "TypeScript",
-        "Convex",
-      ],
-      liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
-      status: "completed",
-      role: "Product discovery, UX/UI, and full-stack development",
-      outcome:
-        "Streamlined scheduling, client communication, and staff coordination for a growing cleaning company; less back-office busywork.",
-      backendShowcase: {
-        available: true,
-        description:
-          "Backend architecture for Lexis Fresh Slate Cleanings, showcasing service management, booking system, staff management, and customer portal.",
-        screenshots: [
-          {
-            id: "service-management",
-            title: "Service Management Dashboard",
-            description:
-              "Comprehensive interface for managing cleaning services, pricing, and availability.",
-            image:
-              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/01-service-management-dashboard.png",
-            features: [
-              "Service category management",
-              "Pricing adjustments",
-              "Availability controls",
-              "Bulk operations",
-              "Analytics",
-            ],
-          },
-          {
-            id: "booking-interface",
-            title: "Customer Booking Interface",
-            description:
-              "Intuitive interface for customers to book cleaning services and view their history.",
-            image:
-              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/02-booking-interface.png",
-            features: [
-              "Real-time booking availability",
-              "Customer booking history",
-              "Service customization options",
-              "Payment processing",
-            ],
-          },
-          {
-            id: "staff-management",
-            title: "Staff Management Dashboard",
-            description:
-              "Complete staff scheduling and management system with performance tracking.",
-            image:
-              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/03-staff-management-dashboard.png",
-            features: [
-              "Staff scheduling",
-              "Performance metrics",
-              "Task assignment",
-              "Time tracking",
-              "Communication tools",
-            ],
-          },
-          {
-            id: "inventory-tracking",
-            title: "Inventory & Equipment Tracking",
-            description:
-              "Real-time inventory management for cleaning supplies and equipment maintenance.",
-            image:
-              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/04-inventory-tracking.png",
-            features: [
-              "Supply inventory tracking",
-              "Equipment maintenance scheduling",
-              "Low stock alerts",
-              "Vendor management",
-              "Usage analytics",
-            ],
-          },
-          {
-            id: "customer-portal",
-            title: "Customer Management Portal",
-            description:
-              "Comprehensive customer relationship management with booking history and preferences.",
-            image:
-              "/projects/lexis-fresh-slate-cleanings/backend-screenshots/05-customer-portal.png",
-            features: [
-              "Customer profiles",
-              "Booking history",
-              "Service preferences",
-              "Communication logs",
-              "Satisfaction tracking",
-            ],
-          },
-        ],
-      },
-    },
-  ];
 
   return (
     <motion.section
@@ -329,7 +174,7 @@ export default function Projects() {
                 {project.backendShowcase &&
                   project.backendShowcase.available && (
                     <motion.a
-                      href={`/projects/${project.id}/backend`}
+                      href={`/projects/${project.id}`}
                       className="text-blue-ncs hover:text-lapis-lazuli transition-colors duration-300 font-medium text-sm sm:text-base py-2 sm:py-0"
                       whileHover={{ scale: 1.1, x: 5 }}
                       whileTap={{ scale: 0.95 }}

@@ -1,61 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
+import { services, skills, processSteps } from "../data/services";
 
 export default function About() {
-  const skills = [
-    {
-      title: "Frontend",
-      skills: "React, Next.js, TypeScript, Tailwind CSS",
-    },
-    {
-      title: "Backend",
-      skills: "Node.js, Express, PostgreSQL, Vite",
-    },
-    {
-      title: "Infrastructure & Tools",
-      skills: "Git, Docker, Vercel, Supabase, Convex",
-    },
-  ];
-
-  const servicesAtGlance = [
-    {
-      title: "Website Development",
-      points: [
-        "Conversion-focused marketing sites that capture local leads",
-        "Clear offers, fast load times, and easy editing",
-      ],
-    },
-    {
-      title: "Web & Mobile Apps",
-      points: [
-        "Customer and staff portals that streamline service delivery",
-        "Mobile-friendly experiences for teams and clients on the go",
-      ],
-    },
-    {
-      title: "Automation & Integrations",
-      points: [
-        "Remove manual busywork with workflows and integrations",
-        "Fewer errors, faster handoffs, and better visibility",
-      ],
-    },
-  ];
-
-  const processSteps = [
-    {
-      title: "Assess",
-      detail: "Understand your goals, bottlenecks, and the outcomes you want.",
-    },
-    {
-      title: "Build",
-      detail: "Design and develop the site/app/automation with clear milestones.",
-    },
-    {
-      title: "Launch & Optimize",
-      detail: "Deploy, measure, and tune so it keeps delivering results.",
-    },
-  ];
 
   return (
     <motion.section
@@ -88,7 +36,7 @@ export default function About() {
           transition={{ duration: 0.6, delay: 0.25 }}
           viewport={{ once: true }}
         >
-          I build conversion-focused websites, web & mobile apps, and automations for local service businesses.
+          I build conversion-focused websites, web & mobile apps, and automations for local businesses.
         </motion.p>
 
         <motion.div
@@ -98,7 +46,7 @@ export default function About() {
           transition={{ duration: 0.7, delay: 0.3 }}
           viewport={{ once: true }}
         >
-          {servicesAtGlance.map((service, index) => (
+          {services.map((service, index) => (
             <motion.div
               key={service.title}
               className="p-4 rounded-2xl bg-rich-black/40 border border-blue-ncs/20 shadow-md h-full"
@@ -128,7 +76,7 @@ export default function About() {
           viewport={{ once: true }}
         >
           <p className="text-text-primary text-base sm:text-lg leading-relaxed">
-            Running a service business in Middle Georgia is demanding. You need
+            Running a business in Middle Georgia is demanding. You need
             digital tools that win more local leads, keep clients informed, and
             remove manual work. I focus on outcomes first, not just a pretty
             site.
@@ -137,7 +85,7 @@ export default function About() {
           <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             I run a software consulting business focused on building
             conversion-focused websites, modern web/mobile applications, and
-            automation solutions for local service companies. I build with
+            automation solutions for local businesses. I build with
             integrity and clarity so your digital tools feel like reliable
             employees working 24/7.
           </p>

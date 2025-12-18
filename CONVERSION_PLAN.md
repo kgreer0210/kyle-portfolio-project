@@ -1,17 +1,19 @@
 # Portfolio to Business Site Conversion Plan
 
 ## Overview
+
 This document outlines the tasks required to convert the current single-page portfolio site into a robust multi-page business website with dedicated pages for different services, projects, and content areas.
 
 ## Phase 1: Project Architecture & Structure
 
 ### 1.1 Create New Page Routes
+
 - [ ] Create `/about` page route (move About section from home)
   - Serve as detailed business/personal background
   - Extended services and expertise breakdown
   - Team information (if applicable)
-- [ ] Create `/services` or `/solutions` page route
-  - Dedicated services/solutions listing
+- [ ] Create `/services` page route
+  - Dedicated services listing
   - Service descriptions with detailed information
   - Service-specific CTAs
   - Pricing information (optional)
@@ -35,6 +37,7 @@ This document outlines the tasks required to convert the current single-page por
   - Cookie policy
 
 ### 1.2 Update Routing Structure
+
 - [ ] Create a navigation data structure (constants/navigation.ts)
   - Define all main routes and subroutes
   - Configure breadcrumb generation
@@ -44,6 +47,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 2: Navigation & Layout
 
 ### 2.1 Update Navigation Components
+
 - [ ] Refactor Header component for multi-page navigation
   - Replace scroll-link navigation with route-based links
   - Keep mobile hamburger menu
@@ -58,6 +62,7 @@ This document outlines the tasks required to convert the current single-page por
   - Or adapt as a fixed header component
 
 ### 2.2 Create Layout Hierarchy
+
 - [ ] Create `/projects/layout.tsx` for project pages
 - [ ] Create `/contact/layout.tsx` if needed
 - [ ] Update root `layout.tsx` with consistent header/footer
@@ -66,6 +71,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 3: Page Implementation
 
 ### 3.1 Home Page (/)
+
 - [ ] Refactor to serve as landing/business entry point
   - Keep Hero section (possibly simplified)
   - Add value proposition section
@@ -75,6 +81,7 @@ This document outlines the tasks required to convert the current single-page por
   - Keep Contact CTA
 
 ### 3.2 About Page (/about)
+
 - [ ] Move About section from home page
 - [ ] Expand with additional content:
   - Detailed background/story
@@ -84,7 +91,8 @@ This document outlines the tasks required to convert the current single-page por
   - Skills matrix or expertise areas
 - [ ] Add professional headshot or hero image
 
-### 3.3 Services/Solutions Page (/services)
+### 3.3 Services Page (/services)
+
 - [ ] Extract services from About section
 - [ ] Create detailed service cards with:
   - Service description
@@ -95,6 +103,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Add comparison table for service tiers (if applicable)
 
 ### 3.4 Projects/Portfolio Page (/projects)
+
 - [ ] Create projects listing/grid
   - Filter by project type/category
   - Search functionality (optional)
@@ -109,6 +118,7 @@ This document outlines the tasks required to convert the current single-page por
   - Call-to-action for similar projects
 
 ### 3.5 Contact Page (/contact)
+
 - [ ] Move contact form to dedicated page
 - [ ] Expand with:
   - Contact information (email, phone, address)
@@ -119,6 +129,7 @@ This document outlines the tasks required to convert the current single-page por
   - FAQ section (optional)
 
 ### 3.6 Project Detail Pages (/projects/[projectId])
+
 - [ ] Expand current backend showcase pages
   - Add project overview section
   - Add project challenge/solution section
@@ -130,6 +141,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 4: Content Management & Data Structure
 
 ### 4.1 Create Data Models
+
 - [ ] Define TypeScript interfaces for:
   - `Project` type with all project fields
   - `Service` type with service details
@@ -138,6 +150,7 @@ This document outlines the tasks required to convert the current single-page por
   - `BlogPost` type (if applicable)
 
 ### 4.2 Move Content to Data Files
+
 - [ ] Create `data/projects.ts` with project definitions
   - Extract current projects from components
   - Add new projects to the list
@@ -146,6 +159,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Create `data/team.ts` if team page is needed
 
 ### 4.3 Database/CMS Consideration (Optional)
+
 - [ ] Evaluate need for database/CMS for dynamic content
   - Could use Sanity, Strapi, or Contentful
   - Or keep content in TypeScript files for now
@@ -154,6 +168,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 5: Component Refactoring
 
 ### 5.1 Extract Home Page Sections
+
 - [ ] Extract current About component
 - [ ] Extract current Projects component
 - [ ] Extract current Testimonials component
@@ -161,6 +176,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Create new Home-specific components for landing page
 
 ### 5.2 Create New Components
+
 - [ ] `ProjectCard` - Reusable project card component
 - [ ] `ProjectDetail` - Full project detail view
 - [ ] `ServiceCard` - Reusable service card component
@@ -170,6 +186,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] `SideNavigation` - Side navigation for complex pages (optional)
 
 ### 5.3 Shared Components
+
 - [ ] Ensure Header, Footer work across all pages
 - [ ] Create shared layout wrappers
 - [ ] Update BackToTop to work on all pages
@@ -178,11 +195,13 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 6: Styling & Design Updates
 
 ### 6.1 Typography & Spacing
+
 - [ ] Create page heading styles (h1-h6 consistency)
 - [ ] Define spacing system for new pages
 - [ ] Create container/max-width classes
 
 ### 6.2 Page-Specific Styling
+
 - [ ] Style About page
 - [ ] Style Services page
 - [ ] Style Projects page and project detail pages
@@ -190,6 +209,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Ensure consistent color and design language across pages
 
 ### 6.3 Responsive Design
+
 - [ ] Test all new pages on mobile, tablet, desktop
 - [ ] Ensure hamburger menu works on all pages
 - [ ] Adjust layout for different screen sizes
@@ -197,16 +217,19 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 7: Functionality & Features
 
 ### 7.1 Search & Filtering
+
 - [ ] Add search functionality to projects page
 - [ ] Add category/technology filter to projects
 - [ ] Add sorting options (date, name, complexity, etc.)
 
 ### 7.2 Related Content
+
 - [ ] Implement related projects carousel
 - [ ] Show related services on project detail pages
 - [ ] Add "See more" suggestions
 
 ### 7.3 Contact Form Enhancement
+
 - [ ] Keep existing rate limiting and validation
 - [ ] Add form field for service interest
 - [ ] Add project type field
@@ -215,6 +238,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 8: SEO & Performance
 
 ### 8.1 SEO Optimization
+
 - [ ] Update metadata for each new page
   - Title tags
   - Meta descriptions
@@ -225,6 +249,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Ensure proper heading hierarchy on all pages
 
 ### 8.2 Performance
+
 - [ ] Optimize images for new pages
 - [ ] Lazy load images where appropriate
 - [ ] Consider code splitting for new pages
@@ -232,6 +257,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Test Core Web Vitals
 
 ### 8.3 Analytics
+
 - [ ] Update Google Analytics to track new pages
 - [ ] Add event tracking for CTAs
 - [ ] Monitor user flow through new pages
@@ -239,6 +265,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 9: Testing & Quality Assurance
 
 ### 9.1 Functional Testing
+
 - [ ] Test all navigation links across all pages
 - [ ] Test forms submission (contact form)
 - [ ] Test dynamic routes and parameters
@@ -246,11 +273,13 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Test mobile responsiveness on all pages
 
 ### 9.2 Browser Testing
+
 - [ ] Test on Chrome, Firefox, Safari, Edge
 - [ ] Test on various device sizes
 - [ ] Test on slow network speeds
 
 ### 9.3 Accessibility
+
 - [ ] Ensure WCAG 2.1 AA compliance
 - [ ] Test keyboard navigation
 - [ ] Test screen reader compatibility
@@ -259,12 +288,14 @@ This document outlines the tasks required to convert the current single-page por
 ## Phase 10: Deployment & Migration
 
 ### 10.1 Pre-Deployment
+
 - [ ] Set up 301 redirects for old URLs (if applicable)
 - [ ] Ensure all environment variables are configured
 - [ ] Run full build and test
 - [ ] Create deployment checklist
 
 ### 10.2 Deployment
+
 - [ ] Deploy to staging environment
 - [ ] Run smoke tests on staging
 - [ ] Get stakeholder approval
@@ -272,6 +303,7 @@ This document outlines the tasks required to convert the current single-page por
 - [ ] Monitor for errors post-deployment
 
 ### 10.3 Post-Deployment
+
 - [ ] Monitor analytics for unusual patterns
 - [ ] Collect user feedback
 - [ ] Fix any reported issues
@@ -293,6 +325,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Dependencies & Considerations
 
 ### Technology Stack (Keep Existing)
+
 - Next.js 16 with App Router
 - React 19
 - TypeScript
@@ -301,6 +334,7 @@ This document outlines the tasks required to convert the current single-page por
 - Resend for email
 
 ### New Considerations
+
 - Choose between static data files vs. database
 - Decide on pagination strategy for projects
 - Plan for future content growth
@@ -321,6 +355,7 @@ This document outlines the tasks required to convert the current single-page por
 ## Timeline Recommendations (by priority, not duration)
 
 ### High Priority (Core Business Site)
+
 1. Create `/services` page
 2. Create `/projects` page and project details
 3. Refactor home page as landing page
@@ -328,6 +363,7 @@ This document outlines the tasks required to convert the current single-page por
 5. Move `/contact` to dedicated page
 
 ### Medium Priority (User Experience)
+
 6. Add search/filtering to projects
 7. Update navigation system
 8. SEO optimization
@@ -335,6 +371,7 @@ This document outlines the tasks required to convert the current single-page por
 10. Responsive design testing
 
 ### Low Priority (Nice-to-Have)
+
 11. Blog/resources section
 12. Admin dashboard
 13. Additional filtering options

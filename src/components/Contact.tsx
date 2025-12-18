@@ -280,7 +280,7 @@ export default function Contact() {
               value={formData.subject}
               onChange={handleInputChange}
               className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
-              placeholder="What's this about?"
+              placeholder="What&apos;s this about?"
               disabled={isSubmitting}
             />
             {errors.subject && (
