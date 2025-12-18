@@ -15,7 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
+  metadataBase: new URL("https://kygrsolutions.com"),
+  title: {
+    default: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
+    template: "%s | KYGR Solutions",
+  },
   description:
     "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local businesses—helping you win more leads, streamline operations, and reclaim time.",
   keywords: [
@@ -28,8 +32,52 @@ export const metadata: Metadata = {
     "integration",
     "Next.js",
     "TypeScript",
+    "software development",
+    "custom software",
   ],
   authors: [{ name: "Kyle Greer" }],
+  creator: "Kyle Greer",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://kygrsolutions.com",
+    siteName: "KYGR Solutions",
+    title: "KYGR Solutions | Custom Software for Local Businesses",
+    description:
+      "Helping local businesses grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
+    images: [
+      {
+        url: "/logo.png", // Ensure this path is correct or use a specific OG image
+        width: 1200,
+        height: 630,
+        alt: "KYGR Solutions Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KYGR Solutions | Custom Software for Local Businesses",
+    description:
+      "Helping local businesses grow through custom websites, apps, and automation.",
+    images: ["/logo.png"],
+    creator: "@kygrsolutions", // Replace with your actual handle if applicable
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -72,7 +120,7 @@ export default function RootLayout({
         </div>
 
         <Header />
-        
+
         {/* Main Content */}
         <div className="relative z-10">
           {children}
