@@ -88,7 +88,7 @@ export default function ServicesPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Request a Business Audit
+                Request a Free Consult
               </motion.button>
             </Link>
             <Link href="/projects">
