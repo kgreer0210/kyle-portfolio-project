@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | KYGR Solutions",
   },
   description:
-    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local businesses—helping you win more leads, streamline operations, and reclaim time.",
+    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local businesses in middle Georgia — helping you win more leads, streamline operations, and reclaim time.",
   keywords: [
     "KYGR Solutions",
     "local business",
@@ -34,6 +34,12 @@ export const metadata: Metadata = {
     "TypeScript",
     "software development",
     "custom software",
+    "Houston County",
+    "Bibb County",
+    "Middle Georgia",
+    "Macon",
+    "Warner Robins",
+    "Milledgeville",
   ],
   authors: [{ name: "Kyle Greer" }],
   creator: "Kyle Greer",
@@ -44,7 +50,7 @@ export const metadata: Metadata = {
     siteName: "KYGR Solutions",
     title: "KYGR Solutions | Custom Software for Local Businesses",
     description:
-      "Helping local businesses grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
+      "Helping local businesses in middle Georgia grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
     images: [
       {
         url: "/logo.png", // Ensure this path is correct or use a specific OG image
@@ -58,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KYGR Solutions | Custom Software for Local Businesses",
     description:
-      "Helping local businesses grow through custom websites, apps, and automation.",
+      "Helping local businesses in middle Georgia grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
     images: ["/logo.png"],
     creator: "@kygrsolutions", // Replace with your actual handle if applicable
   },
