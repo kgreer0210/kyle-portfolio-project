@@ -38,9 +38,6 @@ export default function ServicesClient() {
               viewport={{ once: true }}
             >
               <div className="flex-1">
-                <div className="inline-block px-4 py-1 rounded-full bg-blue-ncs/10 text-blue-ncs text-sm font-bold mb-4">
-                  Service 0{index + 1}
-                </div>
                 <h2 className="text-3xl font-bold text-text-headings mb-4">
                   {service.title}
                 </h2>
