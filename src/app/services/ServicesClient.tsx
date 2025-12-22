@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { Breadcrumb } from "../../components";
+import { Breadcrumb, ServiceIllustration } from "../../components";
 import { services } from "../../data/services";
 
 export default function ServicesClient() {
@@ -60,11 +60,12 @@ export default function ServicesClient() {
                 </ul>
               </div>
               <div className="flex-1 w-full flex justify-center items-center">
-                <div className="w-full aspect-square max-w-sm rounded-2xl bg-linear-to-br from-penn-blue/40 to-blue-ncs/10 border border-blue-ncs/20 flex items-center justify-center p-12">
-                  {/* Placeholder for service-specific illustration or icon */}
-                  <div className="text-blue-ncs/20 font-bold text-9xl opacity-20">
-                    {index === 0 ? "WEB" : index === 1 ? "APP" : "AUTO"}
-                  </div>
+                <div className="w-full aspect-square max-w-sm rounded-2xl bg-linear-to-br from-penn-blue/40 to-blue-ncs/10 border border-blue-ncs/20 flex items-center justify-center p-6 md:p-8">
+                  <ServiceIllustration
+                    type={
+                      index === 0 ? "web" : index === 1 ? "app" : "automation"
+                    }
+                  />
                 </div>
               </div>
             </motion.section>
@@ -106,4 +107,3 @@ export default function ServicesClient() {
     </main>
   );
 }
-

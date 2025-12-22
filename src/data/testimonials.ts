@@ -12,13 +12,4 @@ export const testimonials: Testimonial[] = [
     ],
     company: "Lexis Fresh Slate Cleanings",
   },
-  {
-    id: 2,
-    name: "Service Business Owner",
-    role: "Owner",
-    quote:
-      "Short testimonial placeholder. Want to speak with a client? I can arrange an intro so you can hear about their results firsthand.",
-    company: "(New testimonial scheduling)",
-  },
 ];
-
