@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
+import Image from "next/image";
 import { Breadcrumb } from "../../components";
 
 export default function AboutClient() {
@@ -33,55 +34,41 @@ export default function AboutClient() {
               </h2>
               <div className="space-y-6 text-lg text-text-primary leading-relaxed">
                 <p>
-                  My name is Kyle Greer, and I’m the founder of KYGR Solutions.
-                  I’m a software developer, husband, and father of three young
-                  children. I started this business with a clear goal in mind: to
-                  build something meaningful that serves others well and to build
-                  a business that honors God, supports my family, and allows me to
-                  be a faithful steward of the skills I’ve been given.
+                  My name is Kyle Greer, and I&apos;m the founder of KYGR
+                  Solutions. I&apos;m a software developer, husband, and father
+                  of three young children. I started this business with a clear
+                  goal in mind: to build something meaningful that serves others
+                  well and to build a business that honors God, supports my
+                  family, and allows me to be a faithful steward of the skills
+                  I&apos;ve been given.
                 </p>
                 <p>
                   KYGR Solutions was born out of a desire to use technology
                   responsibly and purposefully — not just to build software, but
                   to solve real problems for real people. I work closely with
                   businesses and organizations to understand what they actually
-                  need, then design solutions that are simple, reliable, and easy
-                  to use.
+                  need, then design solutions that are simple, reliable, and
+                  easy to use.
                 </p>
               </div>
             </motion.div>
 
-            {/* Photo Placeholder Section */}
+            {/* Family Photo Section */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="relative aspect-[4/3] w-full bg-blue-ncs/5 rounded-3xl border-2 border-dashed border-blue-ncs/20 flex items-center justify-center overflow-hidden group hover:border-blue-ncs/40 transition-colors"
+              className="w-full"
             >
-              <div className="text-center p-6">
-                <div className="text-blue-ncs/30 group-hover:text-blue-ncs/50 mb-4 flex justify-center transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="64"
-                    height="64"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                    <circle cx="9" cy="9" r="2" />
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-text-headings mb-2">
-                  Family Photo
-                </h3>
-                <p className="text-text-secondary">Coming Soon</p>
-              </div>
+              <Image
+                src="/FamilyPortrait.png"
+                alt="Kyle Greer and family"
+                width={1200}
+                height={1600}
+                className="w-full h-auto rounded-3xl shadow-xl"
+                priority
+              />
             </motion.div>
           </div>
         </section>
@@ -182,4 +169,3 @@ export default function AboutClient() {
     </main>
   );
 }
-
