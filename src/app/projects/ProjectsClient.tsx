@@ -18,7 +18,7 @@ export default function ProjectsClient() {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6 text-center">
-            Case <span className="text-blue-ncs">Studies</span>
+            My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
             A look at the strategic solutions I&apos;ve built, from personal passion projects to business tools that streamline operations.
@@ -60,7 +60,7 @@ export default function ProjectsClient() {
                 </p>
                 <div className="flex items-center justify-between">
                   <Link href={`/projects/${project.id}`} className="inline-flex items-center gap-2 text-blue-ncs font-bold group/link">
-                    View Case Study
+                    View Project
                     <motion.svg 
                       className="w-4 h-4" 
                       fill="none" 

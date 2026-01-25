@@ -159,7 +159,7 @@ export default function HomeClient() {
                     href={`/projects/${project.id}`}
                     className="text-blue-ncs font-bold inline-flex items-center gap-2"
                   >
-                    Case Study
+                    View Project
                     <svg
                       className="w-4 h-4"
                       fill="none"

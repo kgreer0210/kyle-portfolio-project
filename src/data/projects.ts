@@ -224,4 +224,24 @@ export const projects: Project[] = [
       ],
     },
   },
+  {
+    id: "f3-warner-robins",
+    title: "F3 Warner Robins",
+    description:
+      "A regional website for F3 Warner Robins, a free peer-led outdoor workout group focused on fitness, fellowship, and faith. Features event management, workout schedules, and community engagement tools.",
+    image: "/f3-warner-robins-screenshot.png",
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    liveUrl: "https://f3-warner-robins.vercel.app/",
+    status: "completed",
+    role: "Product design, UX/UI, and full-stack development",
+    challenge:
+      "There was a need for our F3 region to have its own website where we could list out our schedule for workouts and their locations and times with links to the map as well as all of our logos on a rotating carousel on the front page and information about how to join in on the workouts that are free of charge.",
+    outcome:
+      "Delivered a polished, user-friendly website that effectively showcases workout schedules, locations, and regional information, making it easy for the community to participate in free outdoor fitness activities.",
+    backendShowcase: {
+      available: false,
+      description: "",
+      screenshots: [],
+    },
+  },
 ];

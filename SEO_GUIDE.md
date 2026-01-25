@@ -10,7 +10,7 @@ Unlike simple HTML files, Next.js uses the **App Router Metadata API**. This all
 
 - **Server-Side Rendering (SSR):** Next.js renders your pages on the server. This means Google's "crawlers" see the full content of your page immediately, which is much better for SEO than traditional React apps.
 - **Metadata API:** We use a special `metadata` object in `layout.tsx` or `page.tsx` files. Next.js automatically injects these into the `<head>` of your HTML.
-- **Dynamic Metadata:** For pages like project case studies, we can generate metadata dynamically based on the project title.
+- **Dynamic Metadata:** For pages like projects, we can generate metadata dynamically based on the project title.
 
 ---
 

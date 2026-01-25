@@ -18,7 +18,7 @@ This document outlines the tasks required to convert the current single-page por
   - Service-specific CTAs
   - Pricing information (optional)
 - [ ] Create `/projects` page route
-  - Portfolio/case studies grid
+  - Portfolio/projects grid
   - Project filtering/categorization
   - Project detail pages at `/projects/[projectId]`
   - Client testimonials per project
