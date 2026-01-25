@@ -5,8 +5,78 @@ import Image from "next/image";
 import Link from "next/link";
 import { Breadcrumb } from "../../components";
 import { projects } from "../../data/projects";
+import { Project } from "../../types";
 
 export default function ProjectsClient() {
+  // Group projects by category
+  const projectsByCategory = projects.reduce((acc, project) => {
+    if (!acc[project.category]) {
+      acc[project.category] = [];
+    }
+    acc[project.category].push(project);
+    return acc;
+  }, {} as Record<string, Project[]>);
+
+  const categories: Array<"Web Application" | "Website" | "Automation"> = [
+    "Web Application",
+    "Website",
+    "Automation",
+  ];
+
+  const renderProjectCard = (project: Project, index: number) => (
+    <motion.div
+      key={project.id}
+      className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden hover:border-blue-ncs transition-colors duration-500"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true }}
+    >
+      <div className="aspect-video relative overflow-hidden">
+        <Image
+          src={project.image}
+          alt={project.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />
+      </div>
+      <div className="p-8">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.technologies.slice(0, 4).map((tech, idx) => (
+            <span key={idx} className="px-3 py-1 bg-penn-blue/50 text-xs rounded-full text-text-secondary">
+              {tech}
+            </span>
+          ))}
+        </div>
+        <h2 className="text-2xl font-bold text-text-headings mb-3 group-hover:text-blue-ncs transition-colors">
+          {project.title}
+        </h2>
+        <p className="text-text-secondary mb-6 line-clamp-2">
+          {project.description}
+        </p>
+        <div className="flex items-center justify-between">
+          <Link href={`/projects/${project.id}`} className="inline-flex items-center gap-2 text-blue-ncs font-bold group/link">
+            View Project
+            <motion.svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </motion.svg>
+          </Link>
+          {project.status === "completed" && (
+            <span className="text-xs font-bold text-green-500/80 bg-green-500/10 px-2 py-1 rounded">Live</span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -21,65 +91,33 @@ export default function ProjectsClient() {
             My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
-            A look at the strategic solutions I&apos;ve built, from personal passion projects to business tools that streamline operations.
+            A look at the websites, web applications, and automations I&apos;ve built—from personal passion projects to business tools that streamline operations.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden hover:border-blue-ncs transition-colors duration-500"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div className="aspect-video relative overflow-hidden">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-rich-black via-transparent to-transparent opacity-60" />
+        {categories.map((category) => {
+          const categoryProjects = projectsByCategory[category];
+          if (!categoryProjects || categoryProjects.length === 0) return null;
+
+          return (
+            <div key={category} className="mb-20">
+              <motion.h2
+                className="text-3xl font-bold text-text-headings mb-8"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                {category === "Web Application" && "Web Applications"}
+                {category === "Website" && "Websites"}
+                {category === "Automation" && "Automations"}
+              </motion.h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+                {categoryProjects.map((project, index) => renderProjectCard(project, index))}
               </div>
-              <div className="p-8">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.slice(0, 4).map((tech, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-penn-blue/50 text-xs rounded-full text-text-secondary">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-                <h2 className="text-2xl font-bold text-text-headings mb-3 group-hover:text-blue-ncs transition-colors">
-                  {project.title}
-                </h2>
-                <p className="text-text-secondary mb-6 line-clamp-2">
-                  {project.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <Link href={`/projects/${project.id}`} className="inline-flex items-center gap-2 text-blue-ncs font-bold group/link">
-                    View Project
-                    <motion.svg 
-                      className="w-4 h-4" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </motion.svg>
-                  </Link>
-                  {project.status === "completed" && (
-                    <span className="text-xs font-bold text-green-500/80 bg-green-500/10 px-2 py-1 rounded">Live</span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </main>
   );
