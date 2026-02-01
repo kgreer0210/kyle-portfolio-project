@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     // Get contact email from environment or use default
     const contactEmail =
-      process.env.CONTACT_EMAIL || "kylegreer@kygrsolutions.com";
+      process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
 
     // Send email notification
     const resend = getResendClient();
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     }
 
     const emailResult = await resend.emails.send({
-      from: "Contact Form <kylegreer@kygrsolutions.com>",
+      from: "Contact Form <info@kygrsolutions.com>",
       to: contactEmail,
       replyTo: email,
       subject: `Portfolio Contact: ${subject}`,

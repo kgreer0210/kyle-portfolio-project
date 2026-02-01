@@ -53,10 +53,10 @@ export default function ContactClient() {
                   <div>
                     <h3 className="font-semibold text-text-headings">Email</h3>
                     <a
-                      href="mailto:kylegreer@kygrsolutions.com"
+                      href="mailto:info@kygrsolutions.com"
                       className="text-text-secondary"
                     >
-                      kylegreer@kygrsolutions.com
+                      info@kygrsolutions.com
                     </a>
                   </div>
                 </div>
