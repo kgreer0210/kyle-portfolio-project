@@ -33,7 +33,7 @@ export default function Contact() {
     message: string;
   }>({ type: null, message: "" });
 
-  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
+  const consultLink = "https://calendar.app.google/NE1sJkJgG5LDg3so9";
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -69,7 +69,7 @@ export default function Contact() {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -280,7 +280,7 @@ export default function Contact() {
               value={formData.subject}
               onChange={handleInputChange}
               className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
-              placeholder="What&apos;s this about?"
+              placeholder="What's this about?"
               disabled={isSubmitting}
             />
             {errors.subject && (
@@ -349,7 +349,7 @@ export default function Contact() {
             <motion.button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-[44px]"
+              className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-11"
               whileHover={!isSubmitting ? { scale: 1.05, y: -3 } : {}}
               whileTap={!isSubmitting ? { scale: 0.95 } : {}}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}

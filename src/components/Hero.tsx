@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 
 export default function Hero() {
-  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
+  const consultLink = "https://calendar.app.google/NE1sJkJgG5LDg3so9";
 
   const serviceChips = [
     "Conversion-focused websites",
