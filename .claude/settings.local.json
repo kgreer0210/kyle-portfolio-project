@@ -10,9 +10,14 @@
       "mcp__plugin_context7-plugin_context7__query-docs",
       "WebFetch(domain:supabase.com)",
       "Bash(npm uninstall:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "mcp__supabase__execute_sql"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

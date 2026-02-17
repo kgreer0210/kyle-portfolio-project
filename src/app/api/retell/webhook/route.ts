@@ -93,7 +93,9 @@ export async function POST(request: NextRequest) {
           summary: analysis.call_summary ?? null,
           sentiment: analysis.user_sentiment ?? null,
           callerName: customData.caller_name ?? null,
+          callerEmail: customData.caller_email ?? null,
           callReason: customData.call_reason ?? null,
+          projectDetails: customData.project_details ?? null,
           urgency: customData.urgency ?? null,
         };
 

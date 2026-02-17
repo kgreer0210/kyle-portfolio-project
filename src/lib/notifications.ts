@@ -7,7 +7,9 @@ interface CallNotificationData {
   summary: string | null;
   sentiment: string | null;
   callerName: string | null;
+  callerEmail: string | null;
   callReason: string | null;
+  projectDetails: string | null;
   urgency: string | null;
 }
 
@@ -38,12 +40,14 @@ export async function sendEmailNotification(data: CallNotificationData) {
               <td style="padding: 8px;">${caller}</td>
             </tr>
             ${data.fromNumber ? `<tr><td style="padding: 8px; font-weight: bold;">Phone</td><td style="padding: 8px;">${data.fromNumber}</td></tr>` : ""}
+            ${data.callerEmail ? `<tr><td style="padding: 8px; font-weight: bold;">Email</td><td style="padding: 8px;">${data.callerEmail}</td></tr>` : ""}
             <tr>
               <td style="padding: 8px; font-weight: bold;">Duration</td>
               <td style="padding: 8px;">${durationSec}s</td>
             </tr>
             ${data.urgency ? `<tr><td style="padding: 8px; font-weight: bold;">Urgency</td><td style="padding: 8px;"><span style="color: ${urgencyColor}; font-weight: bold;">${data.urgency.toUpperCase()}</span></td></tr>` : ""}
             ${data.callReason ? `<tr><td style="padding: 8px; font-weight: bold;">Reason</td><td style="padding: 8px;">${data.callReason}</td></tr>` : ""}
+            ${data.projectDetails ? `<tr><td style="padding: 8px; font-weight: bold;">Project Details</td><td style="padding: 8px;">${data.projectDetails}</td></tr>` : ""}
             ${data.sentiment ? `<tr><td style="padding: 8px; font-weight: bold;">Sentiment</td><td style="padding: 8px;">${data.sentiment}</td></tr>` : ""}
           </table>
           ${data.summary ? `
@@ -79,7 +83,9 @@ export async function sendDiscordNotification(data: CallNotificationData) {
         { name: "Duration", value: `${durationSec}s`, inline: true },
         { name: "Sentiment", value: data.sentiment || "N/A", inline: true },
         ...(data.urgency ? [{ name: "Urgency", value: data.urgency, inline: true }] : []),
+        ...(data.callerEmail ? [{ name: "Email", value: data.callerEmail, inline: true }] : []),
         ...(data.callReason ? [{ name: "Reason", value: data.callReason }] : []),
+        ...(data.projectDetails ? [{ name: "Project Details", value: data.projectDetails.slice(0, 1024) }] : []),
         ...(data.summary ? [{ name: "Summary", value: data.summary.slice(0, 1024) }] : []),
       ],
       timestamp: new Date().toISOString(),
