@@ -13,6 +13,9 @@ This is a personal portfolio website showcasing Kyle Greer's work as a software 
 - **Framer Motion** - Animation library (referred to as "motion" in package.json)
 - **OGL 1.0.11** - WebGL library for graphics
 - **Resend 6.4.1** - Email service for contact form
+- **Retell SDK** - AI voice agent webhook integration
+- **Supabase** - Database for storing call records
+- **Twilio** - SMS notifications for incoming calls
 
 ## Project Structure
 
@@ -22,8 +25,11 @@ src/
 │   ├── page.tsx              # Home page
 │   ├── layout.tsx            # Root layout
 │   ├── api/
-│   │   └── contact/
-│   │       └── route.ts      # Contact form API endpoint
+│   │   ├── contact/
+│   │   │   └── route.ts      # Contact form API endpoint
+│   │   └── retell/
+│   │       └── webhook/
+│   │           └── route.ts  # Retell AI webhook handler
 │   └── projects/
 │       └── [projectId]/
 │           └── backend/
@@ -40,6 +46,9 @@ src/
 │   ├── Footer.tsx            # Footer
 │   ├── BackendShowcase.tsx   # Backend project showcase
 │   └── index.ts              # Component exports
+├── lib/
+│   ├── supabase.ts           # Supabase server client
+│   └── notifications.ts      # Twilio SMS + Discord webhook helpers
 └── Particles/
     └── Particles.tsx         # Particle animation component
 ```
@@ -74,6 +83,7 @@ src/
 - Enhanced About, Contact, Hero, Projects, and Testimonials components
 - Updated vulnerable version of Next.js
 - Ran audit fix for React vulnerability
+- Added Retell AI voice agent webhook integration with Supabase storage and Twilio/Discord notifications
 
 ## Setup & Development
 
@@ -85,6 +95,7 @@ src/
 ## API Routes
 
 - `POST /api/contact` - Contact form submission endpoint (sends email via Resend)
+- `POST /api/retell/webhook` - Retell AI voice agent webhook (handles `call_started`, `call_ended`, `call_analyzed` events; stores calls in Supabase, sends SMS + Discord notifications)
 
 ## Styling
 
