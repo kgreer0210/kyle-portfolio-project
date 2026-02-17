@@ -23,6 +23,10 @@ export async function POST(request: NextRequest) {
     const { event, call } = JSON.parse(body);
 
     switch (event) {
+      case "call_inbound":
+        console.log("Retell call inbound:", call.call_id);
+        break;
+
       case "call_started":
         console.log("Retell call started:", call.call_id);
         break;
@@ -93,8 +97,8 @@ export async function POST(request: NextRequest) {
           urgency: customData.urgency ?? null,
         };
 
-        // Fire-and-forget — don't block the webhook response
-        Promise.all([
+        // Await notifications — Vercel terminates serverless functions after response is sent
+        await Promise.all([
           sendEmailNotification(notificationData),
           sendDiscordNotification(notificationData),
         ]).catch((err) => console.error("Notification error:", err));

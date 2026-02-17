@@ -103,5 +103,5 @@ Answer with: "Hi, thanks for calling KYGR Solutions! Kyle isn't available right 
 
 - [x] Make a test call to the Retell phone number
 - [x] Confirm record appears in `retell_calls` table in Supabase
-- [ ] Confirm email notification received
+- [x] Confirm email notification received
 - [x] Confirm Discord notification posted
