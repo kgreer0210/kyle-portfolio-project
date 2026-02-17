@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
           sentiment: analysis.user_sentiment ?? null,
           callerName: customData.caller_name ?? null,
           callerEmail: customData.caller_email ?? null,
+          callerPhone: customData.caller_phone ?? null,
           callReason: customData.call_reason ?? null,
           projectDetails: customData.project_details ?? null,
           urgency: customData.urgency ?? null,

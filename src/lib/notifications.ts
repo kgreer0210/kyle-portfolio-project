@@ -8,6 +8,7 @@ interface CallNotificationData {
   sentiment: string | null;
   callerName: string | null;
   callerEmail: string | null;
+  callerPhone: string | null;
   callReason: string | null;
   projectDetails: string | null;
   urgency: string | null;
@@ -41,6 +42,7 @@ export async function sendEmailNotification(data: CallNotificationData) {
             </tr>
             ${data.fromNumber ? `<tr><td style="padding: 8px; font-weight: bold;">Phone</td><td style="padding: 8px;">${data.fromNumber}</td></tr>` : ""}
             ${data.callerEmail ? `<tr><td style="padding: 8px; font-weight: bold;">Email</td><td style="padding: 8px;">${data.callerEmail}</td></tr>` : ""}
+            ${data.callerPhone ? `<tr><td style="padding: 8px; font-weight: bold;">Callback #</td><td style="padding: 8px;">${data.callerPhone}</td></tr>` : ""}
             <tr>
               <td style="padding: 8px; font-weight: bold;">Duration</td>
               <td style="padding: 8px;">${durationSec}s</td>
@@ -84,6 +86,7 @@ export async function sendDiscordNotification(data: CallNotificationData) {
         { name: "Sentiment", value: data.sentiment || "N/A", inline: true },
         ...(data.urgency ? [{ name: "Urgency", value: data.urgency, inline: true }] : []),
         ...(data.callerEmail ? [{ name: "Email", value: data.callerEmail, inline: true }] : []),
+        ...(data.callerPhone ? [{ name: "Callback #", value: data.callerPhone, inline: true }] : []),
         ...(data.callReason ? [{ name: "Reason", value: data.callReason }] : []),
         ...(data.projectDetails ? [{ name: "Project Details", value: data.projectDetails.slice(0, 1024) }] : []),
         ...(data.summary ? [{ name: "Summary", value: data.summary.slice(0, 1024) }] : []),
