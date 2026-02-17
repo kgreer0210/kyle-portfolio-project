@@ -24,6 +24,27 @@ export default function Footer() {
         >
           © {currentYear} KYGR Solutions
         </motion.p>
+        <motion.p
+          className="text-text-secondary text-sm mt-2"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+        >
+          <a
+            href="tel:+14787775799"
+            className="hover:text-blue-ncs transition-colors duration-300"
+          >
+            (478) 777-5799
+          </a>
+          {" | "}
+          <a
+            href="mailto:info@kygrsolutions.com"
+            className="hover:text-blue-ncs transition-colors duration-300"
+          >
+            info@kygrsolutions.com
+          </a>
+        </motion.p>
         <motion.div
           className="flex justify-center mt-3 sm:mt-4"
           initial={{ opacity: 0 }}

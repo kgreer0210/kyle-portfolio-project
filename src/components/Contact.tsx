@@ -176,8 +176,15 @@ export default function Contact() {
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
             book a quick call
-          </a>{" "}
-          or send details through this form—whatever is easiest. I focus on
+          </a>
+          , call us at{" "}
+          <a
+            href="tel:+14787775799"
+            className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
+          >
+            (478) 777-5799
+          </a>
+          , or send details through this form—whatever is easiest. I focus on
           custom websites, web/mobile apps, and automations for local service
           businesses.
         </motion.p>
