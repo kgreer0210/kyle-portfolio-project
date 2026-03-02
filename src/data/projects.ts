@@ -247,4 +247,33 @@ export const projects: Project[] = [
       screenshots: [],
     },
   },
+  {
+    id: "mid-state-baptist-association",
+    title: "Mid-State Baptist Association",
+    description:
+      "A modernized website for the Mid-State Baptist Association, replacing their legacy Weebly site. Features a searchable church finder across 5 counties, event listings, a downloadable resource library, ministry information, and a party trailer rental request form.",
+    image: "/midstatebaptistassociationscreenshot.png",
+    technologies: [
+      "Next.js 16",
+      "TypeScript",
+      "Tailwind CSS",
+      "Convex",
+      "Clerk",
+      "shadcn/ui",
+      "Resend",
+    ],
+    category: "Website",
+    liveUrl: "https://midstatebaptistassociation.org/",
+    status: "completed",
+    role: "Product design, UX/UI, and full-stack development",
+    challenge:
+      "The association needed a modern replacement for their dated Weebly site that could manage 38 churches across 5 counties, surface events and resources, and give the leadership team an admin portal to keep content current — without requiring technical expertise to operate.",
+    outcome:
+      "Delivered a clean, accessible website that makes it easy for the community to find churches, browse events, and download resources, with a protected admin system for staff to manage all content.",
+    backendShowcase: {
+      available: false,
+      description: "",
+      screenshots: [],
+    },
+  },
 ];
