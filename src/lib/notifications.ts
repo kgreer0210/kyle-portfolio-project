@@ -26,7 +26,7 @@ export async function sendEmailNotification(data: CallNotificationData) {
 
     const resend = new Resend(apiKey);
     const notificationEmail =
-      process.env.CONTACT_EMAIL || "kylegreer@kygrsolutions.com";
+      process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
     const durationSec = data.duration ? Math.round(data.duration / 1000) : 0;
     const caller = data.callerName || data.fromNumber || "Unknown";
     const urgencyColor =
@@ -37,7 +37,7 @@ export async function sendEmailNotification(data: CallNotificationData) {
           : "#00cc66";
 
     await resend.emails.send({
-      from: "KYGR Call Alerts <kylegreer@kygrsolutions.com>",
+      from: "KYGR Call Alerts <info@kygrsolutions.com>",
       to: notificationEmail,
       subject: `📞 Missed Call from ${caller}${data.urgency === "high" ? " [URGENT]" : ""}`,
       html: `

@@ -39,10 +39,10 @@ export default function Footer() {
           </a>
           {" | "}
           <a
-            href="mailto:kylegreer@kygrsolutions.com"
+            href="mailto:info@kygrsolutions.com"
             className="hover:text-blue-ncs transition-colors duration-300"
           >
-            kylegreer@kygrsolutions.com
+            info@kygrsolutions.com
           </a>
         </motion.p>
         <motion.div
