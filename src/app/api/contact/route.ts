@@ -62,14 +62,17 @@ function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
 }
 
 // Cleanup old entries periodically (every 30 minutes)
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitStore.entries()) {
-    if (now > entry.resetTime) {
-      rateLimitStore.delete(ip);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [ip, entry] of rateLimitStore.entries()) {
+      if (now > entry.resetTime) {
+        rateLimitStore.delete(ip);
+      }
     }
-  }
-}, 30 * 60 * 1000);
+  },
+  30 * 60 * 1000,
+);
 
 function sanitizeInput(input: string): string {
   return input.trim().replace(/[<>]/g, "");
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
       // Return success to bot to avoid letting them know they were caught
       return NextResponse.json(
         { message: "Thank you for your message! I'll get back to you soon." },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
           headers: {
             "Retry-After": rateLimitCheck.retryAfter?.toString() || "900",
           },
-        }
+        },
       );
     }
 
@@ -116,7 +119,7 @@ export async function POST(request: NextRequest) {
     if (!body.name || !body.email || !body.subject || !body.message) {
       return NextResponse.json(
         { error: "All fields are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -130,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (!validateEmail(email)) {
       return NextResponse.json(
         { error: "Invalid email address" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -138,34 +141,34 @@ export async function POST(request: NextRequest) {
     if (name.length > 100) {
       return NextResponse.json(
         { error: "Name must be less than 100 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (email.length > 255) {
       return NextResponse.json(
         { error: "Email must be less than 255 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (subject.length > 200) {
       return NextResponse.json(
         { error: "Subject must be less than 200 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (message.length > 5000) {
       return NextResponse.json(
         { error: "Message must be less than 5000 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Get contact email from environment or use default
     const contactEmail =
-      process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
+      process.env.CONTACT_EMAIL || "kylegreer@kygrsolutions.com";
 
     // Send email notification
     const resend = getResendClient();
@@ -173,12 +176,12 @@ export async function POST(request: NextRequest) {
       console.error("RESEND_API_KEY is not configured");
       return NextResponse.json(
         { error: "Email service is not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const emailResult = await resend.emails.send({
-      from: "Contact Form <info@kygrsolutions.com>",
+      from: "Contact Form <kylegreer@kygrsolutions.com>",
       to: contactEmail,
       replyTo: email,
       subject: `Portfolio Contact: ${subject}`,
@@ -214,19 +217,19 @@ This email was sent from your portfolio contact form.
       console.error("Email sending error:", emailResult.error);
       return NextResponse.json(
         { error: "Failed to send email. Please try again later." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { message: "Thank you for your message! I'll get back to you soon." },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Contact form error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

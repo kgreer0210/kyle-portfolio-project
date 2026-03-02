@@ -53,10 +53,10 @@ export default function ContactClient() {
                   <div>
                     <h3 className="font-semibold text-text-headings">Email</h3>
                     <a
-                      href="mailto:info@kygrsolutions.com"
+                      href="mailto:kylegreer@kygrsolutions.com"
                       className="text-text-secondary"
                     >
-                      info@kygrsolutions.com
+                      kylegreer@kygrsolutions.com
                     </a>
                   </div>
                 </div>
@@ -79,10 +79,7 @@ export default function ContactClient() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-headings">Phone</h3>
-                    <a
-                      href="tel:+14787775799"
-                      className="text-text-secondary"
-                    >
+                    <a href="tel:+14787775799" className="text-text-secondary">
                       (478) 777-5799
                     </a>
                   </div>
@@ -172,4 +169,3 @@ export default function ContactClient() {
     </main>
   );
 }
-
