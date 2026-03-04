@@ -33,7 +33,7 @@ export default function Contact() {
     message: string;
   }>({ type: null, message: "" });
 
-  const consultLink = "https://calendar.app.google/NE1sJkJgG5LDg3so9";
+  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
