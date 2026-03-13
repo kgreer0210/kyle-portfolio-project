@@ -50,3 +50,14 @@ export interface NavItem {
   href: string;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  readTime: string;
+  publishedAt: string;
+  slug: string;
+}
+
