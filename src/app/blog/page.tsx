@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import BlogClient from "./BlogClient";
 import { getBlogPosts } from "@/lib/blog";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blog | KYGR Solutions",
   description:
