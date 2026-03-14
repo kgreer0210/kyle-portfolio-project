@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
         to: sub.email,
         subject: `New post: ${title}`,
         html: `
+          <meta charset="UTF-8">
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #0094c6;">New post from the KYGR Blog</h2>
             <h3 style="color: #1a1a2e;">${title}</h3>
