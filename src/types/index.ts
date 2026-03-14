@@ -52,12 +52,14 @@ export interface NavItem {
 
 export interface BlogPost {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  category: string;
+  content: string[];
+  category: "Technical Tutorial" | "Case Study" | "Industry Insights" | "General";
   tags: string[];
   readTime: string;
   publishedAt: string;
-  slug: string;
+  featured: boolean;
 }
 
