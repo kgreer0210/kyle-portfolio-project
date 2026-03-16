@@ -21,10 +21,10 @@ export const metadata: Metadata = {
     template: "%s | KYGR Solutions",
   },
   description:
-    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for local businesses in middle Georgia — helping you win more leads, streamline operations, and reclaim time.",
+    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for businesses ready to grow — helping you win more leads, streamline operations, and reclaim time.",
   keywords: [
     "KYGR Solutions",
-    "local business",
+    "business software",
     "website development",
     "web app",
     "mobile app",
@@ -34,12 +34,8 @@ export const metadata: Metadata = {
     "TypeScript",
     "software development",
     "custom software",
-    "Houston County",
-    "Bibb County",
-    "Middle Georgia",
-    "Macon",
-    "Warner Robins",
-    "Milledgeville",
+    "Georgia",
+    "remote software consulting",
   ],
   authors: [{ name: "Kyle Greer" }],
   creator: "Kyle Greer",
@@ -48,9 +44,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://kygrsolutions.com",
     siteName: "KYGR Solutions",
-    title: "KYGR Solutions | Custom Software for Local Businesses",
+    title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Helping local businesses in middle Georgia grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
+      "Helping businesses grow through custom websites, apps, and automation — based in Georgia, working everywhere. Reclaim your time and win more leads.",
     images: [
       {
         url: "/logo.png", // Ensure this path is correct or use a specific OG image
@@ -62,9 +58,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "KYGR Solutions | Custom Software for Local Businesses",
+    title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Helping local businesses in middle Georgia grow through custom websites, apps, and automation. Reclaim your time and win more leads.",
+      "Helping businesses grow through custom websites, apps, and automation — based in Georgia, working everywhere. Reclaim your time and win more leads.",
     images: ["/logo.png"],
     creator: "@kygrsolutions", // Replace with your actual handle if applicable
   },

@@ -49,8 +49,8 @@ export default function HomeClient() {
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
               I build conversion-focused websites, web & mobile apps, and
-              automations for local businesses—helping you win more leads,
-              streamline operations, and reclaim your time.
+              automations for businesses ready to grow—helping you win more
+              leads, streamline operations, and reclaim your time.
             </p>
           </motion.div>
         </section>
@@ -116,7 +116,7 @@ export default function HomeClient() {
                 Featured Work
               </h2>
               <p className="text-lg text-text-secondary">
-                See how I&apos;ve helped other local businesses succeed.
+                See how I&apos;ve helped businesses like yours succeed.
               </p>
             </div>
             <Link href="/projects">
@@ -199,7 +199,7 @@ export default function HomeClient() {
 
             <h2 className="text-4xl md:text-5xl font-bold text-text-headings mb-8 relative z-10">
               Ready to grow your <br />
-              <span className="text-blue-ncs">local business?</span>
+              <span className="text-blue-ncs">business?</span>
             </h2>
             <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
               Stop fighting with manual tasks and messy workflows. Let&apos;s

@@ -3,11 +3,11 @@ import { Service, Skill } from "../types";
 export const services: Service[] = [
   {
     title: "Website Development",
-    description: "Conversion-focused marketing sites built to capture local leads and grow your business.",
+    description: "Conversion-focused marketing sites built to attract qualified leads and grow your business.",
     points: [
-      "Conversion-focused marketing sites that capture local leads",
+      "Conversion-focused marketing sites that attract and convert visitors",
       "Clear offers, fast load times, and easy editing",
-      "SEO optimized structure for local visibility",
+      "SEO optimized structure for search visibility",
       "Mobile-responsive designs that work on any device",
     ],
   },

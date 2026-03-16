@@ -36,7 +36,7 @@ export default function About() {
           transition={{ duration: 0.6, delay: 0.25 }}
           viewport={{ once: true }}
         >
-          I build conversion-focused websites, web & mobile apps, and automations for local businesses.
+          I build conversion-focused websites, web & mobile apps, and automations for businesses of all kinds.
         </motion.p>
 
         <motion.div
@@ -76,18 +76,18 @@ export default function About() {
           viewport={{ once: true }}
         >
           <p className="text-text-primary text-base sm:text-lg leading-relaxed">
-            Running a business in Middle Georgia is demanding. You need
-            digital tools that win more local leads, keep clients informed, and
-            remove manual work. I focus on outcomes first, not just a pretty
-            site.
+            Running a business is demanding. You need digital tools that win
+            more clients, keep people informed, and remove manual work — and
+            they should work whether your customers are next door or across the
+            country. I focus on outcomes first, not just a pretty site.
           </p>
 
           <p className="text-text-primary text-base sm:text-lg leading-relaxed">
             I run a software consulting business focused on building
             conversion-focused websites, modern web/mobile applications, and
-            automation solutions for local businesses. I build with
-            integrity and clarity so your digital tools feel like reliable
-            employees working 24/7.
+            automation solutions for businesses of all kinds — based in
+            Georgia, working everywhere. I build with integrity and clarity so
+            your digital tools feel like reliable employees working 24/7.
           </p>
 
           <p className="text-text-primary text-base sm:text-lg leading-relaxed">
@@ -140,7 +140,7 @@ export default function About() {
               Web Development
             </motion.h4>
             <p className="text-text-secondary text-xs sm:text-sm">
-              Conversion-focused websites built to capture local leads
+              Conversion-focused websites built to capture and convert your ideal customers
             </p>
           </motion.div>
           <motion.div

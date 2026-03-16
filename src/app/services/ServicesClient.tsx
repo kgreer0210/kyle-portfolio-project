@@ -21,7 +21,7 @@ export default function ServicesClient() {
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto">
             I offer comprehensive software solutions tailored to the unique
-            needs of local businesses.
+            needs of your business.
           </p>
         </motion.div>
 

@@ -185,8 +185,8 @@ export default function Contact() {
             (478) 777-5799
           </a>
           , or send details through this form—whatever is easiest. I focus on
-          custom websites, web/mobile apps, and automations for local service
-          businesses.
+          custom websites, web/mobile apps, and automations for businesses ready
+          to grow — wherever you&apos;re located.
         </motion.p>
 
         <motion.div

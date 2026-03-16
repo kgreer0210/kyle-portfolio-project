@@ -42,7 +42,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          Websites, web & mobile apps, and automations for local businesses
+          Websites, web & mobile apps, and automations for businesses ready to grow
         </motion.p>
 
         {/* Strategic Tagline */}
@@ -95,9 +95,10 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.8 }}
         >
-          We help local businesses convert more visitors, streamline operations,
-          and reclaim time with custom websites, modern web/mobile apps, and
-          practical automations.
+          We help businesses convert more visitors, streamline operations, and
+          reclaim time with custom websites, modern web/mobile apps, and
+          practical automations — whether you&apos;re down the street or across
+          the country.
         </motion.p>
       </motion.div>
 
