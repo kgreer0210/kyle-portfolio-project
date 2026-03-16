@@ -37,6 +37,33 @@ interface Props {
 
 export default function BlogClient({ posts }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [email, setEmail] = useState("");
+  const [subStatus, setSubStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subMessage, setSubMessage] = useState("");
+
+  async function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault();
+    setSubStatus("loading");
+    try {
+      const res = await fetch("/api/blog/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubStatus("success");
+        setSubMessage(data.message || "Subscribed successfully!");
+        setEmail("");
+      } else {
+        setSubStatus("error");
+        setSubMessage(data.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setSubStatus("error");
+      setSubMessage("Something went wrong. Please try again.");
+    }
+  }
 
   const filtered =
     activeCategory === "All"
@@ -167,12 +194,70 @@ export default function BlogClient({ posts }: Props) {
           </motion.div>
         )}
 
-        {/* ── Back link ── */}
+        {/* ── Subscribe ── */}
         <motion.div
-          className="text-center mt-16"
+          className="flex items-center gap-4 mt-20 mb-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <div className="flex-1 h-px bg-penn-blue" />
+          <span className="text-text-secondary text-xs tracking-widest uppercase">
+            Stay in the loop
+          </span>
+          <div className="flex-1 h-px bg-penn-blue" />
+        </motion.div>
+
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <p className="text-text-secondary mb-7 text-base max-w-lg mx-auto leading-relaxed">
+            Get notified when new posts are published — tutorials, case studies,
+            and insights from building software for real businesses.
+          </p>
+
+          {subStatus === "success" ? (
+            <p className="text-green-400 font-medium mb-7">{subMessage}</p>
+          ) : (
+            <form
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row justify-center gap-3 mb-7 max-w-md mx-auto"
+            >
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                disabled={subStatus === "loading"}
+                className="flex-1 px-5 py-3 rounded-full bg-oxford-blue border border-penn-blue text-text-headings placeholder:text-text-secondary focus:outline-none focus:border-blue-ncs disabled:opacity-50 transition-colors duration-200"
+              />
+              <motion.button
+                type="submit"
+                disabled={subStatus === "loading"}
+                className="px-8 py-3 rounded-full bg-blue-ncs text-white font-semibold hover:bg-lapis-lazuli transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: subStatus === "loading" ? 1 : 1.05 }}
+                whileTap={{ scale: subStatus === "loading" ? 1 : 0.95 }}
+              >
+                {subStatus === "loading" ? "Subscribing..." : "Subscribe"}
+              </motion.button>
+            </form>
+          )}
+
+          {subStatus === "error" && (
+            <p className="text-red-400 text-sm mb-5">{subMessage}</p>
+          )}
+        </motion.div>
+
+        {/* ── Back link ── */}
+        <motion.div
+          className="text-center mt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.9 }}
         >
           <Link href="/">
             <motion.button

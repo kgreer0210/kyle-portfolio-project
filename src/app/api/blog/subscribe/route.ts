@@ -112,9 +112,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error: dbError } = await supabase
+    const { data: insertData, error: dbError } = await supabase
       .from("blog_subscribers")
-      .insert({ email });
+      .insert({ email })
+      .select("unsubscribe_token")
+      .single();
 
     if (dbError) {
       // Postgres unique constraint violation
@@ -136,6 +138,24 @@ export async function POST(request: NextRequest) {
     const resend = getResendClient();
 
     if (resend) {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || "https://kygrsolutions.com";
+      const unsubscribeUrl = insertData?.unsubscribe_token
+        ? `${siteUrl}/unsubscribe?token=${insertData.unsubscribe_token}`
+        : null;
+
+      if (!unsubscribeUrl) {
+        console.warn("unsubscribe_token missing from insert response — omitting unsubscribe link from welcome email");
+      }
+
+      const unsubscribeFooter = unsubscribeUrl
+        ? `<p style="color: #666; font-size: 12px;">You subscribed at kygrsolutions.com/blog. If you'd like to unsubscribe, <a href="${unsubscribeUrl}" style="color: #0094c6;">click here</a>.</p>`
+        : `<p style="color: #666; font-size: 12px;">You subscribed at kygrsolutions.com/blog.</p>`;
+
+      const unsubscribeTextFooter = unsubscribeUrl
+        ? `To unsubscribe: ${unsubscribeUrl}`
+        : "";
+
       // Welcome email to subscriber
       await resend.emails.send({
         from: "Kyle Greer <info@kygrsolutions.com>",
@@ -148,10 +168,10 @@ export async function POST(request: NextRequest) {
             <p>Thanks for subscribing to the KYGR Blog. I'll send you a note as soon as new content goes live — tutorials, case studies, and insights from building software for real businesses in middle Georgia.</p>
             <p>Stay tuned,<br /><strong>Kyle Greer</strong><br />KYGR Solutions</p>
             <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;" />
-            <p style="color: #666; font-size: 12px;">You subscribed at kygrsolutions.com/blog. If this was a mistake, just ignore this email.</p>
+            ${unsubscribeFooter}
           </div>
         `,
-        text: `You're on the list!\n\nThanks for subscribing to the KYGR Blog. I'll reach out when new content goes live.\n\nStay tuned,\nKyle Greer\nKYGR Solutions`,
+        text: `You're on the list!\n\nThanks for subscribing to the KYGR Blog. I'll reach out when new content goes live.\n\nStay tuned,\nKyle Greer\nKYGR Solutions\n\n${unsubscribeTextFooter}`,
       });
 
       // Notification email to Kyle
