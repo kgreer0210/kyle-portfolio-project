@@ -31,6 +31,16 @@ export const services: Service[] = [
       "Custom reporting and notification systems",
     ],
   },
+  {
+    title: "Tech Stack Review",
+    description: "A focused session to identify what's costing you time, money, and momentum in your current tech setup.",
+    points: [
+      "Audit your current tools, software, and workflows",
+      "Identify redundancies, gaps, and hidden costs",
+      "Get a prioritized action plan you can act on immediately",
+      "No jargon — just clear, honest recommendations",
+    ],
+  },
 ];
 
 export const skills: Skill[] = [

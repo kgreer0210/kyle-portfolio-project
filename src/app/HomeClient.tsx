@@ -77,7 +77,7 @@ export default function HomeClient() {
               </motion.button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, index) => (
               <motion.div
                 key={service.title}
@@ -105,6 +105,78 @@ export default function HomeClient() {
                 </ul>
               </motion.div>
             ))}
+          </div>
+        </section>
+
+        {/* Tech Stack Review Spotlight */}
+        <section className="py-20 border-t border-penn-blue/30">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
+                New Service
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-5">
+                Is Your Tech Stack{" "}
+                <span className="text-blue-ncs">Working for You?</span>
+              </h2>
+              <p className="text-lg text-text-secondary mb-8 leading-relaxed">
+                Most businesses are paying for tools they barely use, missing
+                automations that could save hours each week, and patching
+                together workflows that should just work. A Tech Stack Review
+                gives you a clear picture of where you stand — and exactly what
+                to do next.
+              </p>
+              <Link href="/contact">
+                <motion.button
+                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Schedule Your Tech Audit
+                </motion.button>
+              </Link>
+            </motion.div>
+
+            <motion.div
+              className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-xl font-bold text-blue-ncs mb-6">
+                What&apos;s Included
+              </h3>
+              <ul className="space-y-4">
+                {[
+                  "Audit your current tools, software, and workflows",
+                  "Identify redundancies, gaps, and hidden costs",
+                  "Get a prioritized action plan you can act on immediately",
+                  "No jargon — just clear, honest recommendations",
+                ].map((point, idx) => (
+                  <motion.li
+                    key={idx}
+                    className="flex gap-3 text-text-primary"
+                    initial={{ opacity: 0, x: 10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 + idx * 0.08 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="mt-1 w-5 h-5 rounded-full bg-blue-ncs/10 border border-blue-ncs/40 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-blue-ncs" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    {point}
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
         </section>
 

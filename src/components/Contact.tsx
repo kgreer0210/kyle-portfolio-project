@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useState, FormEvent } from "react";
+import { services } from "../data/services";
 
 interface FormData {
   name: string;
@@ -52,10 +53,8 @@ export default function Contact() {
       newErrors.email = "Email must be less than 255 characters";
     }
 
-    if (!formData.subject.trim()) {
-      newErrors.subject = "Subject is required";
-    } else if (formData.subject.length > 200) {
-      newErrors.subject = "Subject must be less than 200 characters";
+    if (!formData.subject) {
+      newErrors.subject = "Please select a service";
     }
 
     if (!formData.message.trim()) {
@@ -69,7 +68,7 @@ export default function Contact() {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -267,7 +266,7 @@ export default function Contact() {
             )}
           </motion.div>
 
-          {/* Subject Field */}
+          {/* Service / Subject Field */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -278,18 +277,24 @@ export default function Contact() {
               htmlFor="subject"
               className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
             >
-              Subject <span className="text-blue-ncs">*</span>
+              Service <span className="text-blue-ncs">*</span>
             </label>
-            <input
-              type="text"
+            <select
               id="subject"
               name="subject"
               value={formData.subject}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
-              placeholder="What's this about?"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base appearance-none cursor-pointer disabled:opacity-50"
               disabled={isSubmitting}
-            />
+            >
+              <option value="" disabled>Select a service...</option>
+              {services.map((s) => (
+                <option key={s.title} value={s.title}>
+                  {s.title}
+                </option>
+              ))}
+              <option value="General Inquiry">General Inquiry</option>
+            </select>
             {errors.subject && (
               <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
             )}
