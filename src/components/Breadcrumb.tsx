@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "motion/react";
 
 export default function Breadcrumb() {
   const pathname = usePathname();

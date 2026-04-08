@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { createAdminSupabaseClient } from "./supabase";
 import { BlogPost } from "../types";
 
 interface BlogPostRow {
@@ -30,6 +30,7 @@ function rowToPost(row: BlogPostRow): BlogPost {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
+  const supabase = createAdminSupabaseClient();
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")
@@ -44,6 +45,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 }
 
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  const supabase = createAdminSupabaseClient();
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")
@@ -59,6 +61,7 @@ export async function getRelatedPosts(
   excludeSlug: string,
   limit = 3
 ): Promise<BlogPost[]> {
+  const supabase = createAdminSupabaseClient();
   const { data, error } = await supabase
     .from("blog_posts")
     .select("*")

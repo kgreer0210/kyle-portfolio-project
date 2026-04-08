@@ -10,13 +10,13 @@ type Status = "loading" | "success" | "error";
 export default function UnsubscribePageClient() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const [status, setStatus] = useState<Status>("loading");
-  const [message, setMessage] = useState<string>("");
+  const [status, setStatus] = useState<Status>(token ? "loading" : "error");
+  const [message, setMessage] = useState<string>(
+    token ? "" : "No unsubscribe token provided.",
+  );
 
   useEffect(() => {
     if (!token) {
-      setStatus("error");
-      setMessage("No unsubscribe token provided.");
       return;
     }
 

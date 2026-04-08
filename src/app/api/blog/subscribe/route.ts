@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { supabase } from "@/lib/supabase";
+import { createAdminSupabaseClient } from "@/lib/supabase";
 
 const getResendClient = () => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -70,6 +70,7 @@ function validateEmail(email: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = createAdminSupabaseClient();
     const body: { email: string } = await request.json();
 
     const clientIP = getClientIP(request);
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: insertData, error: dbError } = await supabase
+    const { data: insertData, error: dbError } = await supabaseAdmin
       .from("blog_subscribers")
       .insert({ email })
       .select("unsubscribe_token")

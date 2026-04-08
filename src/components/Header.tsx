@@ -11,6 +11,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,11 +20,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
 
   return (
     <motion.header
@@ -133,7 +129,11 @@ export default function Header() {
             >
               <div className="flex flex-col h-full pt-24 px-8 gap-6">
                 {navItems.map((item, index) => (
-                  <Link key={item.href} href={item.href}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                  >
                     <motion.span
                       className={`text-xl font-semibold block py-2 ${
                         pathname === item.href
@@ -149,7 +149,7 @@ export default function Header() {
                     </motion.span>
                   </Link>
                 ))}
-                <Link href="/contact" className="mt-4">
+                <Link href="/contact" className="mt-4" onClick={closeMobileMenu}>
                   <motion.button
                     className="w-full py-4 rounded-xl bg-blue-ncs text-white font-bold text-lg"
                     initial={{ opacity: 0, y: 20 }}
