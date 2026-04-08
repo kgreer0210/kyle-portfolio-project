@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import OnboardingStatusBadge from "@/components/crm/OnboardingStatusBadge";
 import { formatDateTime } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
 
@@ -53,6 +54,15 @@ export default async function AdminClientDetailPage({
     status: string;
     created_at?: string;
   }>;
+  const onboardingStatus =
+    ((onboarding as { status?: string } | null)?.status as
+      | "not_started"
+      | "in_progress"
+      | "submitted"
+      | "completed"
+      | "reopened"
+      | "skipped_legacy"
+      | undefined) || "not_started";
 
   return (
     <main className="space-y-8">
@@ -76,9 +86,15 @@ export default async function AdminClientDetailPage({
             <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
               Onboarding
             </p>
-            <p className="mt-2 text-lg font-semibold text-white">
-              {(onboarding as { status?: string } | null)?.status || "Not started"}
-            </p>
+            <div className="mt-3">
+              <OnboardingStatusBadge status={onboardingStatus} />
+            </div>
+            <Link
+              href={`/admin/onboarding/${organization.id}`}
+              className="mt-4 inline-flex text-sm font-medium text-blue-ncs transition hover:text-white"
+            >
+              Review onboarding
+            </Link>
           </div>
           <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">

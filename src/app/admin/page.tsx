@@ -26,18 +26,26 @@ export default async function AdminDashboardPage() {
             {clientCount || 0}
           </p>
         </div>
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+        <Link
+          href="/admin/tickets"
+          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+        >
           <p className="text-sm text-text-secondary">Active tickets</p>
           <p className="mt-3 text-4xl font-semibold text-white">
             {ticketCount || 0}
           </p>
-        </div>
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+          <p className="mt-4 text-sm font-medium text-blue-ncs">Open ticket queue</p>
+        </Link>
+        <Link
+          href="/admin/onboarding"
+          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+        >
           <p className="text-sm text-text-secondary">Onboarding needing review</p>
           <p className="mt-3 text-4xl font-semibold text-white">
             {onboardingCount || 0}
           </p>
-        </div>
+          <p className="mt-4 text-sm font-medium text-blue-ncs">Review onboarding</p>
+        </Link>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
@@ -56,15 +64,26 @@ export default async function AdminDashboardPage() {
             >
               View clients
             </Link>
+            <Link
+              href="/admin/tickets"
+              className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs"
+            >
+              View tickets
+            </Link>
+            <Link
+              href="/admin/onboarding"
+              className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs"
+            >
+              Review onboarding
+            </Link>
           </div>
         </div>
 
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h2 className="text-xl font-semibold text-white">Implementation status</h2>
+          <h2 className="text-xl font-semibold text-white">Admin inbox</h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-text-secondary">
-            This dashboard is wired for client creation, onboarding visibility,
-            and ticket operations. The root markdown plan tracks what is already
-            done and what remains next.
+            Use the ticket queue for active client requests and the onboarding
+            queue for submitted discovery packages that need a decision.
           </p>
         </div>
       </section>

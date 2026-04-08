@@ -1,5 +1,6 @@
 import type {
   OnboardingStepDefinition,
+  OnboardingStatus,
   ProfileRole,
   TicketStatus,
 } from "@/types/crm";
@@ -180,6 +181,15 @@ export const ticketStatusLabels: Record<TicketStatus, string> = {
   in_progress: "In progress",
   resolved: "Resolved",
   closed: "Closed",
+};
+
+export const onboardingStatusLabels: Record<OnboardingStatus, string> = {
+  not_started: "Not started",
+  in_progress: "In progress",
+  submitted: "Submitted",
+  completed: "Completed",
+  reopened: "Needs updates",
+  skipped_legacy: "Skipped",
 };
 
 export function slugify(value: string): string {
