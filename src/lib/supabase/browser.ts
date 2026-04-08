@@ -11,6 +11,11 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     browserClient = createBrowserClient(
       getSupabaseUrl(),
       getSupabaseAnonKey(),
+      {
+        auth: {
+          detectSessionInUrl: false,
+        },
+      },
     );
   }
 

@@ -3,14 +3,26 @@ import { createServerSupabaseClient } from "@/lib/supabase";
 import { getDefaultRouteForRole } from "@/lib/crm";
 import { syncAuthenticatedProfile } from "@/lib/profile-sync";
 
+type CallbackProfile = {
+  role?: "admin" | "client";
+  status?: "invited" | "active" | "disabled";
+} | null;
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next");
+  const authType = requestUrl.searchParams.get("type");
   const fallbackNext = next && next.startsWith("/") ? next : undefined;
 
   if (!code) {
-    return NextResponse.redirect(new URL("/login?error=Missing+auth+code", request.url));
+    const loginUrl = new URL("/login", request.url);
+
+    if (fallbackNext) {
+      loginUrl.searchParams.set("next", fallbackNext);
+    }
+
+    return NextResponse.redirect(loginUrl);
   }
 
   const supabase = await createServerSupabaseClient();
@@ -32,8 +44,27 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const profile = await syncAuthenticatedProfile(user);
-  const destination = fallbackNext || getDefaultRouteForRole(profile.role);
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("role, status")
+    .eq("id", user.id)
+    .maybeSingle();
+  const callbackProfile = existingProfile as CallbackProfile;
+  const role = callbackProfile?.role || "client";
+  const destination = fallbackNext || getDefaultRouteForRole(role);
+  const isInviteFlow =
+    authType === "invite" || callbackProfile?.status === "invited";
 
-  return NextResponse.redirect(new URL(destination, request.url));
+  if (isInviteFlow) {
+    const passwordSetupUrl = new URL("/reset-password", request.url);
+    passwordSetupUrl.searchParams.set("mode", "invite");
+    passwordSetupUrl.searchParams.set("next", destination);
+    return NextResponse.redirect(passwordSetupUrl);
+  }
+
+  const profile = await syncAuthenticatedProfile(user);
+
+  return NextResponse.redirect(
+    new URL(fallbackNext || getDefaultRouteForRole(profile.role), request.url),
+  );
 }

@@ -59,13 +59,14 @@ p {
   color: var(--text-primary);
 }
 
-/* Links */
-a {
+/* Only style plain content links globally.
+   Component links with Tailwind classes should control their own colors. */
+a:not([class]) {
   color: var(--blue-ncs);
   transition: all 0.3s ease;
 }
 
-a:hover {
+a:not([class]):hover {
   text-decoration: underline;
 }
 

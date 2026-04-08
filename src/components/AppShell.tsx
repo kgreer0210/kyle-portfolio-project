@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Particles from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 
-const appPrefixes = ["/login", "/portal", "/admin", "/auth"];
+const appPrefixes = ["/login", "/reset-password", "/portal", "/admin", "/auth"];
 
 function isAppRoute(pathname: string): boolean {
   return appPrefixes.some(
