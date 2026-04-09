@@ -11,10 +11,6 @@ interface LoginFormProps {
   initialError?: string;
 }
 
-function getSafeNext(next?: string, fallback = "/portal") {
-  return next && next.startsWith("/") ? next : fallback;
-}
-
 export default function LoginForm({ next, initialError }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -22,99 +18,14 @@ export default function LoginForm({ next, initialError }: LoginFormProps) {
   const [error, setError] = useState(initialError || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // If hash fragments with auth tokens arrive on the login page (e.g. from a
+  // stale bookmark or unexpected redirect), hand them off to the dedicated
+  // callback handler rather than processing them here.
   useEffect(() => {
-    let isActive = true;
-
-    async function completeInviteSignIn() {
-      const hash = window.location.hash.startsWith("#")
-        ? window.location.hash.slice(1)
-        : window.location.hash;
-
-      if (!hash) {
-        return;
-      }
-
-      const params = new URLSearchParams(hash);
-      const accessToken = params.get("access_token");
-      const refreshToken = params.get("refresh_token");
-      const authType = params.get("type");
-
-      if (!accessToken || !refreshToken) {
-        return;
-      }
-
-      setIsSubmitting(true);
-      setError("");
-
-      try {
-        const supabase = createBrowserSupabaseClient();
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        if (sessionError) {
-          throw sessionError;
-        }
-
-        // Clear the auth fragment so refreshes do not repeat the flow.
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname + window.location.search,
-        );
-
-        if (authType === "invite") {
-          const destination = getSafeNext(next);
-          const inviteUrl = new URL("/reset-password", window.location.origin);
-          inviteUrl.searchParams.set("mode", "invite");
-          inviteUrl.searchParams.set("next", destination);
-          router.replace(`${inviteUrl.pathname}${inviteUrl.search}`);
-          router.refresh();
-          return;
-        }
-
-        const response = await fetch("/api/auth/profile", {
-          method: "POST",
-        });
-
-        const payload = (await response.json()) as {
-          error?: string;
-          profile?: { role: "admin" | "client" };
-        };
-
-        if (!response.ok || !payload.profile) {
-          throw new Error(payload.error || "Unable to load your portal profile.");
-        }
-
-        const destination =
-          next && next.startsWith("/") ? next : getDefaultRouteForRole(payload.profile.role);
-
-        router.replace(destination);
-        router.refresh();
-      } catch (inviteError) {
-        if (!isActive) {
-          return;
-        }
-
-        const message =
-          inviteError instanceof Error
-            ? inviteError.message
-            : authType === "invite"
-              ? "Unable to start password setup from your invite."
-              : "Unable to sign in.";
-
-        setError(message);
-        setIsSubmitting(false);
-      }
+    if (window.location.hash.includes("access_token")) {
+      window.location.href = "/auth/callback" + window.location.hash;
     }
-
-    void completeInviteSignIn();
-
-    return () => {
-      isActive = false;
-    };
-  }, [next, router]);
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
