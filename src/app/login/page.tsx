@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LoginForm from "@/components/crm/LoginForm";
+import PasskeyLogin from "@/components/crm/PasskeyLogin";
 
 export const metadata: Metadata = {
   title: "Portal Login",
@@ -59,6 +60,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
 
               <LoginForm next={params.next} initialError={params.error} />
+
+              <div className="flex items-center gap-3">
+                <hr className="flex-1 border-penn-blue" />
+                <span className="text-xs text-text-secondary">or</span>
+                <hr className="flex-1 border-penn-blue" />
+              </div>
+
+              <PasskeyLogin next={params.next} />
 
               <div className="rounded-2xl border border-penn-blue bg-rich-black/50 p-4 text-sm text-text-secondary">
                 New clients should use the invite email first. If your invite link
