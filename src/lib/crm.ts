@@ -61,8 +61,8 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
   },
   {
     key: "business-context",
-    title: "Business Context",
-    description: "Document the current systems, processes, and pain points.",
+    title: "Business Context & Goals",
+    description: "Document your current setup, pain points, and what success looks like.",
     fields: [
       {
         key: "current_stack",
@@ -79,16 +79,9 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
       {
         key: "support_hours",
         label: "Preferred support hours",
-        type: "text",
-        placeholder: "Example: Mon-Fri, 9am-5pm ET",
+        type: "radio",
+        options: ["Mon–Fri, 9am–5pm ET", "Mon–Fri, 8am–6pm ET", "24/7", "Custom"],
       },
-    ],
-  },
-  {
-    key: "goals-and-scope",
-    title: "Goals and Scope",
-    description: "Clarify the business goals and highest priority outcomes.",
-    fields: [
       {
         key: "project_goals",
         label: "Goals for this engagement",
@@ -104,15 +97,15 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
       {
         key: "known_constraints",
         label: "Known constraints",
-        type: "textarea",
-        placeholder: "Budget, timing, approvals, compliance, or dependency constraints",
+        type: "checkboxes",
+        options: ["Budget", "Timeline", "Compliance", "Approvals", "None"],
       },
     ],
   },
   {
     key: "systems-and-access",
-    title: "Systems and Access",
-    description: "Capture any systems, assets, and credentials we may need.",
+    title: "Systems & Communication",
+    description: "Tell us about the tools we'll need access to and how you prefer to work.",
     fields: [
       {
         key: "required_accounts",
@@ -132,18 +125,11 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         type: "textarea",
         placeholder: "Brand files, documentation, recordings, source files, credentials",
       },
-    ],
-  },
-  {
-    key: "communication-preferences",
-    title: "Communication Preferences",
-    description: "Set expectations for updates, approvals, and escalation.",
-    fields: [
       {
         key: "preferred_channel",
         label: "Preferred communication channel",
-        type: "text",
-        placeholder: "Email, portal tickets, phone, Slack, etc.",
+        type: "radio",
+        options: ["Email", "Portal tickets", "Phone", "Slack", "Other"],
       },
       {
         key: "decision_makers",
