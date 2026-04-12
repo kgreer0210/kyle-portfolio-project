@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Retell } from "retell-sdk";
-import { supabase } from "@/lib/supabase";
+import { createAdminSupabaseClient } from "@/lib/supabase";
 import { sendEmailNotification, sendDiscordNotification } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = createAdminSupabaseClient();
     const body = await request.text();
     const signature = request.headers.get("x-retell-signature");
 
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
         break;
 
       case "call_ended": {
-        const { error } = await supabase.from("retell_calls").upsert(
+        const { error } = await supabaseAdmin.from("retell_calls").upsert(
           {
             call_id: call.call_id,
             from_number: call.from_number ?? null,
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
         const analysis = call.call_analysis ?? {};
         const customData = analysis.custom_analysis_data ?? {};
 
-        const { error } = await supabase
+        const { error } = await supabaseAdmin
           .from("retell_calls")
           .upsert(
             {

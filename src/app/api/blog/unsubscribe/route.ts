@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createAdminSupabaseClient } from "@/lib/supabase";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = createAdminSupabaseClient();
     const token = request.nextUrl.searchParams.get("token");
 
     if (!token) {
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
 
-    const { data, error: selectError } = await supabase
+    const { data, error: selectError } = await supabaseAdmin
       .from("blog_subscribers")
       .select("id")
       .eq("unsubscribe_token", token)
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from("blog_subscribers")
       .delete()
       .eq("unsubscribe_token", token);
