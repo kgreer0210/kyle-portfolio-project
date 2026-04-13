@@ -31,8 +31,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   Manage onboarding and support in one place.
                 </h1>
                 <p className="max-w-xl text-base leading-7 text-text-secondary">
-                  Clients can complete onboarding, submit requests, report issues,
-                  and track replies without jumping between email threads.
+                  Clients can complete onboarding, submit requests, report
+                  issues, and track replies without jumping between email
+                  threads.
                 </p>
               </div>
             </div>
@@ -55,7 +56,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold text-white">Sign in</h2>
                 <p className="text-sm leading-6 text-text-secondary">
-                  Use the email address tied to your client invite or admin account.
+                  Use the email address tied to your client invite or admin
+                  account.
                 </p>
               </div>
 
@@ -68,12 +70,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
 
               <PasskeyLogin next={params.next} />
-
-              <div className="rounded-2xl border border-penn-blue bg-rich-black/50 p-4 text-sm text-text-secondary">
-                New clients should use the invite email first. If your invite link
-                signs you in automatically, you will be routed into the portal after
-                confirmation.
-              </div>
             </div>
           </section>
         </div>
