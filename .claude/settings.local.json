@@ -18,7 +18,9 @@
       "Bash(find /c/dev/kyle-portfolio-project -type f \\\\\\(-name *.sql -o -name *migration* \\\\\\))",
       "Bash(find /c/dev/kyle-portfolio-project -maxdepth 2 -type f \\\\\\(-name *.md \\\\\\))",
       "mcp__supabase__apply_migration",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Read(//c/Users/kyleg/.claude/skills/blog-post-creator/**)",
+      "Read(//c/Users/kyleg/.claude/plugins/**)"
     ],
     "deny": [],
     "ask": []
