@@ -122,7 +122,7 @@ export default function AuthCallbackHandler({
 
       if (isInviteFlow) {
         const url = new URL("/reset-password", window.location.origin);
-        url.searchParams.set("mode", "invite");
+        url.searchParams.set("mode", "invite-choose");
         url.searchParams.set("next", safeNext);
         window.location.href = url.toString();
         return;

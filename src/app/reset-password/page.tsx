@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import InviteAcceptance from "@/components/crm/InviteAcceptance";
 import ResetPasswordForm from "@/components/crm/ResetPasswordForm";
 
 export const metadata: Metadata = {
@@ -18,21 +19,43 @@ interface ResetPasswordPageProps {
   }>;
 }
 
+type PageMode = "invite-choose" | "invite" | "reset";
+
+function resolvePageMode(mode?: string): PageMode {
+  if (mode === "invite-choose") return "invite-choose";
+  if (mode === "invite") return "invite";
+  return "reset";
+}
+
 export default async function ResetPasswordPage({
   searchParams,
 }: ResetPasswordPageProps) {
   const params = (await searchParams) || {};
-  const isInviteMode = params.mode === "invite";
-  const title = isInviteMode
-    ? "Create your portal password."
-    : "Reset your portal password.";
-  const description = isInviteMode
-    ? "Finish setting up your account by choosing a password before entering the portal."
-    : "Request a secure reset email, or finish updating your password if you already opened a recovery link.";
-  const panelTitle = isInviteMode ? "Create password" : "Password reset";
-  const panelDescription = isInviteMode
-    ? "Choose the password you'll use the next time you sign in to the client portal."
-    : "Use your account email to request a reset, then follow the link in your inbox to set a new password.";
+  const pageMode = resolvePageMode(params.mode);
+  const title =
+    pageMode === "invite-choose"
+      ? "Finish setting up your account."
+      : pageMode === "invite"
+        ? "Create your portal password."
+        : "Reset your portal password.";
+  const description =
+    pageMode === "invite-choose"
+      ? "Choose how you'll sign in to the client portal. Passkeys are faster and more secure — or set a password if you prefer."
+      : pageMode === "invite"
+        ? "Finish setting up your account by choosing a password before entering the portal."
+        : "Request a secure reset email, or finish updating your password if you already opened a recovery link.";
+  const panelTitle =
+    pageMode === "invite-choose"
+      ? "Choose your sign-in method"
+      : pageMode === "invite"
+        ? "Create password"
+        : "Password reset";
+  const panelDescription =
+    pageMode === "invite-choose"
+      ? "Set up a passkey in a single tap, or fall back to a password. You can always add a passkey later from your security settings."
+      : pageMode === "invite"
+        ? "Choose the password you'll use the next time you sign in to the client portal."
+        : "Use your account email to request a reset, then follow the link in your inbox to set a new password.";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(0,148,198,0.22),_transparent_35%),linear-gradient(180deg,#000022_0%,#040f16_50%,#040f16_100%)] px-4 py-16 text-text-primary">
@@ -55,10 +78,16 @@ export default async function ResetPasswordPage({
 
             <div className="grid gap-4 pt-10 text-sm text-text-secondary md:grid-cols-3">
               <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
-                {isInviteMode ? "Secure first login" : "Secure email recovery"}
+                {pageMode === "invite-choose"
+                  ? "Passkey or password"
+                  : pageMode === "invite"
+                    ? "Secure first login"
+                    : "Secure email recovery"}
               </div>
               <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
-                Password update required
+                {pageMode === "invite-choose"
+                  ? "Backed by email recovery"
+                  : "Password update required"}
               </div>
               <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
                 Works for admins and clients
@@ -77,15 +106,19 @@ export default async function ResetPasswordPage({
                 </p>
               </div>
 
-              <ResetPasswordForm
-                initialCode={params.code}
-                initialTokenHash={params.token_hash}
-                initialType={params.type}
-                isRecoveryRedirect={params.recovery === "1"}
-                initialMode={params.mode}
-                next={params.next}
-                initialErrorDescription={params.error_description}
-              />
+              {pageMode === "invite-choose" ? (
+                <InviteAcceptance next={params.next} />
+              ) : (
+                <ResetPasswordForm
+                  initialCode={params.code}
+                  initialTokenHash={params.token_hash}
+                  initialType={params.type}
+                  isRecoveryRedirect={params.recovery === "1"}
+                  initialMode={params.mode}
+                  next={params.next}
+                  initialErrorDescription={params.error_description}
+                />
+              )}
             </div>
           </section>
         </div>

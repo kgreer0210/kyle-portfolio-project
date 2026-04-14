@@ -38,15 +38,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
             </div>
 
-            <div className="grid gap-4 pt-10 text-sm text-text-secondary md:grid-cols-3">
-              <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
+            <div className="grid gap-4 pt-10 text-sm text-text-secondary md:grid-cols-2">
+              <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4 flex items-center justify-center">
                 Guided onboarding
               </div>
-              <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
+              <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4 flex items-center justify-center">
                 Centralized ticket history
-              </div>
-              <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4">
-                Role-based admin access
               </div>
             </div>
           </section>
@@ -56,8 +53,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold text-white">Sign in</h2>
                 <p className="text-sm leading-6 text-text-secondary">
-                  Use the email address tied to your client invite or admin
-                  account.
+                  Use the email address tied to your client invite to sign in.
+                  Or use the passkey feature to sign in without the need for a
+                  password.
                 </p>
               </div>
 
