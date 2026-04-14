@@ -42,3 +42,6 @@ next-env.d.ts
 
 # git worktrees
 .worktrees/
+
+# claude code — session-local dev server config
+.claude/launch.json
