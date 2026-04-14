@@ -38,12 +38,16 @@ export default function OnboardingChecklist({
   const refineMenuRef = useRef<HTMLDivElement>(null);
 
   const activeStep = useMemo(
-    () => onboardingSteps.find((step) => step.key === currentStep) || onboardingSteps[0],
+    () =>
+      onboardingSteps.find((step) => step.key === currentStep) ||
+      onboardingSteps[0],
     [currentStep],
   );
 
   const isLocked =
-    status === "submitted" || status === "completed" || status === "skipped_legacy";
+    status === "submitted" ||
+    status === "completed" ||
+    status === "skipped_legacy";
 
   function updateField(stepKey: string, fieldKey: string, value: string) {
     setResponses((current) => ({
@@ -68,7 +72,11 @@ export default function OnboardingChecklist({
     updateField(stepKey, fieldKey, next.join(","));
   }
 
-  async function refineField(fieldKey: string, fieldLabel: string, action: "polish" | "expand") {
+  async function refineField(
+    fieldKey: string,
+    fieldLabel: string,
+    action: "polish" | "expand",
+  ) {
     const currentValue = responses[activeStep.key]?.[fieldKey] || "";
     if (!currentValue.trim()) return;
 
@@ -88,7 +96,10 @@ export default function OnboardingChecklist({
         }),
       });
 
-      const payload = (await response.json()) as { result?: string; error?: string };
+      const payload = (await response.json()) as {
+        result?: string;
+        error?: string;
+      };
 
       if (!response.ok) {
         throw new Error(payload.error || "Unable to refine field.");
@@ -99,7 +110,9 @@ export default function OnboardingChecklist({
       }
     } catch (refineError) {
       setError(
-        refineError instanceof Error ? refineError.message : "Unable to refine field.",
+        refineError instanceof Error
+          ? refineError.message
+          : "Unable to refine field.",
       );
     } finally {
       setRefiningField(null);
@@ -134,7 +147,9 @@ export default function OnboardingChecklist({
         throw new Error(payload.error || "Unable to save onboarding draft.");
       }
 
-      const nextCompleted = Array.from(new Set([...completedSteps, activeStep.key]));
+      const nextCompleted = Array.from(
+        new Set([...completedSteps, activeStep.key]),
+      );
       setCompletedSteps(nextCompleted);
       if (nextStep) {
         setCurrentStep(nextStep);
@@ -200,7 +215,7 @@ export default function OnboardingChecklist({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-      <aside className="space-y-3 rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-5">
+      <aside className="space-y-3 rounded-4xl border border-penn-blue bg-oxford-blue/80 p-5">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
             Onboarding Progress
@@ -242,7 +257,7 @@ export default function OnboardingChecklist({
         })}
       </aside>
 
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
+      <section className="rounded-4xl border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
         <div className="space-y-3">
           <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
             {activeStep.title}
@@ -379,7 +394,14 @@ export default function OnboardingChecklist({
                       {field.label}
                     </label>
                     {!isLocked && (
-                      <div className="relative" ref={openRefineMenu === field.key ? refineMenuRef : undefined}>
+                      <div
+                        className="relative"
+                        ref={
+                          openRefineMenu === field.key
+                            ? refineMenuRef
+                            : undefined
+                        }
+                      >
                         <button
                           type="button"
                           onClick={() =>
@@ -403,7 +425,11 @@ export default function OnboardingChecklist({
                             <button
                               type="button"
                               onClick={() =>
-                                void refineField(field.key, field.label, "polish")
+                                void refineField(
+                                  field.key,
+                                  field.label,
+                                  "polish",
+                                )
                               }
                               className="block w-full px-4 py-3 text-left text-sm text-text-primary transition hover:bg-blue-ncs/10 hover:text-white"
                             >
@@ -412,7 +438,11 @@ export default function OnboardingChecklist({
                             <button
                               type="button"
                               onClick={() =>
-                                void refineField(field.key, field.label, "expand")
+                                void refineField(
+                                  field.key,
+                                  field.label,
+                                  "expand",
+                                )
                               }
                               className="block w-full px-4 py-3 text-left text-sm text-text-primary transition hover:bg-blue-ncs/10 hover:text-white"
                             >
