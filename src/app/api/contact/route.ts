@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const getResendClient = () => {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    return null;
-  }
-  return new Resend(apiKey);
-};
+import { createAdminSupabaseClient } from "@/lib/supabase";
+import { qualifyLead } from "@/lib/leadQualification";
+import { sendContactLeadNotifications } from "@/lib/notifications";
 
 interface ContactFormData {
   name: string;
@@ -166,62 +160,86 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get contact email from environment or use default
-    const contactEmail = process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
+    // Persist the raw submission to Supabase first so we never lose a lead
+    // even if the downstream AI qualification or notification fans out fails.
+    const supabase = createAdminSupabaseClient();
+    const userAgent = request.headers.get("user-agent") ?? null;
 
-    // Send email notification
-    const resend = getResendClient();
-    if (!resend) {
-      console.error("RESEND_API_KEY is not configured");
+    const { data: insertedLead, error: insertError } = await supabase
+      .from("contact_leads")
+      .insert({
+        name,
+        email,
+        subject,
+        message,
+        ip_address: clientIP,
+        user_agent: userAgent,
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !insertedLead) {
+      console.error("Failed to persist contact lead:", insertError);
       return NextResponse.json(
-        { error: "Email service is not configured" },
+        { error: "An unexpected error occurred. Please try again later." },
         { status: 500 },
       );
     }
 
-    const emailResult = await resend.emails.send({
-      from: "Contact Form <info@kygrsolutions.com>",
-      to: contactEmail,
-      replyTo: email,
-      subject: `Portfolio Contact: ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #0094c6;">New Contact Form Submission</h2>
-          <p><strong>From:</strong> ${name} (${email})</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;" />
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
-            <p style="white-space: pre-wrap; margin: 0;">${message}</p>
-          </div>
-          <p style="margin-top: 20px; color: #666; font-size: 12px;">
-            This email was sent from your portfolio contact form.
-          </p>
-        </div>
-      `,
-      text: `
-New Contact Form Submission
+    // Qualify the lead with Claude Haiku via OpenRouter. Returns null on
+    // missing key or any failure — the UI falls back to the medium tier so
+    // qualification failures never block form submission.
+    const qualification = await qualifyLead({ name, email, subject, message });
 
-From: ${name} (${email})
-Subject: ${subject}
+    // Write qualification results back to the row (best-effort — don't fail
+    // the request if this update fails).
+    if (qualification) {
+      const { error: updateError } = await supabase
+        .from("contact_leads")
+        .update({
+          qualified_at: new Date().toISOString(),
+          intent: qualification.intent,
+          project_type: qualification.project_type,
+          project_fit_score: qualification.project_fit_score,
+          budget_signal: qualification.budget_signal,
+          timeline: qualification.timeline,
+          seriousness_score: qualification.seriousness_score,
+          overall_score: qualification.overall_score,
+          score_tier: qualification.score_tier,
+          reasoning: qualification.reasoning,
+          recommended_action: qualification.recommended_action,
+          qualification_raw: qualification,
+        })
+        .eq("id", insertedLead.id);
 
-Message:
-${message}
+      if (updateError) {
+        console.error(
+          "Failed to update lead with qualification:",
+          updateError,
+        );
+      }
+    }
 
----
-This email was sent from your portfolio contact form.
-      `,
+    // Fan out notifications. Each channel swallows its own errors so one
+    // failing channel won't block the other or the response.
+    await sendContactLeadNotifications({
+      name,
+      email,
+      subject,
+      message,
+      qualification,
     });
 
-    if (emailResult.error) {
-      console.error("Email sending error:", emailResult.error);
-      return NextResponse.json(
-        { error: "Failed to send email. Please try again later." },
-        { status: 500 },
-      );
-    }
+    // Return the tier so the client can branch its success UI (high-intent
+    // leads see a Calendly CTA instead of the standard thank-you). If
+    // qualification failed, default to medium.
+    const tier = qualification?.score_tier ?? "medium";
 
     return NextResponse.json(
-      { message: "Thank you for your message! I'll get back to you soon." },
+      {
+        message: "Thank you for your message! I'll get back to you soon.",
+        tier,
+      },
       { status: 200 },
     );
   } catch (error) {

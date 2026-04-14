@@ -32,6 +32,7 @@ export default function Contact() {
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
+    tier?: "high" | "medium" | "low";
   }>({ type: null, message: "" });
 
   const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
@@ -114,6 +115,7 @@ export default function Contact() {
         message:
           data.message ||
           "Thank you for your message! I'll get back to you soon.",
+        tier: data.tier,
       });
 
       // Reset form
@@ -371,15 +373,43 @@ export default function Contact() {
           </motion.div>
 
           {/* Status Messages */}
-          {submitStatus.type && (
+          {submitStatus.type === "error" && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`p-4 rounded-lg ${
-                submitStatus.type === "success"
-                  ? "bg-green-900/30 border border-green-500 text-green-200"
-                  : "bg-red-900/30 border border-red-500 text-red-200"
-              }`}
+              className="p-4 rounded-lg bg-red-900/30 border border-red-500 text-red-200"
+            >
+              <p className="text-center">{submitStatus.message}</p>
+            </motion.div>
+          )}
+          {submitStatus.type === "success" && submitStatus.tier === "high" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 rounded-lg bg-green-900/30 border border-green-500 text-green-100 text-center"
+            >
+              <p className="font-semibold text-lg mb-2">
+                Thanks — this sounds like a great fit.
+              </p>
+              <p className="mb-4 text-green-200">
+                Want to skip the email thread and grab a time on my calendar
+                now? I&apos;ll review the details before we hop on.
+              </p>
+              <a
+                href={consultLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block btn-primary px-6 py-3 rounded-lg font-medium hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Book a 30-minute call
+              </a>
+            </motion.div>
+          )}
+          {submitStatus.type === "success" && submitStatus.tier !== "high" && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-lg bg-green-900/30 border border-green-500 text-green-200"
             >
               <p className="text-center">{submitStatus.message}</p>
             </motion.div>
