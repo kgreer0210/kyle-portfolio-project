@@ -16,23 +16,30 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://kygrsolutions.com"),
   title: {
-    default: "KYGR Solutions | Websites, Web & Mobile Apps, Automations",
+    default: "KYGR Solutions | Website, Software & Application Development",
     template: "%s | KYGR Solutions",
   },
   description:
-    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and automations for businesses ready to grow — helping you win more leads, streamline operations, and reclaim time.",
+    "KYGR Solutions builds conversion-focused websites, web & mobile apps, and AI automations for businesses ready to grow — custom software development, application development, and tech stack reviews that help you win more leads and reclaim time.",
   keywords: [
     "KYGR Solutions",
-    "business software",
     "website development",
-    "web app",
-    "mobile app",
+    "website development services",
+    "software development",
+    "custom software development",
+    "application development",
+    "custom application development",
+    "web app development",
+    "mobile app development",
+    "AI automations",
+    "AI automation services",
+    "business automation",
+    "workflow automation",
+    "tech stack review",
+    "technology consulting",
+    "business software",
     "automation",
     "integration",
-    "Next.js",
-    "TypeScript",
-    "software development",
-    "custom software",
     "Georgia",
     "remote software consulting",
   ],
@@ -96,6 +103,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-rich-black text-text-primary min-h-screen relative`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ProfessionalService",
+              name: "KYGR Solutions",
+              url: "https://kygrsolutions.com",
+              description:
+                "Custom website development, software development, application development, AI automations, and tech stack reviews for businesses ready to grow.",
+              founder: { "@type": "Person", name: "Kyle Greer" },
+              areaServed: ["Georgia", "United States"],
+              serviceType: [
+                "Website Development",
+                "Software Development",
+                "Application Development",
+                "AI Automation",
+                "Tech Stack Review",
+                "Technology Consulting",
+              ],
+              sameAs: ["https://kygrsolutions.com"],
+            }),
+          }}
+        />
         <AppShell>{children}</AppShell>
       </body>
     </html>
