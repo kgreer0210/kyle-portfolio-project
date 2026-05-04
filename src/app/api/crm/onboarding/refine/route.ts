@@ -195,7 +195,12 @@ export async function POST(request: NextRequest) {
     return jsonFromAuthError(error) || jsonError("Unauthorized", 401);
   }
 
-  const apiKey = process.env.OPEN_ROUTER_API_KEY;
+  // Standardized to OPENROUTER_API_KEY (no underscore split) so all
+  // OpenRouter-backed routes share a single env var. The previous
+  // OPEN_ROUTER_API_KEY name still works locally if both are set, but
+  // OPENROUTER_API_KEY is canonical going forward.
+  const apiKey =
+    process.env.OPENROUTER_API_KEY ?? process.env.OPEN_ROUTER_API_KEY;
   if (!apiKey) {
     return jsonError("AI refine is not configured.", 503);
   }
