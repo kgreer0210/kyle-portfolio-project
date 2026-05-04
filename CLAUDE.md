@@ -43,12 +43,19 @@ src/
 │   ├── Header.tsx            # Navigation header
 │   ├── ScrollHeader.tsx       # Sticky header on scroll
 │   ├── BackToTop.tsx         # Back to top button
+│   ├── ChatWidget.tsx        # Floating AI chat assistant (diagnostic conversations + lead capture)
 │   ├── Footer.tsx            # Footer
 │   ├── BackendShowcase.tsx   # Backend project showcase
 │   └── index.ts              # Component exports
+├── data/
+│   └── knowledge/            # Markdown knowledge files consumed by the chat assistant
 ├── lib/
+│   ├── chatKnowledge.ts      # Loads + assembles knowledge MD files into the chat system prompt
+│   ├── chatStorage.ts        # Supabase persistence for chat_conversations + chat_messages
+│   ├── chatLeadScoring.ts    # AI scoring of completed chat transcripts
+│   ├── leadQualification.ts  # AI scoring of contact-form submissions
 │   ├── supabase.ts           # Supabase server client
-│   └── notifications.ts      # Twilio SMS + Discord webhook helpers
+│   └── notifications.ts      # Email (Resend) + Discord webhook helpers
 └── Particles/
     └── Particles.tsx         # Particle animation component
 ```
@@ -87,6 +94,21 @@ src/
 
 - `POST /api/contact` - Contact form submission endpoint (sends email via Resend)
 - `POST /api/retell/webhook` - Retell AI voice agent webhook (handles `call_started`, `call_ended`, `call_analyzed` events; stores calls in Supabase, sends SMS + Discord notifications)
+- `POST /api/chat` - Streaming chat endpoint for the on-site AI diagnostic assistant. Uses Claude Haiku 4.5 via OpenRouter, persists each turn to Supabase (`chat_conversations`, `chat_messages`).
+- `POST /api/chat/end` - Conversation finalizer. Scores the transcript with `src/lib/chatLeadScoring.ts`, marks the conversation completed in Supabase, and sends Kyle an email digest via Resend.
+
+## Chat Assistant Knowledge Files
+
+The on-site chat assistant (`src/components/ChatWidget.tsx`) reads its persona, services, process, FAQ, diagnostic playbook, and scoping guardrails from markdown files under `src/data/knowledge/`:
+
+- `bio.md` — voice and background (visitor-facing)
+- `services.md` — service buckets and what Kyle declines (visitor-facing)
+- `process.md` — how a project works start to finish (visitor-facing)
+- `faq.md` — common Q&A (visitor-facing)
+- `diagnostic-questions.md` — questioning playbook (internal)
+- `scoping-guidelines.md` — hard rules: never quote price, scope boundaries, when to defer to Kyle (internal)
+
+Edit the markdown to change tone or facts; `src/lib/chatKnowledge.ts` reads them fresh on every chat request, so edits take effect on the next turn — no restart needed.
 
 ## Styling
 
