@@ -155,9 +155,12 @@ export async function scoreChatTranscript(
 
   try {
     const openrouter = createOpenRouter({ apiKey });
+    // Deliberately omit the visitor email here. The model doesn't need it
+    // to score the transcript, and sending raw email PII to a third-party
+    // model provider is unnecessary data exposure. The email lives in our
+    // own Supabase + outbound digest only.
     const userPrompt = [
       `Visitor name: ${visitorMeta.name ?? "(not provided)"}`,
-      `Visitor email: ${visitorMeta.email ?? "(not provided)"}`,
       "",
       "Transcript:",
       transcript,

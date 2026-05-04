@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  finalizeConversation,
+  claimConversationForFinalize,
   getConversationTranscript,
+  writeConversationAnalytics,
 } from "@/lib/chatStorage";
 import { scoreChatTranscript } from "@/lib/chatLeadScoring";
 import { sendChatDigestEmail } from "@/lib/notifications";
@@ -34,8 +35,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Pull the full transcript first. If there are zero user messages we don't
-  // bother scoring or emailing — the visitor opened and abandoned the widget.
+  // Read the conversation + transcript first so we can decide whether the
+  // session ever produced any user content (and to know when it started for
+  // the digest header). The decision to actually run scoring + email comes
+  // AFTER an atomic claim below.
   const { conversation, messages } = await getConversationTranscript(
     body.conversationId,
   );
@@ -47,30 +50,49 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Idempotency guard: if the conversation is already finalized, do NOT
-  // re-score or re-send the email digest. Multiple end calls can fire from
-  // the same conversation (X button click + pagehide + tab close + a stale
-  // session that re-closes a completed convo), and each one would otherwise
-  // blast Kyle's inbox with a duplicate.
+  // Quick early-out for double-fires we can detect cheaply. The atomic
+  // claim below is the authoritative race-free guard, but skipping a write
+  // when we already have evidence the conversation is finalized is a small
+  // optimization.
   if (conversation.status !== "active" || conversation.endedAt !== null) {
     return NextResponse.json({ ok: true, alreadyEnded: true });
   }
 
-  // Honor any visitor info the client might have collected after the last
-  // /api/chat turn (e.g. email captured in a dedicated UI step).
   const visitorName =
     body.visitorName?.trim().slice(0, 100) || conversation.visitorName || null;
   const visitorEmail =
-    body.visitorEmail?.trim().slice(0, 255) || conversation.visitorEmail || null;
+    body.visitorEmail?.trim().slice(0, 255) ||
+    conversation.visitorEmail ||
+    null;
 
   const userMessageCount = messages.filter((m) => m.role === "user").length;
+  const terminalStatus: "completed" | "abandoned" =
+    userMessageCount === 0 ? "abandoned" : body.status || "completed";
 
-  // Empty / abandoned-before-real-engagement conversations: just mark them
-  // and skip scoring + email. No noise in Kyle's inbox.
+  // Atomic transition active -> terminalStatus. Only ONE concurrent caller
+  // can win this race; any other simultaneous /api/chat/end POSTs will get
+  // back `false` and short-circuit without re-scoring or re-emailing the
+  // digest. This is the canonical idempotency mechanism — the read check
+  // above is just an optimization.
+  const claimed = await claimConversationForFinalize(
+    body.conversationId,
+    terminalStatus,
+  );
+  if (!claimed) {
+    return NextResponse.json({ ok: true, alreadyEnded: true });
+  }
+
+  // Persist any newly-captured visitor metadata immediately after the claim,
+  // so even if scoring fails downstream the lead-capture record reflects
+  // what the visitor gave us.
+  await writeConversationAnalytics(body.conversationId, {
+    visitorName,
+    visitorEmail,
+  });
+
+  // Empty conversations are now finalized as "abandoned" by the claim
+  // itself. No scoring, no email — just exit.
   if (userMessageCount === 0) {
-    await finalizeConversation(body.conversationId, {
-      status: "abandoned",
-    });
     return NextResponse.json({ ok: true, scored: false });
   }
 
@@ -79,16 +101,13 @@ export async function POST(req: NextRequest) {
     email: visitorEmail,
   });
 
-  await finalizeConversation(body.conversationId, {
-    status: body.status || "completed",
+  await writeConversationAnalytics(body.conversationId, {
     summary: scoring?.summary ?? null,
     intent: scoring?.intent ?? null,
     leadScore: scoring?.overall_score ?? null,
     scoreTier: scoring?.score_tier ?? null,
   });
 
-  // Send the digest. Failures are swallowed inside the helper; we still
-  // return ok so the client can close the widget cleanly.
   await sendChatDigestEmail({
     conversationId: body.conversationId,
     visitorName,

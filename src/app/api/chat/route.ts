@@ -70,6 +70,21 @@ export async function POST(req: NextRequest) {
       content: m.content.slice(0, 4000),
     }));
 
+  // After sanitization the array can be empty even when body.messages had
+  // entries (all blank, wrong roles, etc.). Reject with 400 instead of
+  // crashing on the lastUserMessage indexing below. Also require the most
+  // recent retained message to be a user turn — replying to our own assistant
+  // message would be incoherent.
+  const lastUserMessage = trimmedMessages[trimmedMessages.length - 1];
+  if (!lastUserMessage || lastUserMessage.role !== "user") {
+    return new Response(
+      JSON.stringify({
+        error: "messages must end with a non-empty user message",
+      }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   const visitorName = body.visitorName?.trim().slice(0, 100) || null;
   const visitorEmail = body.visitorEmail?.trim().slice(0, 255) || null;
 
@@ -83,14 +98,7 @@ export async function POST(req: NextRequest) {
     visitorEmail,
   });
 
-  const lastUserMessage = trimmedMessages[trimmedMessages.length - 1];
-  if (lastUserMessage.role === "user") {
-    await appendMessage(
-      body.conversationId,
-      "user",
-      lastUserMessage.content,
-    );
-  }
+  await appendMessage(body.conversationId, "user", lastUserMessage.content);
 
   const systemPrompt = buildSystemPrompt({
     visitorName,

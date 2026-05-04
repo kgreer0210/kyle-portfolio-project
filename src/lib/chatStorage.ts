@@ -31,25 +31,52 @@ interface UpsertConversationInput {
 
 /**
  * Inserts a new conversation row if one doesn't exist, or updates the
- * visitor name/email if those have been collected since. Idempotent: safe to
+ * visitor name/email when new values are supplied. Idempotent: safe to
  * call on every chat turn.
+ *
+ * Importantly, callers that omit visitorName/visitorEmail (or pass null)
+ * will NOT overwrite previously-captured values. Only non-null inputs are
+ * written, so a stale client passing nothing can't erase lead data we've
+ * already collected on a prior turn.
  */
 export async function upsertConversation(
   input: UpsertConversationInput,
 ): Promise<void> {
   const supabase = createAdminSupabaseClient();
-  const { error } = await supabase
+
+  // Step 1: ensure the row exists with the supplied values (insert-only on
+  // conflict). This populates name/email if they're given on the very first
+  // turn but takes no action if the row already exists.
+  const insertPayload: Record<string, unknown> = {
+    id: input.conversationId,
+  };
+  if (input.visitorName) insertPayload.visitor_name = input.visitorName;
+  if (input.visitorEmail) insertPayload.visitor_email = input.visitorEmail;
+
+  const { error: insertErr } = await supabase
     .from("chat_conversations")
-    .upsert(
-      {
-        id: input.conversationId,
-        visitor_name: input.visitorName ?? null,
-        visitor_email: input.visitorEmail ?? null,
-      },
-      { onConflict: "id", ignoreDuplicates: false },
-    );
-  if (error) {
-    console.error("Failed to upsert chat conversation:", error);
+    .upsert(insertPayload, {
+      onConflict: "id",
+      ignoreDuplicates: true,
+    });
+  if (insertErr) {
+    console.error("Failed to insert chat conversation:", insertErr);
+  }
+
+  // Step 2: if the caller supplied non-null name/email, update those columns.
+  // Skip the update entirely when there's nothing new — that's the path that
+  // used to clobber existing values with null.
+  const updates: Record<string, unknown> = {};
+  if (input.visitorName) updates.visitor_name = input.visitorName;
+  if (input.visitorEmail) updates.visitor_email = input.visitorEmail;
+  if (Object.keys(updates).length > 0) {
+    const { error: updateErr } = await supabase
+      .from("chat_conversations")
+      .update(updates)
+      .eq("id", input.conversationId);
+    if (updateErr) {
+      console.error("Failed to update chat conversation metadata:", updateErr);
+    }
   }
 }
 
@@ -73,32 +100,78 @@ export async function appendMessage(
 }
 
 /**
- * Mark a conversation finished and write the summary/lead-score fields.
+ * Atomically claim a conversation for finalization. Transitions the row
+ * from `status='active'` AND `ended_at IS NULL` to the supplied terminal
+ * status (`completed` or `abandoned`) with `ended_at` set to now.
+ *
+ * Returns true ONLY when this call actually transitioned the row. If
+ * another concurrent /api/chat/end request already won the race, returns
+ * false and the caller MUST skip scoring + emailing the digest.
+ *
+ * This is the canonical idempotency mechanism for end-of-conversation
+ * side effects (digest emails). A read-then-act guard is racy; this
+ * single conditional UPDATE is not.
  */
-export async function finalizeConversation(
+export async function claimConversationForFinalize(
+  conversationId: string,
+  terminalStatus: "completed" | "abandoned" = "completed",
+): Promise<boolean> {
+  const supabase = createAdminSupabaseClient();
+  const { data, error } = await supabase
+    .from("chat_conversations")
+    .update({
+      status: terminalStatus,
+      ended_at: new Date().toISOString(),
+    })
+    .eq("id", conversationId)
+    .eq("status", "active")
+    .is("ended_at", null)
+    .select("id");
+
+  if (error) {
+    console.error("Failed to claim chat conversation for finalize:", error);
+    return false;
+  }
+  return Array.isArray(data) && data.length === 1;
+}
+
+/**
+ * Write analytical fields and any newly-captured visitor metadata to a
+ * conversation that has already been claimed via
+ * claimConversationForFinalize. Skips columns whose values are undefined
+ * so callers can update only what they have.
+ */
+export async function writeConversationAnalytics(
   conversationId: string,
   fields: {
-    status?: "completed" | "abandoned";
     summary?: string | null;
     intent?: string | null;
     leadScore?: number | null;
     scoreTier?: "high" | "medium" | "low" | null;
+    visitorName?: string | null;
+    visitorEmail?: string | null;
   },
 ): Promise<void> {
   const supabase = createAdminSupabaseClient();
+
+  const updates: Record<string, unknown> = {};
+  if (fields.summary !== undefined) updates.summary = fields.summary;
+  if (fields.intent !== undefined) updates.intent = fields.intent;
+  if (fields.leadScore !== undefined) updates.lead_score = fields.leadScore;
+  if (fields.scoreTier !== undefined) updates.score_tier = fields.scoreTier;
+  // Only persist visitor metadata when non-null — same rule as the upsert
+  // helper, so we never overwrite captured leads with null.
+  if (fields.visitorName) updates.visitor_name = fields.visitorName;
+  if (fields.visitorEmail) updates.visitor_email = fields.visitorEmail;
+
+  if (Object.keys(updates).length === 0) return;
+
   const { error } = await supabase
     .from("chat_conversations")
-    .update({
-      status: fields.status ?? "completed",
-      summary: fields.summary ?? null,
-      intent: fields.intent ?? null,
-      lead_score: fields.leadScore ?? null,
-      score_tier: fields.scoreTier ?? null,
-      ended_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq("id", conversationId);
   if (error) {
-    console.error("Failed to finalize chat conversation:", error);
+    console.error("Failed to write chat conversation analytics:", error);
   }
 }
 

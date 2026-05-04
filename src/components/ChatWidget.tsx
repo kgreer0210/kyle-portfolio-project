@@ -119,6 +119,16 @@ export default function ChatWidget() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const conversationIdRef = useRef<string | null>(null);
+  // Mirrors of name/email so the pagehide handler (registered once at
+  // mount) can read the latest values when the visitor closes the tab.
+  // Reading them from React state in the handler would close over stale
+  // values from the first render.
+  const nameRef = useRef<string | null>(null);
+  const emailRef = useRef<string | null>(null);
+  // Active AbortController for the in-flight /api/chat stream. When
+  // performEnd runs we abort this so a late assistant response can't
+  // re-populate state after the conversation has been cleared.
+  const streamAbortRef = useRef<AbortController | null>(null);
 
   // Hydrate from sessionStorage so refresh keeps the conversation alive.
   useEffect(() => {
@@ -127,8 +137,14 @@ export default function ChatWidget() {
       setConversationId(persisted.conversationId);
       conversationIdRef.current = persisted.conversationId;
     }
-    if (persisted.visitorName) setName(persisted.visitorName);
-    if (persisted.visitorEmail) setEmail(persisted.visitorEmail);
+    if (persisted.visitorName) {
+      setName(persisted.visitorName);
+      nameRef.current = persisted.visitorName;
+    }
+    if (persisted.visitorEmail) {
+      setEmail(persisted.visitorEmail);
+      emailRef.current = persisted.visitorEmail;
+    }
     if (persisted.messages.length > 0) setMessages(persisted.messages);
   }, []);
 
@@ -142,10 +158,17 @@ export default function ChatWidget() {
     });
   }, [conversationId, name, email, messages]);
 
-  // Keep ref in sync for the unmount-time end call.
+  // Keep refs in sync so the pagehide handler + cleanup paths read the
+  // latest values without taking these as effect dependencies.
   useEffect(() => {
     conversationIdRef.current = conversationId;
   }, [conversationId]);
+  useEffect(() => {
+    nameRef.current = name;
+  }, [name]);
+  useEffect(() => {
+    emailRef.current = email;
+  }, [email]);
 
   // Email prompt becomes visible after enough turns, unless visitor dismissed
   // it or already provided an email.
@@ -190,6 +213,8 @@ export default function ChatWidget() {
   }, [email, messages.length, name]);
 
   // Fire the end-of-conversation digest when the visitor leaves the page.
+  // Reads name/email from refs so a tab close right after the visitor
+  // saves their email still includes that lead info in the digest.
   useEffect(() => {
     const handler = () => {
       const id = conversationIdRef.current;
@@ -202,6 +227,8 @@ export default function ChatWidget() {
           body: JSON.stringify({
             conversationId: id,
             status: "completed",
+            visitorName: nameRef.current,
+            visitorEmail: emailRef.current,
           }),
         });
       } catch {
@@ -221,6 +248,20 @@ export default function ChatWidget() {
         visitorEmail: string | null;
       },
     ) => {
+      // Cancel any prior in-flight stream before starting a new one. Also
+      // creates the AbortController for THIS request and stashes it in a
+      // ref so performEnd() can abort it from outside this closure.
+      streamAbortRef.current?.abort();
+      const controller = new AbortController();
+      streamAbortRef.current = controller;
+
+      // Capture the conversation id at send time. If performEnd() runs
+      // (which clears state and resets conversationIdRef.current to null)
+      // while this stream is still resolving, we use this captured value
+      // to detect that we shouldn't mutate state for the now-orphaned
+      // assistant response.
+      const startConversationId = ctx.conversationId;
+
       setStreaming(true);
       setStreamingText("");
       setError(null);
@@ -228,6 +269,7 @@ export default function ChatWidget() {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
           body: JSON.stringify({
             conversationId: ctx.conversationId,
             visitorName: ctx.visitorName,
@@ -250,24 +292,54 @@ export default function ChatWidget() {
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
+          // Bail out cleanly if the conversation was reset while streaming.
+          if (
+            controller.signal.aborted ||
+            conversationIdRef.current !== startConversationId
+          ) {
+            try {
+              await reader.cancel();
+            } catch {
+              /* noop */
+            }
+            return;
+          }
           const chunk = decoder.decode(value, { stream: true });
           accumulated += chunk;
           setStreamingText(accumulated);
         }
 
-        if (accumulated.trim().length > 0) {
+        // Final guard: only commit the assistant message if the
+        // conversation that started this stream is still the active one.
+        if (
+          accumulated.trim().length > 0 &&
+          !controller.signal.aborted &&
+          conversationIdRef.current === startConversationId
+        ) {
           setMessages((prev) => [
             ...prev,
             { role: "assistant", content: accumulated },
           ]);
         }
       } catch (err) {
+        // Aborts fire as DOMException(name='AbortError') — they're
+        // expected when the user ends the conversation mid-stream and
+        // shouldn't surface as an error.
+        if (
+          (err instanceof DOMException && err.name === "AbortError") ||
+          (err instanceof Error && err.name === "AbortError")
+        ) {
+          return;
+        }
         const message =
           err instanceof Error
             ? err.message
             : "Something went wrong. Please try again.";
         setError(message);
       } finally {
+        if (streamAbortRef.current === controller) {
+          streamAbortRef.current = null;
+        }
         setStreaming(false);
         setStreamingText("");
       }
@@ -336,6 +408,13 @@ export default function ChatWidget() {
   // instant close — no waiting for the AI scoring + email round-trip.
   const performEnd = useCallback(
     (closePanel: boolean) => {
+      // Cancel any in-flight assistant stream first. Without this, a late
+      // chunk can re-populate `messages` after we just cleared it, which
+      // leaves an orphaned transcript with no active conversationId and
+      // wedges the widget on next open.
+      streamAbortRef.current?.abort();
+      streamAbortRef.current = null;
+
       // Kick off the digest; do NOT await it.
       void finalizeOnClose();
       clearPersistedState();
