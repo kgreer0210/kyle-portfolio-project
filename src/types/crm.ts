@@ -51,9 +51,16 @@ export interface OrganizationMembership {
 export interface OnboardingStepField {
   key: string;
   label: string;
-  type: "text" | "textarea" | "url" | "radio" | "checkboxes";
+  type:
+    | "text"
+    | "textarea"
+    | "url"
+    | "radio"
+    | "checkboxes"
+    | "person_list";
   placeholder?: string;
   options?: string[];
+  helpText?: string;
 }
 
 export interface OnboardingStepDefinition {

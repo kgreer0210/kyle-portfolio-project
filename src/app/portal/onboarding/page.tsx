@@ -1,7 +1,10 @@
 import Link from "next/link";
 import OnboardingChecklist from "@/components/crm/OnboardingChecklist";
 import { onboardingSteps } from "@/lib/crm";
-import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import {
+  requireClientUser,
+  getPrimaryOrganizationMembership,
+} from "@/lib/auth";
 
 function getReadOnlyOnboardingContent(status: "submitted" | "completed") {
   if (status === "completed") {
@@ -49,7 +52,10 @@ export default async function PortalOnboardingPage() {
 
   const responseMap = Object.fromEntries(
     (responses || []).map((row) => {
-      const entry = row as { step_key: string; response: Record<string, string> };
+      const entry = row as {
+        step_key: string;
+        response: Record<string, string>;
+      };
       return [entry.step_key, entry.response || {}];
     }),
   );
@@ -74,8 +80,8 @@ export default async function PortalOnboardingPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-text-secondary">
             This portal was created for an existing client relationship, so you
-            can start using tickets right away without repeating a full discovery
-            flow.
+            can start using tickets right away without repeating a full
+            discovery flow.
           </p>
         </section>
 
@@ -130,7 +136,9 @@ export default async function PortalOnboardingPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
                   Step {index + 1}
                 </p>
-                <h3 className="text-2xl font-semibold text-white">{step.title}</h3>
+                <h3 className="text-2xl font-semibold text-white">
+                  {step.title}
+                </h3>
                 <p className="text-sm leading-7 text-text-secondary">
                   {step.description}
                 </p>
@@ -169,12 +177,21 @@ export default async function PortalOnboardingPage() {
           Client Onboarding
         </p>
         <h2 className="mt-2 text-3xl font-semibold text-white">
-          Tell us what we need to support you well.
+          Let&apos;s get to know your business.
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
-          Save your progress as you go. Once the final step is submitted, the
-          onboarding package moves into review and we can start from a much
-          cleaner shared context.
+          This one-time setup gives us everything we need to do great work for
+          you — your goals, your tools, the people involved, and how you like to
+          work. Five short steps, and you can save anytime; no need to finish in
+          one sitting.
+        </p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
+          Stuck on what to write? Click{" "}
+          <span className="text-blue-ncs">✦ Refine</span> to{" "}
+          <span className="text-blue-ncs">✦ Polish</span> a rough draft, or{" "}
+          <span className="text-blue-ncs">↗ Expand</span> to walk through a few
+          quick multiple-choice questions and have your answer drafted for you.
+          The more we know now, the smoother every step that follows will be.
         </p>
       </section>
 
@@ -186,7 +203,8 @@ export default async function PortalOnboardingPage() {
           onboardingSteps[0].key
         }
         initialCompletedSteps={
-          (onboarding as { completed_steps?: string[] } | null)?.completed_steps || []
+          (onboarding as { completed_steps?: string[] } | null)
+            ?.completed_steps || []
         }
         initialResponses={responseMap}
       />

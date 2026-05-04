@@ -4,6 +4,9 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onboardingSteps } from "@/lib/crm";
 import type { OnboardingStatus } from "@/types/crm";
+import ExpandQuestionnaireModal from "./ExpandQuestionnaireModal";
+import HelpTooltip from "./HelpTooltip";
+import PersonListField from "./PersonListField";
 
 interface OnboardingChecklistProps {
   organizationId: string;
@@ -35,6 +38,10 @@ export default function OnboardingChecklist({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refiningField, setRefiningField] = useState<string | null>(null);
   const [openRefineMenu, setOpenRefineMenu] = useState<string | null>(null);
+  const [expandModalField, setExpandModalField] = useState<{
+    key: string;
+    label: string;
+  } | null>(null);
   const refineMenuRef = useRef<HTMLDivElement>(null);
 
   const activeStep = useMemo(
@@ -298,9 +305,17 @@ export default function OnboardingChecklist({
 
               return (
                 <div key={field.key} className="space-y-3">
-                  <label className="text-sm font-medium text-text-primary">
-                    {field.label}
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-text-primary">
+                      {field.label}
+                    </label>
+                    {field.helpText ? (
+                      <HelpTooltip
+                        text={field.helpText}
+                        label={`${field.label} help`}
+                      />
+                    ) : null}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {field.options.map((option) => {
                       const isSelected = selectedOption === option;
@@ -348,9 +363,17 @@ export default function OnboardingChecklist({
               const selected = value ? value.split(",") : [];
               return (
                 <div key={field.key} className="space-y-3">
-                  <label className="text-sm font-medium text-text-primary">
-                    {field.label}
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-text-primary">
+                      {field.label}
+                    </label>
+                    {field.helpText ? (
+                      <HelpTooltip
+                        text={field.helpText}
+                        label={`${field.label} help`}
+                      />
+                    ) : null}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {field.options.map((option) => {
                       const isChecked = selected.includes(option);
@@ -390,9 +413,17 @@ export default function OnboardingChecklist({
               return (
                 <div key={field.key} className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <label className="text-sm font-medium text-text-primary">
-                      {field.label}
-                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-text-primary">
+                        {field.label}
+                      </label>
+                      {field.helpText ? (
+                        <HelpTooltip
+                          text={field.helpText}
+                          label={`${field.label} help`}
+                        />
+                      ) : null}
+                    </div>
                     {!isLocked && (
                       <div
                         className="relative"
@@ -410,7 +441,11 @@ export default function OnboardingChecklist({
                             )
                           }
                           disabled={isRefiningThis || !value.trim()}
-                          title="AI Refine"
+                          title={
+                            value.trim()
+                              ? "Polish or expand your draft with AI"
+                              : "Type a rough draft first — then polish or expand it"
+                          }
                           className="flex items-center gap-1.5 rounded-full border border-penn-blue/60 bg-rich-black/60 px-3 py-1.5 text-xs text-text-secondary transition hover:border-blue-ncs/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           {isRefiningThis ? (
@@ -437,13 +472,13 @@ export default function OnboardingChecklist({
                             </button>
                             <button
                               type="button"
-                              onClick={() =>
-                                void refineField(
-                                  field.key,
-                                  field.label,
-                                  "expand",
-                                )
-                              }
+                              onClick={() => {
+                                setExpandModalField({
+                                  key: field.key,
+                                  label: field.label,
+                                });
+                                setOpenRefineMenu(null);
+                              }}
                               className="block w-full px-4 py-3 text-left text-sm text-text-primary transition hover:bg-blue-ncs/10 hover:text-white"
                             >
                               ↗ Expand
@@ -467,11 +502,44 @@ export default function OnboardingChecklist({
               );
             }
 
+            if (field.type === "person_list") {
+              return (
+                <div key={field.key} className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-text-primary">
+                      {field.label}
+                    </label>
+                    {field.helpText ? (
+                      <HelpTooltip
+                        text={field.helpText}
+                        label={`${field.label} help`}
+                      />
+                    ) : null}
+                  </div>
+                  <PersonListField
+                    value={value}
+                    onChange={(next) =>
+                      updateField(activeStep.key, field.key, next)
+                    }
+                    disabled={isLocked}
+                  />
+                </div>
+              );
+            }
+
             return (
               <div key={field.key} className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">
-                  {field.label}
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-text-primary">
+                    {field.label}
+                  </label>
+                  {field.helpText ? (
+                    <HelpTooltip
+                      text={field.helpText}
+                      label={`${field.label} help`}
+                    />
+                  ) : null}
+                </div>
                 <input
                   type={field.type}
                   value={value}
@@ -500,20 +568,22 @@ export default function OnboardingChecklist({
         ) : null}
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={isLocked || isSaving}
-            onClick={() => {
-              const currentIndex = onboardingSteps.findIndex(
-                (step) => step.key === activeStep.key,
-              );
-              const nextStep = onboardingSteps[currentIndex + 1]?.key;
-              void saveStep(nextStep);
-            }}
-            className="rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Saving..." : "Save and continue"}
-          </button>
+          {activeStep.key !== "review-and-submit" ? (
+            <button
+              type="button"
+              disabled={isLocked || isSaving}
+              onClick={() => {
+                const currentIndex = onboardingSteps.findIndex(
+                  (step) => step.key === activeStep.key,
+                );
+                const nextStep = onboardingSteps[currentIndex + 1]?.key;
+                void saveStep(nextStep);
+              }}
+              className="rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSaving ? "Saving..." : "Save and continue"}
+            </button>
+          ) : null}
 
           <button
             type="button"
@@ -536,6 +606,25 @@ export default function OnboardingChecklist({
           ) : null}
         </div>
       </section>
+
+      <ExpandQuestionnaireModal
+        open={!!expandModalField}
+        fieldKey={expandModalField?.key ?? ""}
+        fieldLabel={expandModalField?.label ?? ""}
+        currentValue={
+          expandModalField
+            ? responses[activeStep.key]?.[expandModalField.key] || ""
+            : ""
+        }
+        context={responses}
+        onClose={() => setExpandModalField(null)}
+        onAccept={(text) => {
+          if (expandModalField) {
+            updateField(activeStep.key, expandModalField.key, text);
+          }
+          setExpandModalField(null);
+        }}
+      />
     </div>
   );
 }

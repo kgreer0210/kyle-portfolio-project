@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AdminOnboardingReviewForm from "@/components/crm/AdminOnboardingReviewForm";
 import OnboardingStatusBadge from "@/components/crm/OnboardingStatusBadge";
-import { formatDateTime, onboardingSteps } from "@/lib/crm";
+import { formatDateTime, formatFieldValue, onboardingSteps } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
 
 interface AdminOnboardingDetailPageProps {
@@ -168,7 +168,8 @@ export default async function AdminOnboardingDetailPage({
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {step.fields.map((field) => {
-                  const value = responseMap[step.key]?.[field.key]?.trim();
+                  const raw = responseMap[step.key]?.[field.key] ?? "";
+                  const value = formatFieldValue(field, raw);
 
                   return (
                     <div
