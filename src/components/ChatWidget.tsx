@@ -351,7 +351,7 @@ export default function ChatWidget() {
     e.preventDefault();
     const trimmedName = initialName.trim();
     const trimmedMessage = initialMessage.trim();
-    if (!trimmedName || !trimmedMessage) return;
+    if (!trimmedMessage) return;
 
     const id = conversationId ?? newConversationId();
     if (!conversationId) {
@@ -511,7 +511,7 @@ export default function ChatWidget() {
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <div>
                   <h3 className="text-sm font-semibold text-(--color-text-headings)">
-                    Kyle&apos;s diagnostic assistant
+                    Kyle&apos;s assistant
                   </h3>
                   <p className="text-xs text-(--color-text-secondary)">
                     Powered by AI · Real conversations
@@ -583,11 +583,27 @@ export default function ChatWidget() {
               {showInitialForm && messages.length === 0 ? (
                 <form onSubmit={handleStart} className="space-y-3 pt-2">
                   <div>
-                    <p className="text-sm text-(--color-text-primary) mb-2">
-                      Hey there. I&apos;m Kyle&apos;s diagnostic assistant — I&apos;ll ask
-                      a few questions about your business and help frame what you
-                      might need. To get started:
+                    <p className="text-sm text-(--color-text-primary) mb-3">
+                      Hey there. I&apos;m Kyle&apos;s assistant — ask me anything about
+                      his work, services, or how to get started. Or pick a question below:
                     </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {[
+                        "What do you build?",
+                        "How do I work with you?",
+                        "What's the first step?",
+                        "What have you built before?",
+                      ].map((prompt) => (
+                        <button
+                          key={prompt}
+                          type="button"
+                          onClick={() => setInitialMessage(prompt)}
+                          className="text-xs bg-(--color-rich-black) border border-(--color-penn-blue) hover:border-blue-ncs text-(--color-text-secondary) hover:text-(--color-text-primary) px-3 py-1.5 rounded-full transition-colors"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
@@ -597,9 +613,8 @@ export default function ChatWidget() {
                       type="text"
                       value={initialName}
                       onChange={(e) => setInitialName(e.target.value)}
-                      placeholder="What should I call you?"
+                      placeholder="What should I call you? (optional)"
                       maxLength={100}
-                      required
                       className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs"
                     />
                   </div>
@@ -620,7 +635,6 @@ export default function ChatWidget() {
                   <button
                     type="submit"
                     disabled={
-                      !initialName.trim() ||
                       !initialMessage.trim() ||
                       streaming
                     }
