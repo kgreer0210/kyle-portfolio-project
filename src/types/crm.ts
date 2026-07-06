@@ -18,7 +18,28 @@ export type TicketStatus =
   | "in_progress"
   | "resolved"
   | "closed";
+export type TicketPriority = "low" | "normal" | "high" | "urgent";
+export type TicketCategory =
+  | "website"
+  | "automation"
+  | "ai_voice"
+  | "hosting"
+  | "billing"
+  | "other";
 export type TicketMessageVisibility = "public" | "internal";
+
+export interface TicketSummary {
+  id: string;
+  organization_id: string;
+  type: TicketType;
+  status: TicketStatus;
+  priority: TicketPriority;
+  category: TicketCategory | null;
+  title: string;
+  last_activity_at: string;
+  created_at: string;
+  organizations?: { name: string } | null;
+}
 
 export interface CrmProfile {
   id: string;

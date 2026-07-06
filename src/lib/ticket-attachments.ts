@@ -77,21 +77,25 @@ export async function uploadTicketAttachments(args: {
   return createdAttachments;
 }
 
-export async function createSignedAttachmentUrls(
-  attachments: Array<{
+export async function createSignedAttachmentUrls<
+  T extends {
     id: string;
     storage_path: string;
     file_name: string;
     message_id?: string | null;
-  }>,
-) {
+    file_size?: number | null;
+    mime_type?: string | null;
+  },
+>(attachments: T[]) {
   const supabase = createAdminSupabaseClient();
 
   return Promise.all(
     attachments.map(async (attachment) => {
       const { data } = await supabase.storage
         .from(ticketAttachmentBucket)
-        .createSignedUrl(attachment.storage_path, 60 * 60);
+        .createSignedUrl(attachment.storage_path, 60 * 60, {
+          download: attachment.file_name,
+        });
 
       return {
         ...attachment,
@@ -99,4 +103,20 @@ export async function createSignedAttachmentUrls(
       };
     }),
   );
+}
+
+export function formatFileSize(bytes?: number | null): string {
+  if (!bytes || bytes <= 0) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

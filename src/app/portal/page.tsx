@@ -1,5 +1,9 @@
 import Link from "next/link";
+import PriorityBadge from "@/components/crm/PriorityBadge";
+import StatusBadge from "@/components/crm/StatusBadge";
+import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import type { TicketPriority, TicketStatus } from "@/types/crm";
 
 function getOnboardingStatusLabel(status?: string | null) {
   switch (status) {
@@ -34,7 +38,7 @@ export default async function PortalDashboardPage() {
     );
   }
 
-  const [{ data: onboarding }, { count: openTicketCount }] = await Promise.all([
+  const [{ data: onboarding }, { data: openTicketsData }] = await Promise.all([
     supabase
       .from("client_onboardings")
       .select("status, mode")
@@ -42,10 +46,20 @@ export default async function PortalDashboardPage() {
       .maybeSingle(),
     supabase
       .from("tickets")
-      .select("*", { count: "exact", head: true })
+      .select("id, title, status, priority, last_activity_at")
       .eq("organization_id", membership.organization_id)
-      .in("status", ["new", "open", "waiting_on_client", "in_progress"]),
+      .in("status", activeTicketStatuses)
+      .order("last_activity_at", { ascending: false }),
   ]);
+
+  const openTickets = (openTicketsData || []) as Array<{
+    id: string;
+    title: string;
+    status: TicketStatus;
+    priority: TicketPriority;
+    last_activity_at: string;
+  }>;
+  const openTicketCount = openTickets.length;
   const onboardingStatus = (onboarding as { status?: string } | null)?.status;
   const onboardingMode = (onboarding as { mode?: string } | null)?.mode;
   const showFinishOnboardingCard =
@@ -79,12 +93,15 @@ export default async function PortalDashboardPage() {
             {getOnboardingStatusLabel(onboardingStatus)}
           </p>
         </div>
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+        <Link
+          href="/portal/tickets"
+          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+        >
           <p className="text-sm text-text-secondary">Open tickets</p>
           <p className="mt-3 text-2xl font-semibold text-white">
             {openTicketCount || 0}
           </p>
-        </div>
+        </Link>
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <p className="text-sm text-text-secondary">Portal access</p>
           <p className="mt-3 text-2xl font-semibold text-white">Active</p>
@@ -146,6 +163,42 @@ export default async function PortalDashboardPage() {
           </p>
         </Link>
       </section>
+
+      {openTickets.length > 0 ? (
+        <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="text-xl font-semibold text-white">Your open tickets</h3>
+            <Link
+              href="/portal/tickets"
+              className="text-sm font-medium text-blue-ncs transition hover:text-white"
+            >
+              View all tickets
+            </Link>
+          </div>
+          <div className="mt-5 space-y-3">
+            {openTickets.slice(0, 5).map((ticket) => (
+              <Link
+                key={ticket.id}
+                href={`/portal/tickets/${ticket.id}`}
+                className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+              >
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="font-semibold text-white">{ticket.title}</p>
+                    <p className="mt-1 text-sm text-text-secondary">
+                      Last activity {formatDateTime(ticket.last_activity_at)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={ticket.status} />
+                    <PriorityBadge priority={ticket.priority || "normal"} />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

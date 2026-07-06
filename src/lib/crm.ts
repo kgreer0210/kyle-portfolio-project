@@ -3,6 +3,8 @@ import type {
   OnboardingStepField,
   OnboardingStatus,
   ProfileRole,
+  TicketCategory,
+  TicketPriority,
   TicketStatus,
 } from "@/types/crm";
 
@@ -206,6 +208,62 @@ export const ticketStatusLabels: Record<TicketStatus, string> = {
   resolved: "Resolved",
   closed: "Closed",
 };
+
+export const ticketPriorities: TicketPriority[] = [
+  "low",
+  "normal",
+  "high",
+  "urgent",
+];
+
+export const ticketPriorityLabels: Record<TicketPriority, string> = {
+  low: "Low",
+  normal: "Normal",
+  high: "High",
+  urgent: "Urgent",
+};
+
+export const ticketCategories: TicketCategory[] = [
+  "website",
+  "automation",
+  "ai_voice",
+  "hosting",
+  "billing",
+  "other",
+];
+
+export const ticketCategoryLabels: Record<TicketCategory, string> = {
+  website: "Website",
+  automation: "Automation",
+  ai_voice: "AI voice",
+  hosting: "Hosting",
+  billing: "Billing",
+  other: "Other",
+};
+
+export function isTicketPriority(value: string): value is TicketPriority {
+  return (ticketPriorities as string[]).includes(value);
+}
+
+export function isTicketCategory(value: string): value is TicketCategory {
+  return (ticketCategories as string[]).includes(value);
+}
+
+export const ticketStatusTransitions: Record<TicketStatus, TicketStatus[]> = {
+  new: ["open", "in_progress", "waiting_on_client", "resolved", "closed"],
+  open: ["in_progress", "waiting_on_client", "resolved", "closed"],
+  waiting_on_client: ["open", "in_progress", "resolved", "closed"],
+  in_progress: ["open", "waiting_on_client", "resolved", "closed"],
+  resolved: ["closed", "open"],
+  closed: ["open"],
+};
+
+export const activeTicketStatuses: TicketStatus[] = [
+  "new",
+  "open",
+  "waiting_on_client",
+  "in_progress",
+];
 
 export const onboardingStatusLabels: Record<OnboardingStatus, string> = {
   not_started: "Not started",

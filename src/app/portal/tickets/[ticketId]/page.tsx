@@ -1,9 +1,48 @@
 import { notFound } from "next/navigation";
+import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import TicketReplyForm from "@/components/crm/TicketReplyForm";
-import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
+import {
+  createSignedAttachmentUrls,
+  formatFileSize,
+} from "@/lib/ticket-attachments";
 import { formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+
+function AttachmentChip({
+  attachment,
+}: {
+  attachment: {
+    id: string;
+    file_name: string;
+    file_size?: number | null;
+    signedUrl: string | null;
+  };
+}) {
+  const sizeLabel = formatFileSize(attachment.file_size);
+  const label = sizeLabel
+    ? `${attachment.file_name} (${sizeLabel})`
+    : attachment.file_name;
+
+  if (!attachment.signedUrl) {
+    return (
+      <span className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-secondary opacity-60">
+        {attachment.file_name} (unavailable)
+      </span>
+    );
+  }
+
+  return (
+    <a
+      href={attachment.signedUrl}
+      target="_blank"
+      rel="noreferrer"
+      className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
+    >
+      {label}
+    </a>
+  );
+}
 
 interface PortalTicketDetailPageProps {
   params: Promise<{
@@ -37,7 +76,7 @@ export default async function PortalTicketDetailPage({
         .order("created_at", { ascending: true }),
       supabase
         .from("ticket_attachments")
-        .select("id, storage_path, file_name, message_id")
+        .select("id, storage_path, file_name, file_size, message_id")
         .eq("ticket_id", ticketId)
         .order("created_at", { ascending: true }),
     ]);
@@ -51,6 +90,7 @@ export default async function PortalTicketDetailPage({
       id: string;
       storage_path: string;
       file_name: string;
+      file_size?: number | null;
       message_id?: string | null;
     }>,
   );
@@ -70,7 +110,10 @@ export default async function PortalTicketDetailPage({
                 {ticket.title}
               </h2>
             </div>
-            <StatusBadge status={ticket.status} />
+            <div className="flex flex-col items-start gap-2 md:items-end">
+              <StatusBadge status={ticket.status} />
+              <PriorityBadge priority={ticket.priority || "normal"} />
+            </div>
           </div>
 
           <div className="mt-6 rounded-3xl border border-penn-blue bg-rich-black/40 p-5">
@@ -85,15 +128,7 @@ export default async function PortalTicketDetailPage({
           {rootAttachments.length > 0 ? (
             <div className="mt-5 flex flex-wrap gap-3">
               {rootAttachments.map((attachment) => (
-                <a
-                  key={attachment.id}
-                  href={attachment.signedUrl || "#"}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
-                >
-                  {attachment.file_name}
-                </a>
+                <AttachmentChip key={attachment.id} attachment={attachment} />
               ))}
             </div>
           ) : null}
@@ -116,9 +151,6 @@ export default async function PortalTicketDetailPage({
                     <p className="font-semibold text-white">
                       {author?.full_name || author?.email || "Unknown author"}
                     </p>
-                    <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                      {message.visibility}
-                    </p>
                   </div>
                   <p className="text-sm text-text-secondary">
                     {formatDateTime(message.created_at)}
@@ -130,15 +162,10 @@ export default async function PortalTicketDetailPage({
                 {inlineAttachments.length > 0 ? (
                   <div className="mt-4 flex flex-wrap gap-3">
                     {inlineAttachments.map((attachment) => (
-                      <a
+                      <AttachmentChip
                         key={attachment.id}
-                        href={attachment.signedUrl || "#"}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
-                      >
-                        {attachment.file_name}
-                      </a>
+                        attachment={attachment}
+                      />
                     ))}
                   </div>
                 ) : null}

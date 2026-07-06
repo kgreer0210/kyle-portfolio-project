@@ -3,15 +3,11 @@
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface TicketReplyFormProps {
-  ticketId: string;
-  allowInternalNote?: boolean;
-}
-
-export default function TicketReplyForm({
-  ticketId,
-  allowInternalNote = false,
-}: TicketReplyFormProps) {
+export default function OrgNoteForm({
+  organizationId,
+}: {
+  organizationId: string;
+}) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState("");
@@ -24,15 +20,22 @@ export default function TicketReplyForm({
 
     try {
       const formData = new FormData(event.currentTarget);
-      const response = await fetch(`/api/crm/tickets/${ticketId}/messages`, {
-        method: "POST",
-        body: formData,
-      });
+      const body = String(formData.get("body") || "").trim();
+      const response = await fetch(
+        `/api/admin/organizations/${organizationId}/notes`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ body }),
+        },
+      );
 
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to send reply.");
+        throw new Error(payload.error || "Unable to save the note.");
       }
 
       formRef.current?.reset();
@@ -41,7 +44,7 @@ export default function TicketReplyForm({
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "Unable to send reply.",
+          : "Unable to save the note.",
       );
     } finally {
       setIsSubmitting(false);
@@ -50,43 +53,17 @@ export default function TicketReplyForm({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-      {allowInternalNote ? (
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
-            Visibility
-          </label>
-          <select
-            name="visibility"
-            defaultValue="public"
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-          >
-            <option value="public">Public reply</option>
-            <option value="internal">Internal note</option>
-          </select>
-        </div>
-      ) : null}
-
       <div className="space-y-2">
-        <label className="text-sm font-medium text-text-primary">Message</label>
+        <label className="text-sm font-medium text-text-primary">
+          Add a private note
+        </label>
         <textarea
           name="body"
-          rows={5}
+          rows={3}
+          placeholder="Only you can see these notes."
           className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
           required
         />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-text-primary">
-          Attachments
-        </label>
-        <input
-          name="attachments"
-          type="file"
-          multiple
-          className="w-full rounded-2xl border border-dashed border-penn-blue bg-rich-black px-4 py-3"
-        />
-        <p className="text-xs text-text-secondary">Up to 5 files, 10MB each.</p>
       </div>
 
       {error ? (
@@ -100,7 +77,7 @@ export default function TicketReplyForm({
         disabled={isSubmitting}
         className="rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? "Sending..." : "Send reply"}
+        {isSubmitting ? "Saving..." : "Save note"}
       </button>
     </form>
   );

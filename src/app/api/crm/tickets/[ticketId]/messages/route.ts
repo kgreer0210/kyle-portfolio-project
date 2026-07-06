@@ -37,6 +37,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return jsonError("Replies must be 5000 characters or fewer.");
     }
 
+    if (files.length > 5) {
+      return jsonError("You can attach up to 5 files per reply.");
+    }
+
     const adminSupabase = createAdminSupabaseClient();
     const { data: ticket, error: ticketLookupError } = await adminSupabase
       .from("tickets")

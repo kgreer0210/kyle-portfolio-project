@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NewTicketForm from "@/components/crm/NewTicketForm";
+import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
@@ -20,7 +21,7 @@ export default async function PortalTicketsPage() {
 
   const { data } = await supabase
     .from("tickets")
-    .select("id, title, type, status, created_at")
+    .select("id, title, type, status, priority, created_at")
     .eq("organization_id", membership.organization_id)
     .order("created_at", { ascending: false });
 
@@ -29,6 +30,7 @@ export default async function PortalTicketsPage() {
     title: string;
     type: "request" | "issue";
     status: "new" | "open" | "waiting_on_client" | "in_progress" | "resolved" | "closed";
+    priority: "low" | "normal" | "high" | "urgent";
     created_at?: string;
   }>;
 
@@ -66,7 +68,10 @@ export default async function PortalTicketsPage() {
                       {formatDateTime(ticket.created_at)}
                     </p>
                   </div>
-                  <StatusBadge status={ticket.status} />
+                  <div className="flex flex-col items-start gap-2 md:items-end">
+                    <StatusBadge status={ticket.status} />
+                    <PriorityBadge priority={ticket.priority || "normal"} />
+                  </div>
                 </div>
               </Link>
             ))
