@@ -30,7 +30,11 @@ export function verifyRetellSignature(
     .update(body + timestamp)
     .digest("hex");
 
-  // Constant-time compare; timingSafeEqual requires equal-length buffers.
-  if (expected.length !== digest.length) return false;
-  return timingSafeEqual(Buffer.from(expected), Buffer.from(digest));
+  // Constant-time compare. timingSafeEqual throws on differing byte lengths, and
+  // `digest` is request-supplied, so compare the decoded Buffer byte lengths
+  // (string length miscounts any multibyte input) before calling it.
+  const expectedBuf = Buffer.from(expected);
+  const digestBuf = Buffer.from(digest);
+  if (expectedBuf.length !== digestBuf.length) return false;
+  return timingSafeEqual(expectedBuf, digestBuf);
 }
