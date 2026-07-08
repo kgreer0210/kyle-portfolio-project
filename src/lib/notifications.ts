@@ -168,7 +168,7 @@ function tierDiscordColor(tier: "high" | "medium" | "low" | null): number {
   return 0x888888;
 }
 
-function escapeHtml(input: string): string {
+export function escapeHtml(input: string): string {
   return input
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

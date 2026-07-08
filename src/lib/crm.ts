@@ -3,11 +3,14 @@ import type {
   OnboardingStepField,
   OnboardingStatus,
   ProfileRole,
+  TicketCategory,
+  TicketPriority,
   TicketStatus,
 } from "@/types/crm";
 
 export const ticketAttachmentBucket = "ticket-attachments";
 export const maxTicketAttachmentBytes = 10 * 1024 * 1024;
+export const maxTicketAttachmentsPerSubmission = 5;
 
 export const onboardingSteps: OnboardingStepDefinition[] = [
   {
@@ -207,6 +210,62 @@ export const ticketStatusLabels: Record<TicketStatus, string> = {
   closed: "Closed",
 };
 
+export const ticketPriorities: TicketPriority[] = [
+  "low",
+  "normal",
+  "high",
+  "urgent",
+];
+
+export const ticketPriorityLabels: Record<TicketPriority, string> = {
+  low: "Low",
+  normal: "Normal",
+  high: "High",
+  urgent: "Urgent",
+};
+
+export const ticketCategories: TicketCategory[] = [
+  "website",
+  "automation",
+  "ai_voice",
+  "hosting",
+  "billing",
+  "other",
+];
+
+export const ticketCategoryLabels: Record<TicketCategory, string> = {
+  website: "Website",
+  automation: "Automation",
+  ai_voice: "AI voice",
+  hosting: "Hosting",
+  billing: "Billing",
+  other: "Other",
+};
+
+export function isTicketPriority(value: string): value is TicketPriority {
+  return (ticketPriorities as string[]).includes(value);
+}
+
+export function isTicketCategory(value: string): value is TicketCategory {
+  return (ticketCategories as string[]).includes(value);
+}
+
+export const ticketStatusTransitions: Record<TicketStatus, TicketStatus[]> = {
+  new: ["open", "in_progress", "waiting_on_client", "resolved", "closed"],
+  open: ["in_progress", "waiting_on_client", "resolved", "closed"],
+  waiting_on_client: ["open", "in_progress", "resolved", "closed"],
+  in_progress: ["open", "waiting_on_client", "resolved", "closed"],
+  resolved: ["closed", "open"],
+  closed: ["open"],
+};
+
+export const activeTicketStatuses: TicketStatus[] = [
+  "new",
+  "open",
+  "waiting_on_client",
+  "in_progress",
+];
+
 export const onboardingStatusLabels: Record<OnboardingStatus, string> = {
   not_started: "Not started",
   in_progress: "In progress",
@@ -248,6 +307,38 @@ export function formatFieldValue(
   }
 
   return trimmed;
+}
+
+export function validateAttachmentSelection(files: File[]): string | null {
+  if (files.length > maxTicketAttachmentsPerSubmission) {
+    return `You can attach up to ${maxTicketAttachmentsPerSubmission} files.`;
+  }
+
+  const tooLarge = files.find((file) => file.size > maxTicketAttachmentBytes);
+
+  if (tooLarge) {
+    return `${tooLarge.name} exceeds the ${formatFileSize(
+      maxTicketAttachmentBytes,
+    )} per-file limit.`;
+  }
+
+  return null;
+}
+
+export function formatFileSize(bytes?: number | null): string {
+  if (!bytes || bytes <= 0) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function slugify(value: string): string {

@@ -2,6 +2,12 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  formatFileSize,
+  maxTicketAttachmentBytes,
+  maxTicketAttachmentsPerSubmission,
+  validateAttachmentSelection,
+} from "@/lib/crm";
 
 interface TicketReplyFormProps {
   ticketId: string;
@@ -19,11 +25,24 @@ export default function TicketReplyForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitting(true);
     setError("");
 
+    const formData = new FormData(event.currentTarget);
+    const selectedFiles = formData
+      .getAll("attachments")
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
+    const fileError = validateAttachmentSelection(selectedFiles);
+
+    if (fileError) {
+      setError(fileError);
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const formData = new FormData(event.currentTarget);
       const response = await fetch(`/api/crm/tickets/${ticketId}/messages`, {
         method: "POST",
         body: formData,
@@ -86,6 +105,10 @@ export default function TicketReplyForm({
           multiple
           className="w-full rounded-2xl border border-dashed border-penn-blue bg-rich-black px-4 py-3"
         />
+        <p className="text-xs text-text-secondary">
+          Up to {maxTicketAttachmentsPerSubmission} files,{" "}
+          {formatFileSize(maxTicketAttachmentBytes)} each.
+        </p>
       </div>
 
       {error ? (

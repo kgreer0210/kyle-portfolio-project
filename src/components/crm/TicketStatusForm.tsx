@@ -3,15 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TicketStatus } from "@/types/crm";
-
-const statuses: TicketStatus[] = [
-  "new",
-  "open",
-  "waiting_on_client",
-  "in_progress",
-  "resolved",
-  "closed",
-];
+import { ticketStatusLabels, ticketStatusTransitions } from "@/lib/crm";
 
 export default function TicketStatusForm({
   ticketId,
@@ -66,11 +58,13 @@ export default function TicketStatusForm({
           onChange={(event) => setStatus(event.target.value as TicketStatus)}
           className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
         >
-          {statuses.map((value) => (
-            <option key={value} value={value}>
-              {value.replaceAll("_", " ")}
-            </option>
-          ))}
+          {[currentStatus, ...ticketStatusTransitions[currentStatus]].map(
+            (value) => (
+              <option key={value} value={value}>
+                {ticketStatusLabels[value]}
+              </option>
+            ),
+          )}
         </select>
       </div>
 

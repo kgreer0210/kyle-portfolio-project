@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAdminUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
 import { sendTicketStatusChangeNotifications } from "@/lib/crm-notifications";
+import { ticketStatusLabels, ticketStatusTransitions } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import type { TicketStatus } from "@/types/crm";
 
@@ -41,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const adminSupabase = createAdminSupabaseClient();
     const { data: ticket, error: ticketLookupError } = await adminSupabase
       .from("tickets")
-      .select("id, organization_id, title, status, organizations(name)")
+      .select("id, organization_id, title, status, resolved_at, organizations(name)")
       .eq("id", ticketId)
       .maybeSingle();
 
@@ -54,13 +55,31 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return jsonError("Ticket not found.", 404);
     }
 
+    const currentStatus = ticket.status as TicketStatus;
+    const allowedTransitions = ticketStatusTransitions[currentStatus] || [];
+
+    if (status === currentStatus) {
+      return NextResponse.json({ ok: true });
+    }
+
+    if (!allowedTransitions.includes(status)) {
+      const allowedLabels = allowedTransitions
+        .map((allowed) => ticketStatusLabels[allowed])
+        .join(", ");
+      return jsonError(
+        `A ${ticketStatusLabels[currentStatus].toLowerCase()} ticket can only move to: ${allowedLabels}.`,
+      );
+    }
+
     const now = new Date().toISOString();
+    const isReopening = status !== "resolved" && status !== "closed";
     const { error: updateError } = await adminSupabase
       .from("tickets")
       .update({
         status,
         last_activity_at: now,
-        resolved_at: status === "resolved" ? now : null,
+        resolved_at:
+          status === "resolved" ? now : isReopening ? null : ticket.resolved_at,
         closed_at: status === "closed" ? now : null,
       })
       .eq("id", ticket.id);

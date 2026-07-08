@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { getAdminNotificationEmails } from "@/lib/crm";
+import { escapeHtml } from "@/lib/notifications";
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -20,17 +21,32 @@ async function sendEmail(args: {
 }) {
   const resend = getResendClient();
 
-  if (!resend || args.to.length === 0) {
+  if (!resend) {
+    console.warn(
+      `[crm-notifications] RESEND_API_KEY is not set; skipped email "${args.subject}".`,
+    );
     return;
   }
 
-  await resend.emails.send({
+  if (args.to.length === 0) {
+    return;
+  }
+
+  const { error } = await resend.emails.send({
     from: "KYGR CRM <info@kygrsolutions.com>",
     to: args.to,
     subject: args.subject,
     html: args.html,
     text: args.text,
   });
+
+  if (error) {
+    console.error("[crm-notifications] Resend send failed", {
+      subject: args.subject,
+      to: args.to,
+      error,
+    });
+  }
 }
 
 async function getOrganizationMemberEmails(organizationId: string) {
@@ -69,7 +85,7 @@ export async function sendInviteSentNotification(args: {
     to: recipients,
     subject: `CRM invite sent for ${args.organizationName}`,
     html: `
-      <p>An invite was sent to <strong>${args.clientEmail}</strong> for <strong>${args.organizationName}</strong>.</p>
+      <p>An invite was sent to <strong>${escapeHtml(args.clientEmail)}</strong> for <strong>${escapeHtml(args.organizationName)}</strong>.</p>
       <p>Client type: ${args.clientType === "existing" ? "Existing client" : "New client"}.</p>
     `,
     text: `An invite was sent to ${args.clientEmail} for ${args.organizationName}. Client type: ${args.clientType}.`,
@@ -88,10 +104,10 @@ export async function sendInviteAcceptedNotification(args: {
     to: recipients,
     subject: `Client activated portal access: ${clientLabel}`,
     html: `
-      <p><strong>${clientLabel}</strong> accepted their portal access.</p>
+      <p><strong>${escapeHtml(clientLabel)}</strong> accepted their portal access.</p>
       ${
         args.organizationName
-          ? `<p>Organization: <strong>${args.organizationName}</strong></p>`
+          ? `<p>Organization: <strong>${escapeHtml(args.organizationName)}</strong></p>`
           : ""
       }
     `,
@@ -110,8 +126,8 @@ export async function sendOnboardingSubmittedNotification(args: {
     to: recipients,
     subject: `Onboarding submitted: ${args.organizationName}`,
     html: `
-      <p><strong>${args.organizationName}</strong> submitted onboarding.</p>
-      <p>Submitted by: ${args.submittedByEmail}</p>
+      <p><strong>${escapeHtml(args.organizationName)}</strong> submitted onboarding.</p>
+      <p>Submitted by: ${escapeHtml(args.submittedByEmail)}</p>
     `,
     text: `${args.organizationName} submitted onboarding. Submitted by ${args.submittedByEmail}.`,
   });
@@ -123,19 +139,22 @@ export async function sendTicketCreatedNotifications(args: {
   ticketId: string;
   title: string;
   createdByEmail: string;
+  priorityLabel?: string;
 }) {
   const recipients = getAdminNotificationEmails();
+  const subjectPrefix = args.priorityLabel ? `[${args.priorityLabel}] ` : "";
 
   await sendEmail({
     to: recipients,
-    subject: `New client ticket: ${args.title}`,
+    subject: `${subjectPrefix}New client ticket: ${args.title}`,
     html: `
-      <p><strong>${args.organizationName}</strong> created a new ticket.</p>
-      <p>Title: <strong>${args.title}</strong></p>
-      <p>Created by: ${args.createdByEmail}</p>
-      <p>Ticket ID: ${args.ticketId}</p>
+      <p><strong>${escapeHtml(args.organizationName)}</strong> created a new ticket.</p>
+      <p>Title: <strong>${escapeHtml(args.title)}</strong></p>
+      ${args.priorityLabel ? `<p>Priority: <strong>${escapeHtml(args.priorityLabel)}</strong></p>` : ""}
+      <p>Created by: ${escapeHtml(args.createdByEmail)}</p>
+      <p>Ticket ID: ${escapeHtml(args.ticketId)}</p>
     `,
-    text: `${args.organizationName} created a new ticket: ${args.title}. Created by ${args.createdByEmail}. Ticket ID: ${args.ticketId}.`,
+    text: `${args.organizationName} created a new ticket: ${args.title}.${args.priorityLabel ? ` Priority: ${args.priorityLabel}.` : ""} Created by ${args.createdByEmail}. Ticket ID: ${args.ticketId}.`,
   });
 }
 
@@ -157,9 +176,9 @@ export async function sendTicketReplyNotifications(args: {
     to: [...recipients],
     subject: `New portal reply for ticket ${args.ticketId}`,
     html: `
-      <p><strong>${args.organizationName}</strong> has a new public reply.</p>
-      <p>Author: ${args.authorEmail}</p>
-      <p>${args.body.slice(0, 500)}</p>
+      <p><strong>${escapeHtml(args.organizationName)}</strong> has a new public reply.</p>
+      <p>Author: ${escapeHtml(args.authorEmail)}</p>
+      <p>${escapeHtml(args.body.slice(0, 500))}</p>
     `,
     text: `${args.organizationName} has a new public reply from ${args.authorEmail}. ${args.body.slice(0, 500)}`,
   });
@@ -178,9 +197,9 @@ export async function sendTicketStatusChangeNotifications(args: {
     to: recipients,
     subject: `Ticket update: ${args.title}`,
     html: `
-      <p>Your ticket <strong>${args.title}</strong> was updated.</p>
-      <p>New status: <strong>${args.status}</strong></p>
-      <p>Ticket ID: ${args.ticketId}</p>
+      <p>Your ticket <strong>${escapeHtml(args.title)}</strong> was updated.</p>
+      <p>New status: <strong>${escapeHtml(args.status)}</strong></p>
+      <p>Ticket ID: ${escapeHtml(args.ticketId)}</p>
     `,
     text: `Your ticket "${args.title}" is now ${args.status}. Ticket ID: ${args.ticketId}.`,
   });

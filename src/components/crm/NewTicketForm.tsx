@@ -2,6 +2,16 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  formatFileSize,
+  maxTicketAttachmentBytes,
+  maxTicketAttachmentsPerSubmission,
+  ticketCategories,
+  ticketCategoryLabels,
+  ticketPriorities,
+  ticketPriorityLabels,
+  validateAttachmentSelection,
+} from "@/lib/crm";
 
 export default function NewTicketForm() {
   const router = useRouter();
@@ -12,10 +22,23 @@ export default function NewTicketForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const selectedFiles = formData
+      .getAll("attachments")
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
+    const fileError = validateAttachmentSelection(selectedFiles);
+
+    if (fileError) {
+      setError(fileError);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData(event.currentTarget);
       const response = await fetch("/api/crm/tickets", {
         method: "POST",
         body: formData,
@@ -69,6 +92,43 @@ export default function NewTicketForm() {
         </div>
       </div>
 
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-text-primary">
+            Priority
+          </label>
+          <select
+            name="priority"
+            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+            defaultValue="normal"
+          >
+            {ticketPriorities.map((value) => (
+              <option key={value} value={value}>
+                {ticketPriorityLabels[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-text-primary">
+            Category
+          </label>
+          <select
+            name="category"
+            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+            defaultValue=""
+          >
+            <option value="">General</option>
+            {ticketCategories.map((value) => (
+              <option key={value} value={value}>
+                {ticketCategoryLabels[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="text-sm font-medium text-text-primary">
           Description
@@ -91,6 +151,10 @@ export default function NewTicketForm() {
           multiple
           className="w-full rounded-2xl border border-dashed border-penn-blue bg-rich-black px-4 py-3"
         />
+        <p className="text-xs text-text-secondary">
+          Up to {maxTicketAttachmentsPerSubmission} files,{" "}
+          {formatFileSize(maxTicketAttachmentBytes)} each.
+        </p>
       </div>
 
       {error ? (
