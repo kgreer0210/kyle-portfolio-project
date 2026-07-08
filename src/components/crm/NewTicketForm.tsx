@@ -3,6 +3,9 @@
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  formatFileSize,
+  maxTicketAttachmentBytes,
+  maxTicketAttachmentsPerSubmission,
   ticketCategories,
   ticketCategoryLabels,
   ticketPriorities,
@@ -148,7 +151,10 @@ export default function NewTicketForm() {
           multiple
           className="w-full rounded-2xl border border-dashed border-penn-blue bg-rich-black px-4 py-3"
         />
-        <p className="text-xs text-text-secondary">Up to 5 files, 10MB each.</p>
+        <p className="text-xs text-text-secondary">
+          Up to {maxTicketAttachmentsPerSubmission} files,{" "}
+          {formatFileSize(maxTicketAttachmentBytes)} each.
+        </p>
       </div>
 
       {error ? (

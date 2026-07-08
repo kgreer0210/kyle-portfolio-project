@@ -2,7 +2,12 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { validateAttachmentSelection } from "@/lib/crm";
+import {
+  formatFileSize,
+  maxTicketAttachmentBytes,
+  maxTicketAttachmentsPerSubmission,
+  validateAttachmentSelection,
+} from "@/lib/crm";
 
 interface TicketReplyFormProps {
   ticketId: string;
@@ -100,7 +105,10 @@ export default function TicketReplyForm({
           multiple
           className="w-full rounded-2xl border border-dashed border-penn-blue bg-rich-black px-4 py-3"
         />
-        <p className="text-xs text-text-secondary">Up to 5 files, 10MB each.</p>
+        <p className="text-xs text-text-secondary">
+          Up to {maxTicketAttachmentsPerSubmission} files,{" "}
+          {formatFileSize(maxTicketAttachmentBytes)} each.
+        </p>
       </div>
 
       {error ? (

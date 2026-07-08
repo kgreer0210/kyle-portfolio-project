@@ -317,7 +317,9 @@ export function validateAttachmentSelection(files: File[]): string | null {
   const tooLarge = files.find((file) => file.size > maxTicketAttachmentBytes);
 
   if (tooLarge) {
-    return `${tooLarge.name} exceeds the 10MB per-file limit.`;
+    return `${tooLarge.name} exceeds the ${formatFileSize(
+      maxTicketAttachmentBytes,
+    )} per-file limit.`;
   }
 
   return null;
