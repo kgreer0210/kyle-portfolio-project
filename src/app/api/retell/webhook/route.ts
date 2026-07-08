@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Retell } from "retell-sdk";
+import { verifyRetellSignature } from "@/lib/retellWebhook";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { sendEmailNotification, sendDiscordNotification } from "@/lib/notifications";
 
@@ -10,13 +10,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get("x-retell-signature");
 
     // Verify webhook signature
-    if (
-      !Retell.verify(
-        body,
-        process.env.RETELL_API_KEY!,
-        signature as string,
-      )
-    ) {
+    if (!verifyRetellSignature(body, process.env.RETELL_API_KEY!, signature)) {
       console.error("Invalid Retell webhook signature");
       return new NextResponse(null, { status: 401 });
     }
