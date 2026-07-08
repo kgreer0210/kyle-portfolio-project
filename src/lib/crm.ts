@@ -78,13 +78,15 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
   {
     key: "business-context",
     title: "Business Context & Goals",
-    description: "Document your current setup, pain points, and what success looks like.",
+    description:
+      "Document your current setup, pain points, and what success looks like.",
     fields: [
       {
         key: "current_stack",
         label: "Current software and tools",
         type: "textarea",
-        placeholder: "Website, CRM, payment tools, internal systems, integrations",
+        placeholder:
+          "Website, CRM, payment tools, internal systems, integrations",
         helpText:
           "The software you use today — website platform, CRM, email/SMS, payments, scheduling, internal systems. Anything we'd need to integrate with, replace, or hand back at the end.",
       },
@@ -100,7 +102,12 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         key: "support_hours",
         label: "Preferred support hours",
         type: "radio",
-        options: ["Mon–Fri, 9am–5pm ET", "Mon–Fri, 8am–6pm ET", "24/7", "Custom"],
+        options: [
+          "Mon–Fri, 9am–5pm ET",
+          "Mon–Fri, 8am–6pm ET",
+          "24/7",
+          "Custom",
+        ],
         helpText:
           "When should our team be available to respond to you and your customers? Pick the closest match, or choose Custom for split shifts or unusual hours.",
       },
@@ -110,7 +117,7 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         type: "textarea",
         placeholder: "What does success look like over the next 3-6 months?",
         helpText:
-          "What does success look like in 3–6 months? Be specific — e.g. \"cut booking time in half\", \"launch a new site by Q3\", \"capture 50% more leads from the contact form\". Outcomes, not features.",
+          'What does success look like in 3–6 months? Be specific — e.g. "cut booking time in half", "launch a new site by Q3", "capture 50% more leads from the contact form". Outcomes, not features.',
       },
       {
         key: "launch_priorities",
@@ -133,13 +140,15 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
   {
     key: "systems-and-access",
     title: "Systems & Communication",
-    description: "Tell us about the tools we'll need access to and how you prefer to work.",
+    description:
+      "Tell us about the tools we'll need access to and how you prefer to work.",
     fields: [
       {
         key: "required_accounts",
         label: "Accounts and services involved",
         type: "textarea",
-        placeholder: "Domains, hosting, analytics, APIs, repos, app stores, etc.",
+        placeholder:
+          "Domains, hosting, analytics, APIs, repos, app stores, etc.",
         helpText:
           "Accounts we'll need access to — domain registrar, hosting, Google/Microsoft workspace, analytics, GitHub, app stores, payment processors, any APIs you use.",
       },
@@ -147,17 +156,19 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         key: "credential_process",
         label: "How access should be shared",
         type: "textarea",
-        placeholder: "Password manager, delegated access, temporary accounts, etc.",
+        placeholder:
+          "Password manager, delegated access, temporary accounts, etc.",
         helpText:
-          "How you prefer to share access. Examples: \"Add Kyle as a delegated user\", \"1Password shared vault\", \"temporary admin account I'll deactivate after launch\". Avoid emailing passwords.",
+          'How you prefer to share access. Examples: "Add Kyle as a delegated user", "1Password shared vault", "temporary admin account I\'ll deactivate after launch". Avoid emailing passwords.',
       },
       {
         key: "asset_locations",
         label: "Where key assets live",
         type: "textarea",
-        placeholder: "Brand files, documentation, recordings, source files, credentials",
+        placeholder:
+          "Brand files, documentation, recordings, source files, credentials",
         helpText:
-          "Where brand assets, source files, recordings, and documentation live. Examples: \"Logos in Google Drive\", \"product photos in Dropbox\", \"old site backup on the server\". Saves us bothering you for each file.",
+          'Where brand assets, source files, recordings, and documentation live. Examples: "Logos in Google Drive", "product photos in Dropbox", "old site backup on the server". Saves us bothering you for each file.',
       },
       {
         key: "preferred_channel",
@@ -172,7 +183,7 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         label: "Decision makers and approvers",
         type: "person_list",
         helpText:
-          "Who needs to sign off on major decisions or review work before launch? Add a row per person — name on the left, role and what they approve on the right. Use \"+ Add another\" for as many people as needed.",
+          'Who needs to sign off on major decisions or review work before launch? Add a row per person — name on the left, role and what they approve on the right. Use "+ Add another" for as many people as needed.',
       },
       {
         key: "escalation_notes",
@@ -180,7 +191,7 @@ export const onboardingSteps: OnboardingStepDefinition[] = [
         type: "textarea",
         placeholder: "How should urgent issues be escalated?",
         helpText:
-          "If something is on fire, who do we call and how? After-hours phone, backup contact, or what counts as \"on fire\" (site down, payments failing). The rare-but-critical playbook.",
+          'If something is on fire, who do we call and how? After-hours phone, backup contact, or what counts as "on fire" (site down, payments failing). The rare-but-critical playbook.',
       },
     ],
   },
@@ -354,7 +365,7 @@ export function normalizeEmail(email: string): string {
 }
 
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://kygrsolutions.com";
 }
 
 export function getAdminNotificationEmails(): string[] {
