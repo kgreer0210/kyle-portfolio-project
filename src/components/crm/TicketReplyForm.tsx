@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { validateAttachmentSelection } from "@/lib/crm";
 
 interface TicketReplyFormProps {
   ticketId: string;
@@ -19,11 +20,24 @@ export default function TicketReplyForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitting(true);
     setError("");
 
+    const formData = new FormData(event.currentTarget);
+    const selectedFiles = formData
+      .getAll("attachments")
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
+    const fileError = validateAttachmentSelection(selectedFiles);
+
+    if (fileError) {
+      setError(fileError);
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const formData = new FormData(event.currentTarget);
       const response = await fetch(`/api/crm/tickets/${ticketId}/messages`, {
         method: "POST",
         body: formData,

@@ -10,6 +10,7 @@ import type {
 
 export const ticketAttachmentBucket = "ticket-attachments";
 export const maxTicketAttachmentBytes = 10 * 1024 * 1024;
+export const maxTicketAttachmentsPerSubmission = 5;
 
 export const onboardingSteps: OnboardingStepDefinition[] = [
   {
@@ -306,6 +307,36 @@ export function formatFieldValue(
   }
 
   return trimmed;
+}
+
+export function validateAttachmentSelection(files: File[]): string | null {
+  if (files.length > maxTicketAttachmentsPerSubmission) {
+    return `You can attach up to ${maxTicketAttachmentsPerSubmission} files.`;
+  }
+
+  const tooLarge = files.find((file) => file.size > maxTicketAttachmentBytes);
+
+  if (tooLarge) {
+    return `${tooLarge.name} exceeds the 10MB per-file limit.`;
+  }
+
+  return null;
+}
+
+export function formatFileSize(bytes?: number | null): string {
+  if (!bytes || bytes <= 0) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function slugify(value: string): string {

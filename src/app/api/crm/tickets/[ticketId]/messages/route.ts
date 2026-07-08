@@ -3,6 +3,7 @@ import { getPrimaryOrganizationMembership } from "@/lib/auth";
 import { getApiAuthContext } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
 import { sendTicketReplyNotifications } from "@/lib/crm-notifications";
+import { maxTicketAttachmentsPerSubmission } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { uploadTicketAttachments } from "@/lib/ticket-attachments";
 import type { TicketMessageVisibility } from "@/types/crm";
@@ -37,8 +38,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return jsonError("Replies must be 5000 characters or fewer.");
     }
 
-    if (files.length > 5) {
-      return jsonError("You can attach up to 5 files per reply.");
+    if (files.length > maxTicketAttachmentsPerSubmission) {
+      return jsonError(
+        `You can attach up to ${maxTicketAttachmentsPerSubmission} files per reply.`,
+      );
     }
 
     const adminSupabase = createAdminSupabaseClient();

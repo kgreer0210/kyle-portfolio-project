@@ -58,7 +58,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const currentStatus = ticket.status as TicketStatus;
     const allowedTransitions = ticketStatusTransitions[currentStatus] || [];
 
-    if (status !== currentStatus && !allowedTransitions.includes(status)) {
+    if (status === currentStatus) {
+      return NextResponse.json({ ok: true });
+    }
+
+    if (!allowedTransitions.includes(status)) {
       const allowedLabels = allowedTransitions
         .map((allowed) => ticketStatusLabels[allowed])
         .join(", ");

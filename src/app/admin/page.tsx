@@ -49,12 +49,16 @@ export default async function AdminDashboardPage() {
     { data: recentMessagesData },
   ] = await Promise.all([
     supabase.from("organizations").select("*", { count: "exact", head: true }),
+    // Aggregations run in JS over the returned rows. A generous cap keeps the
+    // dashboard query bounded; DB-side GROUP BY aggregation is a Phase 3 item.
     supabase
       .from("tickets")
       .select(
         "id, title, status, priority, last_activity_at, organization_id, organizations(name)",
       )
-      .in("status", activeTicketStatuses),
+      .in("status", activeTicketStatuses)
+      .order("last_activity_at", { ascending: false })
+      .limit(500),
     supabase
       .from("client_onboardings")
       .select("*", { count: "exact", head: true })

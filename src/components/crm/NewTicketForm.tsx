@@ -7,6 +7,7 @@ import {
   ticketCategoryLabels,
   ticketPriorities,
   ticketPriorityLabels,
+  validateAttachmentSelection,
 } from "@/lib/crm";
 
 export default function NewTicketForm() {
@@ -18,10 +19,23 @@ export default function NewTicketForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const selectedFiles = formData
+      .getAll("attachments")
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
+    const fileError = validateAttachmentSelection(selectedFiles);
+
+    if (fileError) {
+      setError(fileError);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData(event.currentTarget);
       const response = await fetch("/api/crm/tickets", {
         method: "POST",
         body: formData,

@@ -9,7 +9,7 @@ import {
   ticketCategoryLabels,
 } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
-import type { TicketCategory, TicketStatus } from "@/types/crm";
+import type { TicketCategory, TicketPriority, TicketStatus } from "@/types/crm";
 
 const pageSize = 20;
 
@@ -64,6 +64,7 @@ export default async function AdminTicketsPage({
       { count: "exact" },
     )
     .order("last_activity_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(page * pageSize, page * pageSize + pageSize - 1);
 
   if (statusFilter) {
@@ -94,7 +95,7 @@ export default async function AdminTicketsPage({
     title: string;
     type: "request" | "issue";
     status: TicketStatus;
-    priority: "low" | "normal" | "high" | "urgent";
+    priority: TicketPriority;
     category: TicketCategory | null;
     created_at?: string;
     last_activity_at?: string;
@@ -192,7 +193,7 @@ export default async function AdminTicketsPage({
                         : "—"}
                     </td>
                     <td className="px-6 py-5">
-                      <PriorityBadge priority={ticket.priority} />
+                      <PriorityBadge priority={ticket.priority || "normal"} />
                     </td>
                     <td className="px-6 py-5">
                       <StatusBadge status={ticket.status} />

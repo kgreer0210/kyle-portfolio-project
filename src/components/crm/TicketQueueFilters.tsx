@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ticketPriorities,
@@ -30,6 +30,10 @@ export default function TicketQueueFilters({
 }: TicketQueueFiltersProps) {
   const router = useRouter();
   const [search, setSearch] = useState(q);
+
+  useEffect(() => {
+    setSearch(q);
+  }, [q]);
 
   function applyFilters(overrides: Record<string, string>) {
     const params = new URLSearchParams();

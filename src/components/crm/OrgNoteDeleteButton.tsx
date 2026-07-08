@@ -12,6 +12,7 @@ export default function OrgNoteDeleteButton({
 }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleDelete() {
     if (!window.confirm("Delete this note?")) {
@@ -19,6 +20,7 @@ export default function OrgNoteDeleteButton({
     }
 
     setIsDeleting(true);
+    setError("");
 
     try {
       const response = await fetch(
@@ -32,19 +34,27 @@ export default function OrgNoteDeleteButton({
       }
 
       router.refresh();
-    } catch {
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Unable to delete the note.",
+      );
       setIsDeleting(false);
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleDelete}
-      disabled={isDeleting}
-      className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary transition hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      {isDeleting ? "Deleting..." : "Delete"}
-    </button>
+    <div className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary transition hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isDeleting ? "Deleting..." : "Delete"}
+      </button>
+      {error ? <p className="text-xs text-red-300">{error}</p> : null}
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import type { TicketPriority, TicketStatus } from "@/types/crm";
 
 export default async function PortalTicketsPage() {
   const { supabase, user } = await requireClientUser();
@@ -29,8 +30,8 @@ export default async function PortalTicketsPage() {
     id: string;
     title: string;
     type: "request" | "issue";
-    status: "new" | "open" | "waiting_on_client" | "in_progress" | "resolved" | "closed";
-    priority: "low" | "normal" | "high" | "urgent";
+    status: TicketStatus;
+    priority: TicketPriority;
     created_at?: string;
   }>;
 

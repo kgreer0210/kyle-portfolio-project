@@ -20,7 +20,8 @@
       "mcp__supabase__apply_migration",
       "Bash(npm install:*)",
       "Read(//c/Users/kyleg/.claude/skills/blog-post-creator/**)",
-      "Read(//c/Users/kyleg/.claude/plugins/**)"
+      "Read(//c/Users/kyleg/.claude/plugins/**)",
+      "Bash(npm run *)"
     ],
     "deny": [],
     "ask": []

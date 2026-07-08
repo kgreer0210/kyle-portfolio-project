@@ -5,13 +5,12 @@ import { sendTicketCreatedNotifications } from "@/lib/crm-notifications";
 import {
   isTicketCategory,
   isTicketPriority,
+  maxTicketAttachmentsPerSubmission,
   ticketPriorityLabels,
 } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { uploadTicketAttachments } from "@/lib/ticket-attachments";
 import type { TicketType } from "@/types/crm";
-
-const maxAttachmentsPerSubmission = 5;
 
 function isTicketType(value: string): value is TicketType {
   return value === "request" || value === "issue";
@@ -61,9 +60,9 @@ export async function POST(request: NextRequest) {
       return jsonError("Invalid ticket category.");
     }
 
-    if (files.length > maxAttachmentsPerSubmission) {
+    if (files.length > maxTicketAttachmentsPerSubmission) {
       return jsonError(
-        `You can attach up to ${maxAttachmentsPerSubmission} files per ticket.`,
+        `You can attach up to ${maxTicketAttachmentsPerSubmission} files per ticket.`,
       );
     }
 

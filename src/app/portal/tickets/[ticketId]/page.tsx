@@ -1,48 +1,11 @@
 import { notFound } from "next/navigation";
+import AttachmentChip from "@/components/crm/AttachmentChip";
 import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import TicketReplyForm from "@/components/crm/TicketReplyForm";
-import {
-  createSignedAttachmentUrls,
-  formatFileSize,
-} from "@/lib/ticket-attachments";
+import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
 import { formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
-
-function AttachmentChip({
-  attachment,
-}: {
-  attachment: {
-    id: string;
-    file_name: string;
-    file_size?: number | null;
-    signedUrl: string | null;
-  };
-}) {
-  const sizeLabel = formatFileSize(attachment.file_size);
-  const label = sizeLabel
-    ? `${attachment.file_name} (${sizeLabel})`
-    : attachment.file_name;
-
-  if (!attachment.signedUrl) {
-    return (
-      <span className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-secondary opacity-60">
-        {attachment.file_name} (unavailable)
-      </span>
-    );
-  }
-
-  return (
-    <a
-      href={attachment.signedUrl}
-      target="_blank"
-      rel="noreferrer"
-      className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
-    >
-      {label}
-    </a>
-  );
-}
 
 interface PortalTicketDetailPageProps {
   params: Promise<{

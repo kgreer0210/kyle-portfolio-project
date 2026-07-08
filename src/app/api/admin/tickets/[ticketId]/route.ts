@@ -97,14 +97,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     if (changes.length > 0) {
-      await adminSupabase.from("ticket_messages").insert({
-        ticket_id: ticket.id,
-        organization_id: ticket.organization_id,
-        author_id: context.user.id,
-        visibility: "internal",
-        body: `${changes.join(". ")}.`,
-        is_system: true,
-      });
+      const { error: noteError } = await adminSupabase
+        .from("ticket_messages")
+        .insert({
+          ticket_id: ticket.id,
+          organization_id: ticket.organization_id,
+          author_id: context.user.id,
+          visibility: "internal",
+          body: `${changes.join(". ")}.`,
+          is_system: true,
+        });
+
+      if (noteError) {
+        console.error("Ticket meta audit note error:", noteError);
+      }
     }
 
     return NextResponse.json({ ok: true });
