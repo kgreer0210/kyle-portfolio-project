@@ -14,7 +14,7 @@
     "@simplewebauthn/server": "^13.3.2",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.108.2",
-    "ai": "^6.0.209",
+    "ai": "^7.0.22",
     "motion": "^12.41.0",
     "next": "^16.2.9",
     "ogl": "^1.0.11",
