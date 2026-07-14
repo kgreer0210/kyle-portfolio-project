@@ -11,3 +11,15 @@ updates:
     labels:
       - 'dependencies'
       - 'automated'
+    ignore:
+      # TS 7 is the native (Go) compiler port; @typescript-eslint@8 (pulled in
+      # by eslint-config-next@16) caps TypeScript at <6.0.0, so a major bump
+      # breaks `next lint`. Revisit when Next ships a config on
+      # typescript-eslint@9+. Minor/patch TS 5.x updates still flow.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      # ESLint 10 requires typescript-eslint@9, but eslint-config-next@16 pins
+      # typescript-eslint@8 (peer eslint "^8.57.0 || ^9.0.0"). Revisit alongside
+      # the TypeScript bump. Minor/patch ESLint 9.x updates still flow.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
