@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     if (resend) {
       const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL || "https://kygrsolutions.com";
+        process.env.NEXT_PUBLIC_SITE_URL || "https://www.kygrsolutions.com";
       const unsubscribeUrl = insertData?.unsubscribe_token
         ? `${siteUrl}/unsubscribe?token=${insertData.unsubscribe_token}`
         : null;

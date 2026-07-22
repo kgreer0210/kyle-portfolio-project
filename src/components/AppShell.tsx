@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Particles from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
+import ChatWidget from "@/components/ChatWidget";
 
 const appPrefixes = ["/login", "/reset-password", "/portal", "/admin", "/auth"];
 
@@ -48,6 +49,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <BackToTop />
+      <ChatWidget />
     </>
   );
 }
