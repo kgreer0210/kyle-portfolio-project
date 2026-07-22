@@ -11,6 +11,13 @@ import { services } from "../data/services";
 export default function HomeClient() {
   // Handle page refresh - always start at top and clear hash
   useEffect(() => {
+    // If Supabase auth tokens land here (e.g. an invite/recovery link whose
+    // redirect fell back to the Site URL), hand them off to the dedicated
+    // callback handler instead of wiping them below.
+    if (window.location.hash.includes("access_token")) {
+      window.location.href = "/auth/callback" + window.location.hash;
+      return;
+    }
     window.scrollTo(0, 0);
     if (window.location.hash) {
       window.history.replaceState(

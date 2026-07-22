@@ -365,7 +365,7 @@ export function normalizeEmail(email: string): string {
 }
 
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://kygrsolutions.com";
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://www.kygrsolutions.com";
 }
 
 export function getAdminNotificationEmails(): string[] {
