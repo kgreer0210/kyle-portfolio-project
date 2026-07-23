@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface AssistMessage {
   role: "user" | "assistant";
@@ -40,7 +40,15 @@ function extractSummary(content: string): AssistSummary | null {
 }
 
 function stripSummaryBlock(content: string): string {
-  return content.replace(SUMMARY_REGEX, "").trim();
+  const stripped = content.replace(SUMMARY_REGEX, "");
+  if (stripped !== content) {
+    return stripped.trim();
+  }
+
+  // Mid-stream the closing tag hasn't arrived yet — truncate at the opening
+  // tag so raw summary markup never flashes in the chat bubble.
+  const openIndex = content.indexOf("[TICKET SUMMARY");
+  return (openIndex === -1 ? content : content.slice(0, openIndex)).trim();
 }
 
 export default function TicketAssistPanel({
@@ -61,6 +69,10 @@ export default function TicketAssistPanel({
   const [applied, setApplied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
   const latestAssistant = [...messages]
     .reverse()
     .find((message) => message.role === "assistant");
@@ -68,8 +80,7 @@ export default function TicketAssistPanel({
     ? extractSummary(latestAssistant.content)
     : null;
 
-  async function handleSend(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSend() {
     const trimmed = input.trim();
 
     if (!trimmed || isStreaming) {
@@ -242,21 +253,32 @@ export default function TicketAssistPanel({
             </p>
           ) : null}
 
-          <form onSubmit={handleSend} className="flex gap-2">
+          {/* Not a <form>: this panel renders inside the ticket <form>, and
+              nested forms are invalid HTML. Enter is handled on the input,
+              with preventDefault so it never submits the outer ticket form. */}
+          <div className="flex gap-2">
             <input
+              aria-label="Describe the problem or request"
               value={input}
               onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void handleSend();
+                }
+              }}
               placeholder="Describe the problem or request..."
               className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-2 text-sm"
             />
             <button
-              type="submit"
+              type="button"
+              onClick={() => void handleSend()}
               disabled={isStreaming || !input.trim()}
               className="shrink-0 rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isStreaming ? "…" : "Send"}
             </button>
-          </form>
+          </div>
         </div>
       ) : null}
     </div>

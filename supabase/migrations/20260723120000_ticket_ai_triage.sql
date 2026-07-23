@@ -16,8 +16,24 @@ alter table public.tickets
 alter table public.tickets
   add column if not exists cost_amount numeric(10, 2);
 
+alter table public.tickets
+  drop constraint if exists tickets_cost_amount_check;
+alter table public.tickets
+  add constraint tickets_cost_amount_check
+  check (cost_amount is null or cost_amount >= 0);
+
 -- How this client pays: trade agreement (price out every fix), monthly plan
--- (small fixes included, major work billable), or per-project. Plain text
--- validated app-side, matching the tickets.category pattern.
+-- (small fixes included, major work billable), or per-project. Text rather
+-- than an enum (matching the tickets.category pattern), with a check
+-- constraint so service-role or future writers can't insert invalid values.
 alter table public.organizations
   add column if not exists billing_type text;
+
+alter table public.organizations
+  drop constraint if exists organizations_billing_type_check;
+alter table public.organizations
+  add constraint organizations_billing_type_check
+  check (
+    billing_type is null
+    or billing_type in ('trade', 'monthly_plan', 'per_project')
+  );

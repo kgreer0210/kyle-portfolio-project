@@ -56,7 +56,11 @@ export default function BillingTypeForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
+      <label htmlFor="billing-type-select" className="sr-only">
+        Billing arrangement
+      </label>
       <select
+        id="billing-type-select"
         value={billingType}
         onChange={(event) => setBillingType(event.target.value)}
         className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3 text-sm"

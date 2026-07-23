@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { streamText, type ModelMessage } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { z } from "zod";
 import { requireApiClientUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
 import { readTriageGuidelines } from "@/lib/ticketTriage";
@@ -10,11 +11,23 @@ export const runtime = "nodejs";
 // Vercel Fluid Compute. Default would cut off mid-stream.
 export const maxDuration = 300;
 
-interface AssistRequestBody {
-  messages: Array<{ role: "user" | "assistant"; content: string }>;
-  draftTitle?: string | null;
-  draftDescription?: string | null;
-}
+// Validate the whole body up front so malformed entries (non-object
+// messages, non-string drafts) get a controlled 400 instead of an
+// unhandled TypeError when accessed below.
+const assistBodySchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string(),
+      }),
+    )
+    .min(1),
+  draftTitle: z.string().nullable().optional(),
+  draftDescription: z.string().nullable().optional(),
+});
+
+type AssistRequestBody = z.infer<typeof assistBodySchema>;
 
 function buildAssistSystemPrompt(draft: {
   title: string | null;
@@ -60,7 +73,11 @@ export async function POST(req: NextRequest) {
 
   let body: AssistRequestBody;
   try {
-    body = (await req.json()) as AssistRequestBody;
+    const parsed = assistBodySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return jsonError("Invalid request body");
+    }
+    body = parsed.data;
   } catch {
     return jsonError("Invalid JSON");
   }
@@ -73,17 +90,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return jsonError("messages must be a non-empty array");
-  }
-
   const trimmedMessages = body.messages
-    .filter(
-      (m) =>
-        (m.role === "user" || m.role === "assistant") &&
-        typeof m.content === "string" &&
-        m.content.trim().length > 0,
-    )
+    .filter((m) => m.content.trim().length > 0)
     .slice(-20)
     .map((m) => ({
       role: m.role,

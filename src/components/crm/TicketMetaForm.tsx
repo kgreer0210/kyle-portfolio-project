@@ -106,10 +106,14 @@ export default function TicketMetaForm({
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-text-primary">
+        <label
+          htmlFor="ticket-cost-amount"
+          className="text-sm font-medium text-text-primary"
+        >
           Cost (USD)
         </label>
         <input
+          id="ticket-cost-amount"
           type="number"
           min="0"
           step="0.01"
