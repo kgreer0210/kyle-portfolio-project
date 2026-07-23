@@ -14,14 +14,19 @@ export default function TicketMetaForm({
   ticketId,
   currentPriority,
   currentCategory,
+  currentCost,
 }: {
   ticketId: string;
   currentPriority: TicketPriority;
   currentCategory: TicketCategory | null;
+  currentCost?: number | null;
 }) {
   const router = useRouter();
   const [priority, setPriority] = useState<TicketPriority>(currentPriority);
   const [category, setCategory] = useState<string>(currentCategory || "");
+  const [cost, setCost] = useState<string>(
+    currentCost !== null && currentCost !== undefined ? String(currentCost) : "",
+  );
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,12 +36,22 @@ export default function TicketMetaForm({
     setError("");
 
     try {
+      const trimmedCost = cost.trim();
+
+      if (trimmedCost && !Number.isFinite(Number(trimmedCost))) {
+        throw new Error("Cost must be a number.");
+      }
+
       const response = await fetch(`/api/admin/tickets/${ticketId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ priority, category: category || null }),
+        body: JSON.stringify({
+          priority,
+          category: category || null,
+          cost_amount: trimmedCost ? Number(trimmedCost) : null,
+        }),
       });
 
       const payload = (await response.json()) as { error?: string };
@@ -90,6 +105,29 @@ export default function TicketMetaForm({
         </select>
       </div>
 
+      <div className="space-y-2">
+        <label
+          htmlFor="ticket-cost-amount"
+          className="text-sm font-medium text-text-primary"
+        >
+          Cost (USD)
+        </label>
+        <input
+          id="ticket-cost-amount"
+          type="number"
+          min="0"
+          step="0.01"
+          inputMode="decimal"
+          value={cost}
+          onChange={(event) => setCost(event.target.value)}
+          placeholder="Leave blank if not billed"
+          className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+        />
+        <p className="text-xs text-text-secondary">
+          Visible to the client on their ticket once set.
+        </p>
+      </div>
+
       {error ? (
         <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {error}
@@ -101,7 +139,7 @@ export default function TicketMetaForm({
         disabled={isSubmitting}
         className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? "Saving..." : "Save priority & category"}
+        {isSubmitting ? "Saving..." : "Save ticket details"}
       </button>
     </form>
   );

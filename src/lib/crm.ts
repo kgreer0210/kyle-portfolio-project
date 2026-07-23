@@ -1,4 +1,5 @@
 import type {
+  BillingType,
   OnboardingStepDefinition,
   OnboardingStepField,
   OnboardingStatus,
@@ -252,6 +253,33 @@ export const ticketCategoryLabels: Record<TicketCategory, string> = {
   billing: "Billing",
   other: "Other",
 };
+
+export const billingTypes: BillingType[] = [
+  "trade",
+  "monthly_plan",
+  "per_project",
+];
+
+export const billingTypeLabels: Record<BillingType, string> = {
+  trade: "Trade agreement",
+  monthly_plan: "Monthly plan",
+  per_project: "Per project",
+};
+
+export function isBillingType(value: string): value is BillingType {
+  return (billingTypes as string[]).includes(value);
+}
+
+export function formatCurrency(amount?: number | null): string {
+  if (amount === null || amount === undefined || Number.isNaN(amount)) {
+    return "";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
 
 export function isTicketPriority(value: string): value is TicketPriority {
   return (ticketPriorities as string[]).includes(value);

@@ -2,6 +2,9 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import TicketAssistPanel, {
+  type AssistSummary,
+} from "@/components/crm/TicketAssistPanel";
 import {
   formatFileSize,
   maxTicketAttachmentBytes,
@@ -13,11 +16,28 @@ import {
   validateAttachmentSelection,
 } from "@/lib/crm";
 
+const MAX_DESCRIPTION_LENGTH = 5000;
+
 export default function NewTicketForm() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handleApplySummary(summary: AssistSummary) {
+    if (summary.title && !title.trim()) {
+      setTitle(summary.title.slice(0, 200));
+    }
+
+    setDescription((prev) => {
+      const combined = prev.trim()
+        ? `${prev.trim()}\n\n${summary.description}`
+        : summary.description;
+      return combined.slice(0, MAX_DESCRIPTION_LENGTH);
+    });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,6 +74,8 @@ export default function NewTicketForm() {
       }
 
       formRef.current?.reset();
+      setTitle("");
+      setDescription("");
       router.push(`/portal/tickets/${payload.ticketId}`);
       router.refresh();
     } catch (submitError) {
@@ -86,6 +108,8 @@ export default function NewTicketForm() {
           <label className="text-sm font-medium text-text-primary">Title</label>
           <input
             name="title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
             className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
             required
           />
@@ -129,6 +153,12 @@ export default function NewTicketForm() {
         </div>
       </div>
 
+      <TicketAssistPanel
+        draftTitle={title}
+        draftDescription={description}
+        onApplySummary={handleApplySummary}
+      />
+
       <div className="space-y-2">
         <label className="text-sm font-medium text-text-primary">
           Description
@@ -136,6 +166,9 @@ export default function NewTicketForm() {
         <textarea
           name="description"
           rows={5}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          maxLength={MAX_DESCRIPTION_LENGTH}
           className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
           required
         />

@@ -98,11 +98,14 @@ export async function getOrganizationActivity(
 
     events.push({
       id: `message-${message.id}`,
-      type: message.is_system
-        ? "status_change"
-        : message.visibility === "internal"
+      type:
+        message.visibility === "internal" && !author
           ? "internal_note"
-          : "ticket_reply",
+          : message.is_system
+            ? "status_change"
+            : message.visibility === "internal"
+              ? "internal_note"
+              : "ticket_reply",
       occurredAt: message.created_at,
       title: ticketTitle,
       detail: message.is_system

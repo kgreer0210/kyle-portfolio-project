@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActivityTimeline from "@/components/crm/ActivityTimeline";
+import BillingTypeForm from "@/components/crm/BillingTypeForm";
 import OnboardingStatusBadge from "@/components/crm/OnboardingStatusBadge";
 import OrgNoteDeleteButton from "@/components/crm/OrgNoteDeleteButton";
 import OrgNoteForm from "@/components/crm/OrgNoteForm";
@@ -8,7 +9,7 @@ import StatusBadge from "@/components/crm/StatusBadge";
 import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
 import { getOrganizationActivity } from "@/lib/crm-activity";
 import { requireAdminUser } from "@/lib/auth";
-import type { TicketStatus } from "@/types/crm";
+import type { BillingType, TicketStatus } from "@/types/crm";
 
 interface ClientDetailPageProps {
   params: Promise<{
@@ -188,6 +189,25 @@ export default async function AdminClientDetailPage({
             <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-primary">
               {organization.notes || "No general notes."}
             </p>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+            Billing arrangement
+          </p>
+          <p className="mt-2 text-sm leading-6 text-text-secondary">
+            Trade agreement clients get every fix priced out; monthly-plan
+            clients include small fixes but pay for major work. AI ticket
+            triage uses this to flag likely-billable tickets.
+          </p>
+          <div className="mt-4 max-w-sm">
+            <BillingTypeForm
+              organizationId={organization.id}
+              currentBillingType={
+                (organization.billing_type as BillingType | null) || null
+              }
+            />
           </div>
         </div>
       </section>

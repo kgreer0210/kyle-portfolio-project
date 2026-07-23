@@ -27,6 +27,7 @@ export type TicketCategory =
   | "billing"
   | "other";
 export type TicketMessageVisibility = "public" | "internal";
+export type BillingType = "trade" | "monthly_plan" | "per_project";
 
 export interface TicketSummary {
   id: string;
@@ -38,6 +39,8 @@ export interface TicketSummary {
   title: string;
   last_activity_at: string;
   created_at: string;
+  ai_triaged_at?: string | null;
+  cost_amount?: number | null;
   organizations?: { name: string } | null;
 }
 
@@ -56,6 +59,7 @@ export interface OrganizationSummary {
   name: string;
   slug: string;
   client_kind: ClientKind;
+  billing_type?: BillingType | null;
   primary_contact_name: string | null;
   primary_contact_email: string | null;
   notes: string | null;
