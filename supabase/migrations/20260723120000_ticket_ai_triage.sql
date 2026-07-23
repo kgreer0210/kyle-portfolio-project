@@ -16,11 +16,16 @@ alter table public.tickets
 alter table public.tickets
   add column if not exists cost_amount numeric(10, 2);
 
+-- Constraints are added NOT VALID then validated separately so the ADD
+-- takes only a metadata lock instead of a write-blocking table scan.
 alter table public.tickets
   drop constraint if exists tickets_cost_amount_check;
 alter table public.tickets
   add constraint tickets_cost_amount_check
-  check (cost_amount is null or cost_amount >= 0);
+  check (cost_amount is null or cost_amount >= 0)
+  not valid;
+alter table public.tickets
+  validate constraint tickets_cost_amount_check;
 
 -- How this client pays: trade agreement (price out every fix), monthly plan
 -- (small fixes included, major work billable), or per-project. Text rather
@@ -36,4 +41,7 @@ alter table public.organizations
   check (
     billing_type is null
     or billing_type in ('trade', 'monthly_plan', 'per_project')
-  );
+  )
+  not valid;
+alter table public.organizations
+  validate constraint organizations_billing_type_check;
