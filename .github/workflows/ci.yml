@@ -27,6 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          # Nothing after checkout needs authenticated git, and npm ci runs
+          # package lifecycle scripts — don't leave the token in .git/config.
+          persist-credentials: false
 
       - uses: actions/setup-node@v5
         with:
