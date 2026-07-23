@@ -134,15 +134,28 @@ export default function ExpandQuestionnaireModal({
     }
   }, [fieldKey, fieldLabel, currentValue, questions, selections, customAnswers]);
 
-  // Reset and load questions whenever the modal opens for a (potentially new) field.
+  // Reset whenever the modal opens for a (potentially new) field — state is
+  // adjusted during render; the fetch itself stays in the effect below.
+  const openKey = open ? fieldKey : null;
+  const [prevOpenKey, setPrevOpenKey] = useState<string | null>(null);
+  if (openKey !== prevOpenKey) {
+    setPrevOpenKey(openKey);
+    if (openKey !== null) {
+      setQuestions([]);
+      setSelections({});
+      setCustomAnswers({});
+      setComposed("");
+      setErrorMessage("");
+      setPhase("loading-questions");
+    }
+  }
+
+  // Load questions whenever the modal opens for a (potentially new) field.
   useEffect(() => {
     if (!open) return;
-    setQuestions([]);
-    setSelections({});
-    setCustomAnswers({});
-    setComposed("");
-    setErrorMessage("");
-    void loadQuestions();
+    void (async () => {
+      await loadQuestions();
+    })();
     // We intentionally do not include loadQuestions in deps — its identity changes
     // every render due to context object reference, and we only want a fresh fetch
     // when the modal opens for a new field.

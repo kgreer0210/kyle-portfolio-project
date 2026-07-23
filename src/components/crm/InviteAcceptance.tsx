@@ -1,11 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { startRegistration } from "@simplewebauthn/browser";
 import ResetPasswordForm from "@/components/crm/ResetPasswordForm";
 
 type View = "choose" | "password-fallback";
+
+// WebAuthn support is a static browser capability. Reading it through
+// useSyncExternalStore keeps the server render on the "still checking"
+// snapshot (null) and resolves to the real value right after hydration.
+function subscribeNoop() {
+  return () => {};
+}
+function getWebAuthnSupport(): boolean | null {
+  return !!window.PublicKeyCredential;
+}
+function getServerWebAuthnSupport(): boolean | null {
+  return null;
+}
 
 interface InviteAcceptanceProps {
   next?: string;
@@ -14,24 +27,17 @@ interface InviteAcceptanceProps {
 export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
   const router = useRouter();
   const [view, setView] = useState<View>("choose");
-  const [supportsPasskey, setSupportsPasskey] = useState<boolean | null>(null);
-  const [autoFellBack, setAutoFellBack] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const hasWebAuthn =
-      typeof window !== "undefined" && !!window.PublicKeyCredential;
-
-    if (!hasWebAuthn) {
-      setSupportsPasskey(false);
-      setAutoFellBack(true);
-      setView("password-fallback");
-      return;
-    }
-
-    setSupportsPasskey(true);
-  }, []);
+  const supportsPasskey = useSyncExternalStore(
+    subscribeNoop,
+    getWebAuthnSupport,
+    getServerWebAuthnSupport,
+  );
+  // Browsers without WebAuthn are routed straight to the password form and
+  // can't navigate back to the passkey view.
+  const autoFellBack = supportsPasskey === false;
 
   async function handleCreatePasskey() {
     setIsRegistering(true);
@@ -83,7 +89,7 @@ export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
     }
   }
 
-  if (view === "password-fallback") {
+  if (view === "password-fallback" || autoFellBack) {
     return (
       <div className="space-y-4">
         {autoFellBack ? (

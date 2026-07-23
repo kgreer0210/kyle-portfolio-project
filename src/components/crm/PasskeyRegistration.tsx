@@ -23,16 +23,22 @@ export default function PasskeyRegistration() {
   const [editName, setEditName] = useState("");
 
   const fetchCredentials = useCallback(async () => {
-    const res = await fetch("/api/auth/passkey/credentials");
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/auth/passkey/credentials");
+      if (!res.ok) throw new Error("Failed to load passkeys.");
       const data = await res.json();
       setCredentials(data.credentials ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load passkeys.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchCredentials();
+    void (async () => {
+      await fetchCredentials();
+    })();
   }, [fetchCredentials]);
 
   async function handleAddPasskey() {

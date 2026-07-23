@@ -92,11 +92,18 @@ function isValidEmail(email: string): boolean {
 }
 
 export default function ChatWidget() {
+  // Hydrate from sessionStorage so refresh keeps the conversation alive.
+  // loadPersistedState is SSR-safe (returns empty state on the server), and
+  // the initial closed-widget DOM doesn't depend on any of these values, so
+  // lazy initialization can't cause a hydration mismatch.
+  const [persisted] = useState(loadPersistedState);
   const [isOpen, setIsOpen] = useState(false);
-  const [conversationId, setConversationId] = useState<string | null>(null);
-  const [name, setName] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(
+    persisted.conversationId,
+  );
+  const [name, setName] = useState<string | null>(persisted.visitorName);
+  const [email, setEmail] = useState<string | null>(persisted.visitorEmail);
+  const [messages, setMessages] = useState<ChatMessage[]>(persisted.messages);
   const [draft, setDraft] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
@@ -107,7 +114,6 @@ export default function ChatWidget() {
   const [initialMessage, setInitialMessage] = useState("");
 
   // Email capture state
-  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [emailDraft, setEmailDraft] = useState("");
   const [emailDismissed, setEmailDismissed] = useState(false);
 
@@ -117,36 +123,26 @@ export default function ChatWidget() {
   // know that before it happens.
   const [confirmingEnd, setConfirmingEnd] = useState(false);
 
+  // Email prompt becomes visible after enough turns, unless visitor dismissed
+  // it or already provided an email. Fully derived from other state.
+  const showEmailPrompt =
+    !email &&
+    !emailDismissed &&
+    messages.filter((m) => m.role === "user").length >=
+      EMAIL_PROMPT_AFTER_TURNS;
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const conversationIdRef = useRef<string | null>(null);
+  const conversationIdRef = useRef<string | null>(persisted.conversationId);
   // Mirrors of name/email so the pagehide handler (registered once at
   // mount) can read the latest values when the visitor closes the tab.
   // Reading them from React state in the handler would close over stale
   // values from the first render.
-  const nameRef = useRef<string | null>(null);
-  const emailRef = useRef<string | null>(null);
+  const nameRef = useRef<string | null>(persisted.visitorName);
+  const emailRef = useRef<string | null>(persisted.visitorEmail);
   // Active AbortController for the in-flight /api/chat stream. When
   // performEnd runs we abort this so a late assistant response can't
   // re-populate state after the conversation has been cleared.
   const streamAbortRef = useRef<AbortController | null>(null);
-
-  // Hydrate from sessionStorage so refresh keeps the conversation alive.
-  useEffect(() => {
-    const persisted = loadPersistedState();
-    if (persisted.conversationId) {
-      setConversationId(persisted.conversationId);
-      conversationIdRef.current = persisted.conversationId;
-    }
-    if (persisted.visitorName) {
-      setName(persisted.visitorName);
-      nameRef.current = persisted.visitorName;
-    }
-    if (persisted.visitorEmail) {
-      setEmail(persisted.visitorEmail);
-      emailRef.current = persisted.visitorEmail;
-    }
-    if (persisted.messages.length > 0) setMessages(persisted.messages);
-  }, []);
 
   // Persist on any state change.
   useEffect(() => {
@@ -169,19 +165,6 @@ export default function ChatWidget() {
   useEffect(() => {
     emailRef.current = email;
   }, [email]);
-
-  // Email prompt becomes visible after enough turns, unless visitor dismissed
-  // it or already provided an email.
-  useEffect(() => {
-    if (email || emailDismissed) {
-      setShowEmailPrompt(false);
-      return;
-    }
-    const userTurnCount = messages.filter((m) => m.role === "user").length;
-    if (userTurnCount >= EMAIL_PROMPT_AFTER_TURNS) {
-      setShowEmailPrompt(true);
-    }
-  }, [messages, email, emailDismissed]);
 
   // Auto-scroll to bottom on new messages or while streaming.
   useEffect(() => {
@@ -398,7 +381,6 @@ export default function ChatWidget() {
     const trimmed = emailDraft.trim();
     if (!isValidEmail(trimmed)) return;
     setEmail(trimmed);
-    setShowEmailPrompt(false);
     setEmailDraft("");
   };
 
@@ -427,7 +409,6 @@ export default function ChatWidget() {
       setStreamingText("");
       setError(null);
       setEmailDismissed(false);
-      setShowEmailPrompt(false);
       setConfirmingEnd(false);
       if (closePanel) setIsOpen(false);
     },
@@ -698,10 +679,7 @@ export default function ChatWidget() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setEmailDismissed(true);
-                      setShowEmailPrompt(false);
-                    }}
+                    onClick={() => setEmailDismissed(true)}
                     className="text-xs text-(--color-text-secondary) hover:text-(--color-text-primary) px-2 py-1.5 transition-colors"
                   >
                     No thanks
