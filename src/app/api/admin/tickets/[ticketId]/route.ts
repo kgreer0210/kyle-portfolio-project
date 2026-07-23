@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAdminUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
 import {
+  formatCurrency,
   isTicketCategory,
   isTicketPriority,
   ticketCategoryLabels,
@@ -29,9 +30,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = (await request.json()) as {
       priority?: string;
       category?: string | null;
+      cost_amount?: number | string | null;
     };
 
-    const updates: { priority?: string; category?: string | null } = {};
+    const updates: {
+      priority?: string;
+      category?: string | null;
+      cost_amount?: number | null;
+    } = {};
 
     if (body.priority !== undefined) {
       if (!isTicketPriority(body.priority)) {
@@ -50,6 +56,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    if (body.cost_amount !== undefined) {
+      if (body.cost_amount === null || body.cost_amount === "") {
+        updates.cost_amount = null;
+      } else {
+        const parsed = Number(body.cost_amount);
+
+        if (!Number.isFinite(parsed) || parsed < 0 || parsed > 99999999) {
+          return jsonError("Invalid cost amount.");
+        }
+
+        updates.cost_amount = Math.round(parsed * 100) / 100;
+      }
+    }
+
     if (Object.keys(updates).length === 0) {
       return jsonError("Nothing to update.");
     }
@@ -57,7 +77,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const adminSupabase = createAdminSupabaseClient();
     const { data: ticket, error: ticketLookupError } = await adminSupabase
       .from("tickets")
-      .select("id, organization_id, priority, category")
+      .select("id, organization_id, priority, category, cost_amount")
       .eq("id", ticketId)
       .maybeSingle();
 
@@ -93,6 +113,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         updates.category
           ? `Category changed to ${ticketCategoryLabels[updates.category as keyof typeof ticketCategoryLabels]}`
           : "Category cleared",
+      );
+    }
+
+    if (
+      updates.cost_amount !== undefined &&
+      updates.cost_amount !== ticket.cost_amount
+    ) {
+      changes.push(
+        updates.cost_amount !== null
+          ? `Cost set to ${formatCurrency(updates.cost_amount)}`
+          : "Cost cleared",
       );
     }
 

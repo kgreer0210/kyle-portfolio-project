@@ -97,6 +97,18 @@ src/
 - `POST /api/chat` - Streaming chat endpoint for the on-site AI diagnostic assistant. Uses Claude Haiku 4.5 via OpenRouter, persists each turn to Supabase (`chat_conversations`, `chat_messages`).
 - `POST /api/chat/end` - Conversation finalizer. Scores the transcript with `src/lib/chatLeadScoring.ts`, marks the conversation completed in Supabase, and sends Kyle an email digest via Resend.
 
+## AI Ticket Triage (CRM portal)
+
+Client tickets submitted through the portal (`POST /api/crm/tickets`) are auto-triaged by AI (`src/lib/ticketTriage.ts`, Claude Haiku 4.5 via OpenRouter):
+
+- Posts an **internal-only** analysis note on the ticket (summary, missing info, paste-able clarifying questions, work-scope + billing assessment). Clients never see it; the AI never messages clients.
+- Auto-sets priority (can escalate, never downgrades the client's choice) and category (fills blank; overrides an explicit choice only on high confidence).
+- Enriches the admin notification email with the triage results.
+- Rubric lives in `src/data/knowledge/ticket-triage.md` — edit the markdown to tune behavior; it's read fresh on every request.
+- Triage failure never blocks ticket creation (returns `null`, logs, continues).
+
+Related: organizations have a `billing_type` (trade agreement / monthly plan / per-project, set on the admin client page) used for the billing assessment; tickets have an optional admin-set `cost_amount` shown to the client once set. The new-ticket form includes an optional AI assist panel (`src/components/crm/TicketAssistPanel.tsx` + `POST /api/crm/tickets/assist`) that helps clients write complete tickets before submitting.
+
 ## Chat Assistant Knowledge Files
 
 The on-site chat assistant (`src/components/ChatWidget.tsx`) reads its persona, services, process, FAQ, diagnostic playbook, and scoping guardrails from markdown files under `src/data/knowledge/`:

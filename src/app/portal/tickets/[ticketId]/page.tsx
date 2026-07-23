@@ -4,7 +4,7 @@ import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import TicketReplyForm from "@/components/crm/TicketReplyForm";
 import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
-import { formatDateTime } from "@/lib/crm";
+import { formatCurrency, formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
 
 interface PortalTicketDetailPageProps {
@@ -87,6 +87,17 @@ export default async function PortalTicketDetailPage({
               Opened {formatDateTime(ticket.created_at)}
             </p>
           </div>
+
+          {ticket.cost_amount !== null && ticket.cost_amount !== undefined ? (
+            <div className="mt-5 rounded-3xl border border-penn-blue bg-rich-black/40 p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+                Cost for this work
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-white">
+                {formatCurrency(Number(ticket.cost_amount))}
+              </p>
+            </div>
+          ) : null}
 
           {rootAttachments.length > 0 ? (
             <div className="mt-5 flex flex-wrap gap-3">

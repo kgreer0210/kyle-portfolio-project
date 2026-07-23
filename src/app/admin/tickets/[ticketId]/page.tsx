@@ -6,8 +6,13 @@ import TicketMetaForm from "@/components/crm/TicketMetaForm";
 import TicketReplyForm from "@/components/crm/TicketReplyForm";
 import TicketStatusForm from "@/components/crm/TicketStatusForm";
 import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
-import { formatDateTime, ticketCategoryLabels } from "@/lib/crm";
+import {
+  billingTypeLabels,
+  formatDateTime,
+  ticketCategoryLabels,
+} from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
+import type { BillingType } from "@/types/crm";
 
 interface AdminTicketDetailPageProps {
   params: Promise<{
@@ -25,7 +30,9 @@ export default async function AdminTicketDetailPage({
     await Promise.all([
       supabase
         .from("tickets")
-        .select("*, organizations(name), profiles:created_by(full_name, email)")
+        .select(
+          "*, organizations(name, billing_type), profiles:created_by(full_name, email)",
+        )
         .eq("id", ticketId)
         .maybeSingle(),
       supabase
@@ -115,7 +122,9 @@ export default async function AdminTicketDetailPage({
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="font-semibold text-white">
-                      {author?.full_name || author?.email || "Unknown author"}
+                      {author?.full_name ||
+                        author?.email ||
+                        (message.is_system ? "AI triage" : "Unknown author")}
                     </p>
                     <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
                       {message.is_system ? "system" : message.visibility}
@@ -154,13 +163,23 @@ export default async function AdminTicketDetailPage({
 
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <h3 className="text-xl font-semibold text-white">
-            Priority &amp; category
+            Priority, category &amp; cost
           </h3>
+          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-text-secondary">
+            {(ticket.organizations as { billing_type?: BillingType | null } | null)
+              ?.billing_type
+              ? `Billing: ${billingTypeLabels[(ticket.organizations as { billing_type: BillingType }).billing_type]}`
+              : "Billing: not set"}
+            {ticket.ai_triaged_at
+              ? ` · AI triaged ${formatDateTime(ticket.ai_triaged_at)}`
+              : ""}
+          </p>
           <div className="mt-5">
             <TicketMetaForm
               ticketId={ticket.id}
               currentPriority={ticket.priority || "normal"}
               currentCategory={ticket.category || null}
+              currentCost={ticket.cost_amount ?? null}
             />
           </div>
         </div>

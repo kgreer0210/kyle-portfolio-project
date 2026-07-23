@@ -133,6 +133,67 @@ export async function sendOnboardingSubmittedNotification(args: {
   });
 }
 
+export interface TicketTriageEmailData {
+  summary: string;
+  appliedPriorityLabel: string;
+  appliedCategoryLabel: string | null;
+  missingInfo: string[];
+  clarifyingQuestions: string[];
+  workScope: string;
+  billingAssessment: string;
+}
+
+function formatTriageEmailHtml(triage: TicketTriageEmailData): string {
+  const missingInfoHtml = triage.missingInfo.length
+    ? `<p>Missing info:</p><ul>${triage.missingInfo
+        .map((item) => `<li>${escapeHtml(item)}</li>`)
+        .join("")}</ul>`
+    : "";
+  const questionsHtml = triage.clarifyingQuestions.length
+    ? `<p>Suggested questions for the client:</p><ol>${triage.clarifyingQuestions
+        .map((question) => `<li>${escapeHtml(question)}</li>`)
+        .join("")}</ol>`
+    : "";
+
+  return `
+      <hr />
+      <p><strong>AI triage</strong></p>
+      <p>${escapeHtml(triage.summary)}</p>
+      <p>Applied priority: <strong>${escapeHtml(triage.appliedPriorityLabel)}</strong>${
+        triage.appliedCategoryLabel
+          ? ` · Category: <strong>${escapeHtml(triage.appliedCategoryLabel)}</strong>`
+          : ""
+      }</p>
+      <p>Work scope: ${escapeHtml(triage.workScope)} · ${escapeHtml(triage.billingAssessment)}</p>
+      ${missingInfoHtml}
+      ${questionsHtml}
+    `;
+}
+
+function formatTriageEmailText(triage: TicketTriageEmailData): string {
+  const parts = [
+    `AI triage: ${triage.summary}`,
+    `Applied priority: ${triage.appliedPriorityLabel}${
+      triage.appliedCategoryLabel
+        ? `. Category: ${triage.appliedCategoryLabel}`
+        : ""
+    }.`,
+    `Work scope: ${triage.workScope}. ${triage.billingAssessment}`,
+  ];
+
+  if (triage.missingInfo.length) {
+    parts.push(`Missing info: ${triage.missingInfo.join("; ")}`);
+  }
+
+  if (triage.clarifyingQuestions.length) {
+    parts.push(
+      `Suggested questions: ${triage.clarifyingQuestions.join(" | ")}`,
+    );
+  }
+
+  return parts.join("\n");
+}
+
 export async function sendTicketCreatedNotifications(args: {
   organizationId: string;
   organizationName: string;
@@ -140,6 +201,7 @@ export async function sendTicketCreatedNotifications(args: {
   title: string;
   createdByEmail: string;
   priorityLabel?: string;
+  triage?: TicketTriageEmailData;
 }) {
   const recipients = getAdminNotificationEmails();
   const subjectPrefix = args.priorityLabel ? `[${args.priorityLabel}] ` : "";
@@ -153,8 +215,9 @@ export async function sendTicketCreatedNotifications(args: {
       ${args.priorityLabel ? `<p>Priority: <strong>${escapeHtml(args.priorityLabel)}</strong></p>` : ""}
       <p>Created by: ${escapeHtml(args.createdByEmail)}</p>
       <p>Ticket ID: ${escapeHtml(args.ticketId)}</p>
+      ${args.triage ? formatTriageEmailHtml(args.triage) : ""}
     `,
-    text: `${args.organizationName} created a new ticket: ${args.title}.${args.priorityLabel ? ` Priority: ${args.priorityLabel}.` : ""} Created by ${args.createdByEmail}. Ticket ID: ${args.ticketId}.`,
+    text: `${args.organizationName} created a new ticket: ${args.title}.${args.priorityLabel ? ` Priority: ${args.priorityLabel}.` : ""} Created by ${args.createdByEmail}. Ticket ID: ${args.ticketId}.${args.triage ? `\n\n${formatTriageEmailText(args.triage)}` : ""}`,
   });
 }
 

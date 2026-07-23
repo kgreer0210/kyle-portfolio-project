@@ -67,7 +67,7 @@ export async function getPrimaryOrganizationMembership(
   const { data, error } = await supabase
     .from("organization_members")
     .select(
-      "organization_id, role, organizations(id, name, slug, client_kind, primary_contact_name, primary_contact_email, notes, created_at, updated_at)",
+      "organization_id, role, organizations(id, name, slug, client_kind, billing_type, primary_contact_name, primary_contact_email, notes, created_at, updated_at)",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
