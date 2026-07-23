@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 interface PersonRow {
   name: string;
@@ -56,11 +56,15 @@ export default function PersonListField({
   const initialRows = useMemo(() => parseValue(value), [value]);
   const [rows, setRows] = useState<PersonRow[]>(initialRows);
 
-  // Re-sync if the parent resets the value (e.g. step change).
-  useEffect(() => {
+  // Re-sync if the parent resets the value (e.g. step change). Mirrors the
+  // previous effect-based sync: only when the value flips between empty and
+  // filled, adjusting state during render instead of in an effect.
+  const isEmpty = value === "";
+  const [prevIsEmpty, setPrevIsEmpty] = useState(isEmpty);
+  if (isEmpty !== prevIsEmpty) {
+    setPrevIsEmpty(isEmpty);
     setRows(parseValue(value));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value === "" ? "empty" : "filled"]);
+  }
 
   function update(next: PersonRow[]) {
     setRows(next);

@@ -32,7 +32,9 @@ export default function PasskeyRegistration() {
   }, []);
 
   useEffect(() => {
-    fetchCredentials();
+    void (async () => {
+      await fetchCredentials();
+    })();
   }, [fetchCredentials]);
 
   async function handleAddPasskey() {
