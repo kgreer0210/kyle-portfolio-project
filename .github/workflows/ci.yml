@@ -1,0 +1,64 @@
+# Verification gate for every PR and for pushes to master.
+#
+# The `verify` job name is what branch protection should require. The
+# auto-merge workflow (auto-merge-deps.yml) merges with `gh pr merge --auto`,
+# which waits for required checks — so once `verify` is required on master,
+# bot PRs only land after this gate passes.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Corepack must never block CI waiting for a download confirmation.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Nothing after checkout needs authenticated git, and npm ci runs
+          # package lifecycle scripts — don't leave the token in .git/config.
+          persist-credentials: false
+
+      - uses: actions/setup-node@v5
+        with:
+          # The repo declares no Node version (.nvmrc/engines absent);
+          # 22 matches the environment the dependency upgrades were
+          # validated against.
+          node-version: 22
+          cache: npm
+
+      # Corepack only shims yarn/pnpm by default; npm has to be named
+      # explicitly for the packageManager pin in package.json to apply.
+      - name: Enable corepack for npm
+        run: corepack enable npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Build
+        run: npm run build
+        env:
+          # Placeholder values so Supabase-backed prerenders (blog,
+          # sitemap) can complete; queries fail soft and render empty.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key

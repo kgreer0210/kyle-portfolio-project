@@ -2,6 +2,7 @@
   "name": "kyle-portfolio-project",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@12.0.1",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
