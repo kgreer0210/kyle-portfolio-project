@@ -20,9 +20,14 @@ alter table public.tickets
 -- takes only a metadata lock instead of a write-blocking table scan.
 alter table public.tickets
   drop constraint if exists tickets_cost_amount_check;
+-- The NaN exclusion is required: numeric NaN sorts greater than all other
+-- values in Postgres, so it would otherwise satisfy >= 0.
 alter table public.tickets
   add constraint tickets_cost_amount_check
-  check (cost_amount is null or cost_amount >= 0)
+  check (
+    cost_amount is null
+    or (cost_amount >= 0 and cost_amount <> 'NaN'::numeric)
+  )
   not valid;
 alter table public.tickets
   validate constraint tickets_cost_amount_check;
