@@ -66,13 +66,13 @@ export default function Header() {
             </Link>
           ))}
           <Link href="/login">
-            <motion.button
-              className="px-5 py-2 rounded-full border border-blue-ncs text-blue-ncs text-sm font-semibold hover:bg-blue-ncs hover:text-white transition-colors"
+            <motion.span
+              className="inline-block px-5 py-2 rounded-full border border-blue-ncs text-blue-ncs text-sm font-semibold hover:bg-blue-ncs hover:text-white transition-colors cursor-pointer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Client Login
-            </motion.button>
+            </motion.span>
           </Link>
           <Link href="/contact">
             <motion.button
@@ -159,15 +159,15 @@ export default function Header() {
                   </Link>
                 ))}
                 <Link href="/login" className="mt-4" onClick={closeMobileMenu}>
-                  <motion.button
-                    className="w-full py-4 rounded-xl border border-blue-ncs text-blue-ncs font-bold text-lg"
+                  <motion.span
+                    className="block w-full py-4 rounded-xl border border-blue-ncs text-blue-ncs font-bold text-lg text-center cursor-pointer"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Client Login
-                  </motion.button>
+                  </motion.span>
                 </Link>
                 <Link href="/contact" onClick={closeMobileMenu}>
                   <motion.button
