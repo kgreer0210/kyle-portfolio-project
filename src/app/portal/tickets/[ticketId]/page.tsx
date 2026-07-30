@@ -6,6 +6,10 @@ import TicketReplyForm from "@/components/crm/TicketReplyForm";
 import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
 import { formatCurrency, formatDateTime } from "@/lib/crm";
 import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import {
+  getTicketAuthorLabel,
+  resolveTicketAuthorNames,
+} from "@/lib/ticket-authors";
 
 interface PortalTicketDetailPageProps {
   params: Promise<{
@@ -24,29 +28,54 @@ export default async function PortalTicketDetailPage({
     notFound();
   }
 
-  const [{ data: ticket }, { data: messages }, { data: attachments }] =
-    await Promise.all([
-      supabase
-        .from("tickets")
-        .select("*, profiles:created_by(full_name, email)")
-        .eq("id", ticketId)
-        .eq("organization_id", membership.organization_id)
-        .maybeSingle(),
-      supabase
-        .from("ticket_messages")
-        .select("id, body, visibility, created_at, profiles:author_id(full_name, email)")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("ticket_attachments")
-        .select("id, storage_path, file_name, file_size, message_id")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-    ]);
+  const [
+    { data: ticket, error: ticketError },
+    { data: messages, error: messagesError },
+    { data: attachments, error: attachmentsError },
+  ] = await Promise.all([
+    supabase
+      .from("tickets")
+      .select("*, profiles:created_by(full_name, email)")
+      .eq("id", ticketId)
+      .eq("organization_id", membership.organization_id)
+      .maybeSingle(),
+    supabase
+      .from("ticket_messages")
+      .select("id, body, visibility, is_system, created_at, author_id")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("ticket_attachments")
+      .select("id, storage_path, file_name, file_size, message_id")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  // A failed ticket read leaves `ticket` null, which would fall through to
+  // notFound() and tell the client their ticket doesn't exist. Fail loudly
+  // instead, and reserve notFound() for a query that succeeded and found nothing.
+  if (ticketError) {
+    console.error("Portal ticket error:", ticketError);
+    throw new Error("Unable to load the ticket.", { cause: ticketError });
+  }
+
+  // Messages and attachments are degraded gracefully by comparison - the ticket
+  // itself still renders - but an empty thread must not pass for "no replies yet".
+  if (messagesError) {
+    console.error("Portal ticket messages error:", messagesError);
+  }
+
+  if (attachmentsError) {
+    console.error("Portal ticket attachments error:", attachmentsError);
+  }
 
   if (!ticket) {
     notFound();
   }
+
+  const authorNames = await resolveTicketAuthorNames(
+    (messages || []).map((message) => message.author_id),
+  );
 
   const signedAttachments = await createSignedAttachmentUrls(
     (attachments || []) as Array<{
@@ -110,7 +139,11 @@ export default async function PortalTicketDetailPage({
 
         <div className="space-y-4">
           {(messages || []).map((message) => {
-            const author = (message as { profiles?: { full_name?: string | null; email?: string | null } | null }).profiles;
+            const authorLabel = getTicketAuthorLabel({
+              authorId: message.author_id,
+              isSystem: message.is_system,
+              names: authorNames,
+            });
             const inlineAttachments = signedAttachments.filter(
               (attachment) => attachment.message_id === message.id,
             );
@@ -122,9 +155,7 @@ export default async function PortalTicketDetailPage({
               >
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <p className="font-semibold text-white">
-                      {author?.full_name || author?.email || "Unknown author"}
-                    </p>
+                    <p className="font-semibold text-white">{authorLabel}</p>
                   </div>
                   <p className="text-sm text-text-secondary">
                     {formatDateTime(message.created_at)}

@@ -126,6 +126,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           (ticket.organizations as { name?: string | null } | null)?.name ||
           "Unknown organization",
         ticketId: ticket.id,
+        title: ticket.title,
         authorEmail: context.profile.email,
         body,
       }).catch((notificationError) => {

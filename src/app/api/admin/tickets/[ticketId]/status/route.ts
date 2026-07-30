@@ -106,7 +106,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         "Unknown organization",
       ticketId: ticket.id,
       title: ticket.title,
-      status: status.replaceAll("_", " "),
+      status,
     }).catch((notificationError) => {
       console.error("Ticket status notification error:", notificationError);
     });

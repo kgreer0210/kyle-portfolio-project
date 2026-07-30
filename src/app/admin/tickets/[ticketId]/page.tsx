@@ -26,26 +26,47 @@ export default async function AdminTicketDetailPage({
   const { ticketId } = await params;
   const { supabase } = await requireAdminUser();
 
-  const [{ data: ticket }, { data: messages }, { data: attachments }] =
-    await Promise.all([
-      supabase
-        .from("tickets")
-        .select(
-          "*, organizations(name, billing_type), profiles:created_by(full_name, email)",
-        )
-        .eq("id", ticketId)
-        .maybeSingle(),
-      supabase
-        .from("ticket_messages")
-        .select("id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("ticket_attachments")
-        .select("id, storage_path, file_name, file_size, message_id")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-    ]);
+  const [
+    { data: ticket, error: ticketError },
+    { data: messages, error: messagesError },
+    { data: attachments, error: attachmentsError },
+  ] = await Promise.all([
+    supabase
+      .from("tickets")
+      .select(
+        "*, organizations(name, billing_type), profiles:created_by(full_name, email)",
+      )
+      .eq("id", ticketId)
+      .maybeSingle(),
+    supabase
+      .from("ticket_messages")
+      .select("id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("ticket_attachments")
+      .select("id, storage_path, file_name, file_size, message_id")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  // A failed ticket read leaves `ticket` null, which would fall through to
+  // notFound() and present a database failure as a missing ticket. Fail loudly
+  // instead, and reserve notFound() for a query that succeeded and found nothing.
+  if (ticketError) {
+    console.error("Admin ticket error:", ticketError);
+    throw new Error("Unable to load the ticket.", { cause: ticketError });
+  }
+
+  // Messages and attachments are degraded gracefully by comparison - the ticket
+  // itself still renders - but an empty thread must not pass for "no replies yet".
+  if (messagesError) {
+    console.error("Admin ticket messages error:", messagesError);
+  }
+
+  if (attachmentsError) {
+    console.error("Admin ticket attachments error:", attachmentsError);
+  }
 
   if (!ticket) {
     notFound();
