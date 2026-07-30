@@ -26,26 +26,39 @@ export default async function AdminTicketDetailPage({
   const { ticketId } = await params;
   const { supabase } = await requireAdminUser();
 
-  const [{ data: ticket }, { data: messages }, { data: attachments }] =
-    await Promise.all([
-      supabase
-        .from("tickets")
-        .select(
-          "*, organizations(name, billing_type), profiles:created_by(full_name, email)",
-        )
-        .eq("id", ticketId)
-        .maybeSingle(),
-      supabase
-        .from("ticket_messages")
-        .select("id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("ticket_attachments")
-        .select("id, storage_path, file_name, file_size, message_id")
-        .eq("ticket_id", ticketId)
-        .order("created_at", { ascending: true }),
-    ]);
+  const [
+    { data: ticket },
+    { data: messages, error: messagesError },
+    { data: attachments, error: attachmentsError },
+  ] = await Promise.all([
+    supabase
+      .from("tickets")
+      .select(
+        "*, organizations(name, billing_type), profiles:created_by(full_name, email)",
+      )
+      .eq("id", ticketId)
+      .maybeSingle(),
+    supabase
+      .from("ticket_messages")
+      .select("id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("ticket_attachments")
+      .select("id, storage_path, file_name, file_size, message_id")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  // These render as an empty thread when they fail, so surface them rather than
+  // letting a read error look like "the client hasn't replied yet".
+  if (messagesError) {
+    console.error("Admin ticket messages error:", messagesError);
+  }
+
+  if (attachmentsError) {
+    console.error("Admin ticket attachments error:", attachmentsError);
+  }
 
   if (!ticket) {
     notFound();
