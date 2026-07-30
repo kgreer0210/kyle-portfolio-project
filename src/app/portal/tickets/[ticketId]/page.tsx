@@ -29,7 +29,7 @@ export default async function PortalTicketDetailPage({
   }
 
   const [
-    { data: ticket },
+    { data: ticket, error: ticketError },
     { data: messages, error: messagesError },
     { data: attachments, error: attachmentsError },
   ] = await Promise.all([
@@ -51,8 +51,12 @@ export default async function PortalTicketDetailPage({
       .order("created_at", { ascending: true }),
   ]);
 
-  // These render as an empty thread when they fail, so surface them rather than
-  // letting a read error look like "the client hasn't replied yet".
+  // A failed read renders as an empty thread, or as a 404 for the ticket itself,
+  // so surface it rather than letting it pass for "there's nothing here".
+  if (ticketError) {
+    console.error("Portal ticket error:", ticketError);
+  }
+
   if (messagesError) {
     console.error("Portal ticket messages error:", messagesError);
   }

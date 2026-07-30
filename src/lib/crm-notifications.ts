@@ -8,6 +8,15 @@ import {
 import { escapeHtml } from "@/lib/notifications";
 import type { TicketStatus } from "@/types/crm";
 
+/**
+ * Ticket titles are client-supplied and only trimmed/length-capped on the way in,
+ * so they can still carry newlines. Collapse control characters before they reach
+ * a mail header rather than trusting the provider to handle it.
+ */
+function toEmailSubject(value: string) {
+  return value.replace(/[\u0000-\u001F\u007F]+/g, " ").trim();
+}
+
 function getAdminTicketUrl(ticketId: string) {
   return `${getSiteUrl()}/admin/tickets/${ticketId}`;
 }
@@ -239,7 +248,7 @@ export async function sendTicketCreatedNotifications(args: {
 
   await sendEmail({
     to: recipients,
-    subject: `${subjectPrefix}New client ticket: ${args.title}`,
+    subject: toEmailSubject(`${subjectPrefix}New client ticket: ${args.title}`),
     html: `
       <p><strong>${escapeHtml(args.organizationName)}</strong> created a new ticket.</p>
       <p>Title: <strong>${escapeHtml(args.title)}</strong></p>
@@ -261,7 +270,7 @@ export async function sendTicketReplyNotifications(args: {
   body: string;
 }) {
   const excerpt = args.body.slice(0, 500);
-  const subject = `New reply on ticket: ${args.title}`;
+  const subject = toEmailSubject(`New reply on ticket: ${args.title}`);
 
   // Admins and clients need different destinations, so these go out as separate
   // sends rather than one shared `to:` list.
@@ -319,7 +328,7 @@ export async function sendTicketStatusChangeNotifications(args: {
 
   await sendEmail({
     to: recipients,
-    subject: `Ticket update: ${args.title}`,
+    subject: toEmailSubject(`Ticket update: ${args.title}`),
     html: `
       <p>Your ticket <strong>${escapeHtml(args.title)}</strong> was updated.</p>
       <p>New status: <strong>${escapeHtml(statusLabel)}</strong></p>
