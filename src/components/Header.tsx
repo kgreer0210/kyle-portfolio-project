@@ -65,6 +65,15 @@ export default function Header() {
               </motion.span>
             </Link>
           ))}
+          <Link href="/login">
+            <motion.button
+              className="px-5 py-2 rounded-full border border-blue-ncs text-blue-ncs text-sm font-semibold hover:bg-blue-ncs hover:text-white transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Client Login
+            </motion.button>
+          </Link>
           <Link href="/contact">
             <motion.button
               className="px-5 py-2 rounded-full bg-blue-ncs text-white text-sm font-semibold hover:bg-lapis-lazuli transition-colors"
@@ -149,7 +158,18 @@ export default function Header() {
                     </motion.span>
                   </Link>
                 ))}
-                <Link href="/contact" className="mt-4" onClick={closeMobileMenu}>
+                <Link href="/login" className="mt-4" onClick={closeMobileMenu}>
+                  <motion.button
+                    className="w-full py-4 rounded-xl border border-blue-ncs text-blue-ncs font-bold text-lg"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Client Login
+                  </motion.button>
+                </Link>
+                <Link href="/contact" onClick={closeMobileMenu}>
                   <motion.button
                     className="w-full py-4 rounded-xl bg-blue-ncs text-white font-bold text-lg"
                     initial={{ opacity: 0, y: 20 }}
