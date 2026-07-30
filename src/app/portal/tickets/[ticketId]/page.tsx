@@ -51,12 +51,16 @@ export default async function PortalTicketDetailPage({
       .order("created_at", { ascending: true }),
   ]);
 
-  // A failed read renders as an empty thread, or as a 404 for the ticket itself,
-  // so surface it rather than letting it pass for "there's nothing here".
+  // A failed ticket read leaves `ticket` null, which would fall through to
+  // notFound() and tell the client their ticket doesn't exist. Fail loudly
+  // instead, and reserve notFound() for a query that succeeded and found nothing.
   if (ticketError) {
     console.error("Portal ticket error:", ticketError);
+    throw new Error("Unable to load the ticket.", { cause: ticketError });
   }
 
+  // Messages and attachments are degraded gracefully by comparison - the ticket
+  // itself still renders - but an empty thread must not pass for "no replies yet".
   if (messagesError) {
     console.error("Portal ticket messages error:", messagesError);
   }
