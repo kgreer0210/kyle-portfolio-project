@@ -13,6 +13,14 @@ export interface AssistSummary {
 }
 
 const SUMMARY_REGEX = /\[TICKET SUMMARY\]([\s\S]*?)\[\/TICKET SUMMARY\]/;
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled]):not([tabindex='-1'])",
+  "input:not([disabled]):not([tabindex='-1'])",
+  "select:not([disabled]):not([tabindex='-1'])",
+  "textarea:not([disabled]):not([tabindex='-1'])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
 
 function extractSummary(content: string): AssistSummary | null {
   const match = content.match(SUMMARY_REGEX);
@@ -62,6 +70,8 @@ export default function TicketAssistPanel({
   const [error, setError] = useState("");
   const [applied, setApplied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const drawerTitleId = useId();
 
@@ -72,22 +82,65 @@ export default function TicketAssistPanel({
   useEffect(() => {
     if (!isOpen) return;
 
+    const launcher = launcherRef.current;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusFrame = window.requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
 
-    function handleEscape(event: globalThis.KeyboardEvent) {
-      if (event.key === "Escape") setIsOpen(false);
+    function handleDialogKeyDown(event: globalThis.KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+
+      const focusableElements = Array.from(
+        drawer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter(
+        (element) =>
+          element.offsetWidth > 0 || element.offsetHeight > 0,
+      );
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        drawer.focus();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey) {
+        if (activeElement === firstElement || !drawer.contains(activeElement)) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      } else if (
+        activeElement === lastElement ||
+        !drawer.contains(activeElement)
+      ) {
+        event.preventDefault();
+        firstElement.focus();
+      }
     }
 
-    window.addEventListener("keydown", handleEscape);
+    window.addEventListener("keydown", handleDialogKeyDown);
 
     return () => {
       window.cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("keydown", handleDialogKeyDown);
+      if (launcher?.isConnected) {
+        launcher.focus();
+      }
     };
   }, [isOpen]);
 
@@ -182,6 +235,7 @@ export default function TicketAssistPanel({
   return (
     <>
       <button
+        ref={launcherRef}
         type="button"
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
@@ -212,7 +266,7 @@ export default function TicketAssistPanel({
       <button
         type="button"
         aria-label="Close ticket assistant"
-        tabIndex={isOpen ? 0 : -1}
+        tabIndex={-1}
         onClick={() => setIsOpen(false)}
         className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] transition-opacity duration-300 ${
           isOpen
@@ -222,7 +276,9 @@ export default function TicketAssistPanel({
       />
 
       <aside
+        ref={drawerRef}
         role="dialog"
+        tabIndex={-1}
         aria-modal="true"
         aria-labelledby={drawerTitleId}
         aria-hidden={!isOpen}
