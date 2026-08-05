@@ -36,50 +36,7 @@ export default async function PortalTicketsPage() {
   }>;
 
   return (
-    <main className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-      <section className="space-y-6">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-            Ticket History
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold text-white">Your tickets</h2>
-        </div>
-
-        <div className="space-y-4">
-          {tickets.length === 0 ? (
-            <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 text-sm text-text-secondary">
-              No tickets yet. Use the form to create your first request or issue.
-            </div>
-          ) : (
-            tickets.map((ticket) => (
-              <Link
-                key={ticket.id}
-                href={`/portal/tickets/${ticket.id}`}
-                className="block rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                      {ticket.type}
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold text-white">
-                      {ticket.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-text-secondary">
-                      {formatDateTime(ticket.created_at)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start gap-2 md:items-end">
-                    <StatusBadge status={ticket.status} />
-                    <PriorityBadge priority={ticket.priority || "normal"} />
-                  </div>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
-      </section>
-
+    <main className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
       <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
@@ -91,6 +48,42 @@ export default async function PortalTicketsPage() {
         </div>
         <div className="mt-6">
           <NewTicketForm />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+            Recent Activity
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Your tickets</h2>
+        </div>
+
+        <div className="divide-y divide-penn-blue overflow-hidden rounded-[2rem] border border-penn-blue bg-oxford-blue/80">
+          {tickets.length === 0 ? (
+            <p className="p-6 text-sm leading-6 text-text-secondary">
+              No tickets yet. Use the form to create your first request or issue.
+            </p>
+          ) : (
+            tickets.map((ticket) => (
+              <Link
+                key={ticket.id}
+                href={`/portal/tickets/${ticket.id}`}
+                className="block p-5 transition hover:bg-penn-blue/30"
+              >
+                <p className="text-xs uppercase tracking-[0.16em] text-text-secondary">
+                  {ticket.type} · {formatDateTime(ticket.created_at)}
+                </p>
+                <h3 className="mt-2 line-clamp-2 font-semibold text-white">
+                  {ticket.title}
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <StatusBadge status={ticket.status} />
+                  <PriorityBadge priority={ticket.priority || "normal"} />
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </section>
     </main>
