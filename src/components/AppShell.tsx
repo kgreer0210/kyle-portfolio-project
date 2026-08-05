@@ -6,7 +6,14 @@ import Particles from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 import ChatWidget from "@/components/ChatWidget";
 
-const appPrefixes = ["/login", "/reset-password", "/portal", "/admin", "/auth"];
+const appPrefixes = [
+  "/login",
+  "/reset-password",
+  "/portal",
+  "/admin",
+  "/auth",
+  "/ticket-layouts",
+];
 
 function isAppRoute(pathname: string): boolean {
   return appPrefixes.some(

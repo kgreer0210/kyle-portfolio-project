@@ -91,6 +91,12 @@ export default function NewTicketForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      <TicketAssistPanel
+        draftTitle={title}
+        draftDescription={description}
+        onApplySummary={handleApplySummary}
+      />
+
       <div className="grid gap-5 md:grid-cols-[200px_1fr]">
         <div className="space-y-2">
           <label className="text-sm font-medium text-text-primary">Type</label>
@@ -152,12 +158,6 @@ export default function NewTicketForm() {
           </select>
         </div>
       </div>
-
-      <TicketAssistPanel
-        draftTitle={title}
-        draftDescription={description}
-        onApplySummary={handleApplySummary}
-      />
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-text-primary">
