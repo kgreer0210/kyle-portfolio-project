@@ -12,7 +12,6 @@ const appPrefixes = [
   "/portal",
   "/admin",
   "/auth",
-  "/ticket-layouts",
 ];
 
 function isAppRoute(pathname: string): boolean {
