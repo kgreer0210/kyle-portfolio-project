@@ -1,8 +1,8 @@
-# Auto-merge PRs from Dependabot and Renovate for non-breaking dependency bumps
+# Auto-merge routine Dependabot version updates after required checks pass.
 #
-# - Patch + minor bumps: auto-approved + auto-merged
+# - Grouped patch + minor version bumps: auto-approved + auto-merged
 # - Major bumps: labeled 'needs-review', no auto-merge
-# - Security patches: flagged for fast-track
+# - Security updates: labeled 'security', no auto-merge
 #
 # Requires: 'dependencies' and 'automated' labels exist on the repo
 name: Auto-merge Dependencies
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   classify-and-merge:
-    if: ${{ contains(fromJson('["dependabot[bot]", "renovate[bot]"]'), github.actor) }}
+    if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     # gh resolves the target repo from GH_REPO when no git checkout is present,
     # so these commands don't need actions/checkout.
@@ -27,29 +27,25 @@ jobs:
       GH_REPO: ${{ github.repository }}
     steps:
       - name: Fetch Dependabot metadata
-        if: ${{ github.actor == 'dependabot[bot]' }}
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v2
-        with:
-          alert-lookup: true
-          compat-lookup: true
+        uses: dependabot/fetch-metadata@v3
 
       - name: Label major version bumps for review
-        if: ${{ github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.update-type == 'version-update:semver-major' }}
+        if: ${{ steps.dependabot-metadata.outputs.update-type == 'version-update:semver-major' }}
         run: |
           gh pr edit ${{ github.event.pull_request.number }} \
             --add-label "needs-review" \
             --remove-label "automated" 2>/dev/null || true
 
-      - name: Label security patches
-        if: ${{ github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.vulnerability-alert-id != '' }}
+      - name: Label security updates
+        if: ${{ steps.dependabot-metadata.outputs.dependency-group == 'security-updates' }}
         run: |
           gh pr edit ${{ github.event.pull_request.number }} \
             --add-label "security" \
             --remove-label "automated" 2>/dev/null || true
 
-      - name: Approve and auto-merge safe bumps
-        if: ${{ (github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && steps.dependabot-metadata.outputs.vulnerability-alert-id == '') || github.actor == 'renovate[bot]' }}
+      - name: Approve and auto-merge routine updates
+        if: ${{ steps.dependabot-metadata.outputs.dependency-group == 'routine-updates' && steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
         run: |
           gh pr review --approve ${{ github.event.pull_request.number }}
           gh pr merge --auto --squash ${{ github.event.pull_request.number }}
