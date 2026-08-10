@@ -2,7 +2,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Next.js 16.3 currently fails when standalone output is combined with
+  // Vercel's injected build adapter. Vercel does not consume the standalone
+  // artifact, so keep it only for local/self-hosted builds until upstream is
+  // fixed: https://github.com/vercel/next.js/issues/96646
+  output: process.env.VERCEL ? undefined : "standalone",
   // The chat assistant reads markdown knowledge files from
   // src/data/knowledge/ at runtime via fs.readFileSync. Because the path is
   // built from process.cwd() and a variable filename, @vercel/nft can't
