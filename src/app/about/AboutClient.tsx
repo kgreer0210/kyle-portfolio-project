@@ -63,9 +63,9 @@ export default function AboutClient() {
             >
               <Image
                 src="/FamilyPortrait.png"
-                alt="Kyle Greer and family"
-                width={1200}
-                height={1600}
+                alt="Kyle Greer with his wife and three children"
+                width={1024}
+                height={819}
                 className="w-full h-auto rounded-3xl shadow-xl"
                 priority
               />
