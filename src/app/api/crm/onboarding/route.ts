@@ -1,29 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiClientUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
-import { onboardingSteps } from "@/lib/crm";
+import {
+  computeCompletedSteps,
+  sanitizeAnswers,
+} from "@/lib/onboardingFlow";
+import {
+  loadOnboardingContext,
+  saveOnboardingAnswers,
+} from "@/lib/onboardingServer";
 import { createAdminSupabaseClient } from "@/lib/supabase";
+import type { OnboardingAnswers } from "@/types/crm";
 
-function sanitizeStepResponse(
-  stepKey: string,
-  value: unknown,
-): Record<string, string> {
-  const step = onboardingSteps.find((entry) => entry.key === stepKey);
+interface SaveBody {
+  organizationId?: string;
+  /** New shape: answers for every step the client has touched. */
+  responses?: unknown;
+  /** Legacy single-step shape, still accepted. */
+  stepKey?: string;
+  response?: unknown;
+  currentStep?: string;
+}
 
-  if (!step || typeof value !== "object" || value === null || Array.isArray(value)) {
-    return {};
+function collectIncoming(body: SaveBody): unknown {
+  if (body.responses && typeof body.responses === "object") {
+    return body.responses;
   }
-
-  const source = value as Record<string, unknown>;
-  return Object.fromEntries(
-    step.fields.map((field) => {
-      const fieldValue = source[field.key];
-      return [
-        field.key,
-        typeof fieldValue === "string" ? fieldValue.trim().slice(0, 5000) : "",
-      ];
-    }),
-  );
+  if (body.stepKey && body.response && typeof body.response === "object") {
+    return { [body.stepKey]: body.response };
+  }
+  return {};
 }
 
 export async function POST(request: NextRequest) {
@@ -36,37 +42,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as {
-      organizationId?: string;
-      stepKey?: string;
-      response?: unknown;
-      currentStep?: string;
-      completedSteps?: string[];
-    };
+    const body = (await request.json()) as SaveBody;
+    const organizationId = context.membership.organization_id;
 
-    if (!body.organizationId || body.organizationId !== context.membership.organization_id) {
+    if (!body.organizationId || body.organizationId !== organizationId) {
       return jsonError("You do not have access to this onboarding record.", 403);
     }
 
-    const stepKey = body.stepKey?.trim() || "";
-    const currentStep = body.currentStep?.trim() || stepKey;
-    const validKeys = new Set(onboardingSteps.map((step) => step.key));
-
-    if (!validKeys.has(stepKey) || !validKeys.has(currentStep)) {
-      return jsonError("Invalid onboarding step.");
-    }
-
-    const adminSupabase = createAdminSupabaseClient();
-    const { data: onboarding, error: onboardingLookupError } = await adminSupabase
-      .from("client_onboardings")
-      .select("status, mode, started_at")
-      .eq("organization_id", context.membership.organization_id)
-      .maybeSingle();
-
-    if (onboardingLookupError) {
-      console.error("Onboarding lookup error:", onboardingLookupError);
+    const onboardingContext = await loadOnboardingContext(organizationId);
+    if (!onboardingContext) {
       return jsonError("Unable to load onboarding.", 500);
     }
+
+    const { onboarding, steps, savedAnswers } = onboardingContext;
 
     if (
       onboarding?.status === "submitted" ||
@@ -76,37 +64,36 @@ export async function POST(request: NextRequest) {
       return jsonError("This onboarding flow is locked.", 400);
     }
 
-    const completedSteps = Array.from(
-      new Set(
-        (body.completedSteps || []).filter((entry) => validKeys.has(entry)).concat(stepKey),
-      ),
-    );
-    const sanitizedResponse = sanitizeStepResponse(stepKey, body.response);
-
-    const { error: responseError } = await adminSupabase
-      .from("onboarding_step_responses")
-      .upsert(
-        {
-          organization_id: context.membership.organization_id,
-          step_key: stepKey,
-          response: sanitizedResponse,
-        },
-        { onConflict: "organization_id,step_key" },
-      );
-
-    if (responseError) {
-      console.error("Onboarding response save error:", responseError);
-      return jsonError("Unable to save the onboarding step.", 500);
+    if (!onboardingContext.isReadyForClient) {
+      return jsonError("Your onboarding isn't ready yet. Kyle is still preparing it.", 400);
     }
 
+    const validKeys = new Set(steps.map((step) => step.key));
+    const currentStep = body.currentStep?.trim() || body.stepKey?.trim() || "";
+    if (currentStep && !validKeys.has(currentStep)) {
+      return jsonError("Invalid onboarding step.");
+    }
+
+    const sanitized = sanitizeAnswers(steps, collectIncoming(body), savedAnswers);
+    const saveError = await saveOnboardingAnswers(organizationId, sanitized);
+    if (saveError) {
+      return jsonError(saveError, 500);
+    }
+
+    const mergedAnswers: OnboardingAnswers = { ...savedAnswers, ...sanitized };
+    const completedSteps = computeCompletedSteps(steps, mergedAnswers);
+    const nextStatus =
+      onboarding?.status === "reopened" ? "reopened" : "in_progress";
+
+    const adminSupabase = createAdminSupabaseClient();
     const { error: updateError } = await adminSupabase
       .from("client_onboardings")
       .upsert(
         {
-          organization_id: context.membership.organization_id,
+          organization_id: organizationId,
           mode: onboarding?.mode || "standard",
-          status: "in_progress",
-          current_step: currentStep,
+          status: nextStatus,
+          current_step: currentStep || onboarding?.current_step || steps[0].key,
           completed_steps: completedSteps,
           started_at: onboarding?.started_at || new Date().toISOString(),
         },
@@ -118,7 +105,11 @@ export async function POST(request: NextRequest) {
       return jsonError("Unable to update onboarding progress.", 500);
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      completedSteps,
+      savedSteps: Object.keys(sanitized),
+    });
   } catch (error) {
     console.error("Onboarding save route error:", error);
     return jsonError("An unexpected error occurred while saving onboarding.", 500);

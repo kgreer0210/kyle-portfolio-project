@@ -62,7 +62,7 @@ export default function AdminOnboardingReviewForm({
           }
           className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
         >
-          <option value="completed">Mark onboarding complete</option>
+          <option value="completed">Mark reviewed — ready to start</option>
           <option value="reopened">Reopen for client updates</option>
         </select>
       </div>

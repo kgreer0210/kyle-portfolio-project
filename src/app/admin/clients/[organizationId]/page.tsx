@@ -7,9 +7,10 @@ import OrgNoteDeleteButton from "@/components/crm/OrgNoteDeleteButton";
 import OrgNoteForm from "@/components/crm/OrgNoteForm";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
+import { projectTypeLabels } from "@/lib/onboardingPresets";
 import { getOrganizationActivity } from "@/lib/crm-activity";
 import { requireAdminUser } from "@/lib/auth";
-import type { BillingType, TicketStatus } from "@/types/crm";
+import type { BillingType, ProjectType, TicketStatus } from "@/types/crm";
 
 interface ClientDetailPageProps {
   params: Promise<{
@@ -100,6 +101,24 @@ export default async function AdminClientDetailPage({
       | "skipped_legacy"
       | undefined) || "not_started";
   const lastActivityAt = activity[0]?.occurredAt;
+  const onboardingRow = onboarding as {
+    mode?: string | null;
+    flow_version?: string | null;
+    project_type?: string | null;
+    plan_sent_at?: string | null;
+    plan_updated_at?: string | null;
+  } | null;
+  const memberCount = organizationMembers.length;
+  const isLegacySkipped = onboardingRow?.mode === "skipped_legacy";
+  const preparationLabel = isLegacySkipped
+    ? "Skipped (legacy client)"
+    : onboardingRow?.plan_sent_at
+      ? `Sent ${formatDateTime(onboardingRow.plan_sent_at)}`
+      : onboardingRow?.flow_version === "v2"
+        ? "Prepared, not sent"
+        : onboardingStatus === "not_started"
+          ? "Not prepared"
+          : "Original questionnaire in use";
 
   return (
     <main className="space-y-8">
@@ -210,6 +229,38 @@ export default async function AdminClientDetailPage({
             />
           </div>
         </div>
+
+        {!isLegacySkipped ? (
+          <div className="mt-4 rounded-3xl border border-blue-ncs/40 bg-blue-ncs/5 p-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-blue-ncs">
+                  Onboarding preparation
+                </p>
+                <p className="mt-2 font-semibold text-white">{preparationLabel}</p>
+                <p className="mt-1 text-sm leading-6 text-text-secondary">
+                  {onboardingRow?.project_type
+                    ? `Project type: ${projectTypeLabels[onboardingRow.project_type as ProjectType] ?? onboardingRow.project_type}. `
+                    : ""}
+                  {memberCount === 0
+                    ? "No portal invitation has been sent yet — sending the prepared onboarding invites the client."
+                    : `${memberCount} portal member${memberCount === 1 ? "" : "s"}.`}
+                </p>
+                <p className="mt-2 text-xs leading-5 text-text-secondary">
+                  Do this once the agreement is signed and the deposit has cleared. The
+                  client confirms what we already know and shares materials — scope
+                  discussions stay separate.
+                </p>
+              </div>
+              <Link
+                href={`/admin/clients/${organization.id}/onboarding-setup`}
+                className="inline-flex shrink-0 rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli"
+              >
+                {onboardingRow?.flow_version === "v2" ? "Edit onboarding plan" : "Prepare onboarding"}
+              </Link>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">

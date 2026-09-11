@@ -75,6 +75,7 @@ src/
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm test` - Run vitest unit and component tests
 
 ## Important Files
 
@@ -96,6 +97,16 @@ src/
 - `POST /api/retell/webhook` - Retell AI voice agent webhook (handles `call_started`, `call_ended`, `call_analyzed` events; stores calls in Supabase, sends SMS + Discord notifications)
 - `POST /api/chat` - Streaming chat endpoint for the on-site AI diagnostic assistant. Uses Claude Haiku 4.5 via OpenRouter, persists each turn to Supabase (`chat_conversations`, `chat_messages`).
 - `POST /api/chat/end` - Conversation finalizer. Scores the transcript with `src/lib/chatLeadScoring.ts`, marks the conversation completed in Supabase, and sends Kyle an email digest via Resend.
+
+## Client Onboarding (CRM portal)
+
+Onboarding is admin-prepared and project-specific; see `ONBOARDING_SETUP.md` for the full flow and migration notes.
+
+- Admin prepares a plan from the client record (`/admin/clients/[id]/onboarding-setup`, `src/components/crm/PrepareOnboardingForm.tsx`): project type preset, known info, client-friendly summary + deliverables, requested items (have / ask / not needed), live preview, then Send (`PUT/POST /api/admin/onboarding/[id]/plan|send`). Send invites the client if they have no portal member yet, otherwise emails them that onboarding is ready; it stamps `plan_sent_at`, which unlocks the flow.
+- Client questions are generated, not static: `src/lib/onboardingFlow.ts` (`buildOnboardingSteps`, visibility, status, validation, summaries) + `src/lib/onboardingPresets.ts`. Legacy v1 steps live in `src/lib/onboardingLegacySteps.ts` and still render for rows with `flow_version = 'v1'`.
+- `OnboardingChecklist.tsx` saves **all** steps on every save/submit (fixes the earlier single-step data loss); step chips reflect real answer status, never "saved once".
+- Submission validates required fields only and sets `submitted`; readiness is the admin's decision on `/admin/onboarding/[id]` (Provided / Sending later / Needs help / To discuss groups).
+- Tests: `npm test` (vitest) — `src/lib/__tests__/onboardingFlow.test.ts`, `src/components/crm/__tests__/OnboardingChecklist.test.tsx`.
 
 ## AI Ticket Triage (CRM portal)
 

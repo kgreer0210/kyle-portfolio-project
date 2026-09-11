@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAdminUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
-import { onboardingSteps } from "@/lib/crm";
+import { loadOnboardingContext } from "@/lib/onboardingServer";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
 interface RouteParams {
@@ -42,6 +42,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return jsonError("Onboarding record not found.", 404);
     }
 
+    // Reopening sends the client back to the first step of THEIR flow (v1 or v2).
+    const context = await loadOnboardingContext(organizationId);
+    const firstStepKey = context?.steps[0]?.key || "contact";
+
     const now = new Date().toISOString();
     const updatePayload =
       status === "completed"
@@ -52,7 +56,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         : {
             status,
             reviewed_at: now,
-            current_step: onboardingSteps[0]?.key || "account-setup",
+            current_step: firstStepKey,
           };
 
     const { error: updateError } = await adminSupabase

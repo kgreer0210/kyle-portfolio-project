@@ -13,6 +13,8 @@ export default function CreateClientForm() {
   const [primaryContactEmail, setPrimaryContactEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [clientType, setClientType] = useState<ClientMode>("new");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [sendInviteNow, setSendInviteNow] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,26 +36,35 @@ export default function CreateClientForm() {
           slug,
           primaryContactName,
           primaryContactEmail,
+          websiteUrl,
           notes,
           clientType,
+          sendInviteNow,
         }),
       });
 
       const payload = (await response.json()) as {
         error?: string;
         organizationId?: string;
+        invited?: boolean;
       };
 
-      if (!response.ok || !payload.organizationId) {
+      if (!payload.organizationId) {
         throw new Error(payload.error || "Unable to create client.");
       }
 
-      setSuccess("Client created successfully.");
+      if (!response.ok && payload.error) {
+        // Client exists but the invite failed; land on the record so it can be resent.
+        setError(payload.error);
+      } else {
+        setSuccess("Client created successfully.");
+      }
       setOrganizationName("");
       setSlug("");
       setPrimaryContactName("");
       setPrimaryContactEmail("");
       setNotes("");
+      setWebsiteUrl("");
       router.push(`/admin/clients/${payload.organizationId}`);
       router.refresh();
     } catch (submitError) {
@@ -136,7 +147,8 @@ export default function CreateClientForm() {
           >
             <div className="font-semibold text-white">New client</div>
             <p className="mt-2 text-sm text-text-secondary">
-              Invite into the full onboarding flow before portal work begins.
+              Create the record now, prepare a project-specific onboarding, then send
+              the portal invite from the client page.
             </p>
           </button>
           <button
@@ -155,6 +167,38 @@ export default function CreateClientForm() {
           </button>
         </div>
       </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-text-primary">
+          Website (optional)
+        </label>
+        <input
+          type="url"
+          value={websiteUrl}
+          onChange={(event) => setWebsiteUrl(event.target.value)}
+          className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+          placeholder="https://"
+        />
+      </div>
+
+      {clientType === "new" ? (
+        <label className="flex items-start gap-3 rounded-3xl border border-penn-blue bg-rich-black/40 p-4 text-sm text-text-secondary">
+          <input
+            type="checkbox"
+            checked={sendInviteNow}
+            onChange={(event) => setSendInviteNow(event.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-penn-blue"
+          />
+          <span>
+            <span className="font-medium text-text-primary">Send the portal invitation now</span>
+            <span className="mt-1 block leading-6">
+              Off by default: the invite goes out when you send the prepared onboarding,
+              so the client never lands on a generic questionnaire. Turn on to invite
+              immediately (they&apos;ll see a &ldquo;being prepared&rdquo; notice until you send).
+            </span>
+          </span>
+        </label>
+      ) : null}
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-text-primary">Notes</label>

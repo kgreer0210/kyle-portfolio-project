@@ -10,7 +10,7 @@ export default async function AdminOnboardingQueuePage() {
   const { data } = await supabase
     .from("client_onboardings")
     .select(
-      "organization_id, status, submitted_at, updated_at, organizations(name, primary_contact_name, primary_contact_email)",
+      "organization_id, status, submitted_at, updated_at, flow_version, plan_sent_at, organizations(name, primary_contact_name, primary_contact_email)",
     )
     .in("status", reviewQueueStatuses)
     .order("updated_at", { ascending: false });
@@ -20,6 +20,8 @@ export default async function AdminOnboardingQueuePage() {
     status: "in_progress" | "submitted" | "reopened";
     submitted_at?: string | null;
     updated_at?: string;
+    flow_version?: string | null;
+    plan_sent_at?: string | null;
     organizations?: {
       name?: string | null;
       primary_contact_name?: string | null;
@@ -78,7 +80,9 @@ export default async function AdminOnboardingQueuePage() {
                         Submitted:{" "}
                         {entry.submitted_at
                           ? formatDateTime(entry.submitted_at)
-                          : "Not submitted yet"}
+                          : entry.plan_sent_at
+                            ? "Not submitted yet (sent to client)"
+                            : "Not submitted yet"}
                       </p>
                       <p>Last updated: {formatDateTime(entry.updated_at)}</p>
                     </div>

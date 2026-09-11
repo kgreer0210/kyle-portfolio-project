@@ -338,3 +338,86 @@ export async function sendTicketStatusChangeNotifications(args: {
     text: `Your ticket "${args.title}" is now ${statusLabel}.${prompt ? ` ${prompt}` : ""}\n\n${ticketCallToActionText(portalUrl, needsClientReply ? "View and reply in the portal" : "View ticket")}`,
   });
 }
+
+// ---------------------------------------------------------------------------
+// Onboarding plan emails (client-facing)
+// ---------------------------------------------------------------------------
+
+function getPortalOnboardingUrl() {
+  return `${getSiteUrl()}/portal/onboarding`;
+}
+
+/**
+ * Sent when the admin publishes a prepared onboarding to a client who already
+ * has portal access.
+ */
+export async function sendOnboardingReadyNotification(args: {
+  to: string[];
+  clientName?: string | null;
+  organizationName: string;
+}) {
+  const greeting = args.clientName ? `Hi ${escapeHtml(args.clientName)},` : "Hi,";
+  const url = getPortalOnboardingUrl();
+
+  await sendEmail({
+    to: args.to,
+    subject: `Let's get ready to start: onboarding for ${args.organizationName}`,
+    html: `
+      <p>${greeting}</p>
+      <p>Your onboarding for <strong>${escapeHtml(args.organizationName)}</strong> is ready in the client portal. It's four short steps: confirm your contact details, check the project summary, and share any materials you already have. Short answers are fine, and you can save and come back any time.</p>
+      ${ticketCallToActionHtml(url, "Open onboarding")}
+      <p style="font-size:12px;color:#6b7280;">If you have questions, reply to this email or open a ticket in the portal.</p>
+    `,
+    text: `${args.clientName ? `Hi ${args.clientName},` : "Hi,"}\n\nYour onboarding for ${args.organizationName} is ready in the client portal. It's four short steps: confirm your contact details, check the project summary, and share any materials you already have. Short answers are fine, and you can save and come back any time.\n\nOpen onboarding: ${url}`,
+  });
+}
+
+/**
+ * Fallback delivery for portal access when Supabase's built-in invite email
+ * can't be used (the address is already registered).
+ */
+export async function sendPortalAccessLinkEmail(args: {
+  to: string;
+  clientName?: string | null;
+  organizationName: string;
+  actionLink: string;
+}) {
+  const greeting = args.clientName ? `Hi ${escapeHtml(args.clientName)},` : "Hi,";
+
+  await sendEmail({
+    to: [args.to],
+    subject: `Your client portal access for ${args.organizationName}`,
+    html: `
+      <p>${greeting}</p>
+      <p>Here's your sign-in link for the <strong>${escapeHtml(args.organizationName)}</strong> client portal. Use it once to set up your access, then head to onboarding.</p>
+      <p style="margin:24px 0;">
+        <a href="${escapeHtml(args.actionLink)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">Set up portal access</a>
+      </p>
+      <p style="font-size:12px;color:#6b7280;">This link is single-use and expires. If it has expired, reply to this email and we'll send a new one.</p>
+    `,
+    text: `${args.clientName ? `Hi ${args.clientName},` : "Hi,"}\n\nHere's your sign-in link for the ${args.organizationName} client portal. Use it once to set up your access, then head to onboarding.\n\n${args.actionLink}\n\nThis link is single-use and expires. If it has expired, reply to this email and we'll send a new one.`,
+  });
+}
+
+export async function sendOnboardingSentAdminNotification(args: {
+  organizationName: string;
+  clientEmail: string;
+  method: "invite" | "magiclink" | "ready_email";
+}) {
+  const methodLabel =
+    args.method === "invite"
+      ? "portal invitation"
+      : args.method === "magiclink"
+        ? "sign-in link (address already registered)"
+        : "onboarding-ready email (client already has access)";
+
+  await sendEmail({
+    to: getAdminNotificationEmails(),
+    subject: `Onboarding sent: ${args.organizationName}`,
+    html: `
+      <p>Onboarding for <strong>${escapeHtml(args.organizationName)}</strong> was sent to <strong>${escapeHtml(args.clientEmail)}</strong>.</p>
+      <p>Delivery: ${escapeHtml(methodLabel)}.</p>
+    `,
+    text: `Onboarding for ${args.organizationName} was sent to ${args.clientEmail}. Delivery: ${methodLabel}.`,
+  });
+}

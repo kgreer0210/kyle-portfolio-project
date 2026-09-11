@@ -61,7 +61,7 @@ export async function getOrganizationActivity(
       .limit(limit),
     supabase
       .from("client_onboardings")
-      .select("id, status, started_at, submitted_at, reviewed_at")
+      .select("id, status, started_at, submitted_at, reviewed_at, plan_sent_at")
       .eq("organization_id", organizationId)
       .maybeSingle(),
     supabase
@@ -117,6 +117,7 @@ export async function getOrganizationActivity(
 
   if (onboarding) {
     const onboardingEntries: Array<{ at: string | null; label: string }> = [
+      { at: onboarding.plan_sent_at, label: "Onboarding sent to client" },
       { at: onboarding.started_at, label: "Onboarding started" },
       { at: onboarding.submitted_at, label: "Onboarding submitted" },
       {

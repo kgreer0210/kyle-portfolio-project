@@ -1,26 +1,33 @@
 import Link from "next/link";
 import OnboardingChecklist from "@/components/crm/OnboardingChecklist";
-import { onboardingSteps } from "@/lib/crm";
+import OnboardingReviewSummary from "@/components/crm/OnboardingReviewSummary";
+import { formatFieldValue } from "@/lib/crm";
 import {
   requireClientUser,
   getPrimaryOrganizationMembership,
 } from "@/lib/auth";
+import {
+  buildInitialAnswers,
+  getVisibleFields,
+  summarizeResponses,
+} from "@/lib/onboardingFlow";
+import { loadOnboardingContext } from "@/lib/onboardingServer";
 
 function getReadOnlyOnboardingContent(status: "submitted" | "completed") {
   if (status === "completed") {
     return {
-      eyebrow: "Onboarding Complete",
+      eyebrow: "Onboarding reviewed",
       title: "Your onboarding is complete.",
       description:
-        "Thanks for wrapping up the onboarding flow. Your responses are saved here as a reference point for future work.",
+        "Kyle has reviewed your answers. They stay here for reference. If anything changes, open a support ticket and we'll update our notes.",
     };
   }
 
   return {
-    eyebrow: "Onboarding Under Review",
-    title: "Your onboarding has been submitted.",
+    eyebrow: "Onboarding submitted",
+    title: "Thanks — we have your answers.",
     description:
-      "Thanks for completing the onboarding checklist. We're reviewing your responses now, and the details below remain available for reference.",
+      "Kyle is reviewing them now and will follow up on anything marked as sending later, needing help, or to discuss. Your answers are locked below; to add materials or send a correction, open a support ticket or ask Kyle to reopen this form.",
   };
 }
 
@@ -38,37 +45,23 @@ export default async function PortalOnboardingPage() {
     );
   }
 
-  const [{ data: onboarding }, { data: responses }] = await Promise.all([
-    supabase
-      .from("client_onboardings")
-      .select("*")
-      .eq("organization_id", membership.organization_id)
-      .maybeSingle(),
-    supabase
-      .from("onboarding_step_responses")
-      .select("step_key, response")
-      .eq("organization_id", membership.organization_id),
-  ]);
+  const context = await loadOnboardingContext(membership.organization_id);
 
-  const responseMap = Object.fromEntries(
-    (responses || []).map((row) => {
-      const entry = row as {
-        step_key: string;
-        response: Record<string, string>;
-      };
-      return [entry.step_key, entry.response || {}];
-    }),
-  );
-  const onboardingStatus =
-    ((onboarding as { status?: string } | null)?.status as
-      | "not_started"
-      | "in_progress"
-      | "submitted"
-      | "completed"
-      | "reopened"
-      | "skipped_legacy") || "not_started";
+  if (!context) {
+    return (
+      <main className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8">
+        <p className="text-sm text-text-secondary">
+          We couldn&apos;t load your onboarding right now. Please try again shortly.
+        </p>
+      </main>
+    );
+  }
 
-  if ((onboarding as { mode?: string } | null)?.mode === "skipped_legacy") {
+  const { onboarding, steps, savedAnswers, isReadyForClient } = context;
+  const onboardingStatus = onboarding?.status ?? "not_started";
+  const isV2 = onboarding?.flow_version === "v2";
+
+  if (onboarding?.mode === "skipped_legacy") {
     return (
       <main className="space-y-6">
         <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8">
@@ -80,11 +73,9 @@ export default async function PortalOnboardingPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-text-secondary">
             This portal was created for an existing client relationship, so you
-            can start using tickets right away without repeating a full
-            discovery flow.
+            can start using tickets right away.
           </p>
         </section>
-
         <Link
           href="/portal/tickets"
           className="inline-flex rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli"
@@ -97,6 +88,7 @@ export default async function PortalOnboardingPage() {
 
   if (onboardingStatus === "submitted" || onboardingStatus === "completed") {
     const content = getReadOnlyOnboardingContent(onboardingStatus);
+    const summary = summarizeResponses(steps, savedAnswers);
 
     return (
       <main className="space-y-6">
@@ -104,9 +96,7 @@ export default async function PortalOnboardingPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
             {content.eyebrow}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold text-white">
-            {content.title}
-          </h2>
+          <h2 className="mt-2 text-3xl font-semibold text-white">{content.title}</h2>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
             {content.description}
           </p>
@@ -121,47 +111,54 @@ export default async function PortalOnboardingPage() {
               href="/portal/tickets"
               className="rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli"
             >
-              Go to tickets
+              Send a correction or more materials
             </Link>
           </div>
         </section>
 
+        {isV2 ? (
+          <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+            <h3 className="text-xl font-semibold text-white">Where things stand</h3>
+            <p className="mt-2 text-sm text-text-secondary">
+              What you provided, what you&apos;ll send later, and what we&apos;ll work through together.
+            </p>
+            <div className="mt-5">
+              <OnboardingReviewSummary summary={summary} showUnanswered={false} hideEmpty />
+            </div>
+          </section>
+        ) : null}
+
         <section className="space-y-4">
-          {onboardingSteps.map((step, index) => (
+          {steps.map((step, index) => (
             <article
               key={step.key}
               className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6"
             >
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-                  Step {index + 1}
-                </p>
-                <h3 className="text-2xl font-semibold text-white">
-                  {step.title}
-                </h3>
-                <p className="text-sm leading-7 text-text-secondary">
-                  {step.description}
-                </p>
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">Step {index + 1}</p>
+                <h3 className="text-2xl font-semibold text-white">{step.title}</h3>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {step.fields.map((field) => {
-                  const value = responseMap[step.key]?.[field.key]?.trim();
-
-                  return (
-                    <div
-                      key={field.key}
-                      className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4"
-                    >
-                      <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                        {field.label}
-                      </p>
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white">
-                        {value || "No response provided."}
-                      </p>
-                    </div>
-                  );
-                })}
+                {getVisibleFields(step, savedAnswers)
+                  .filter((field) => field.type !== "static")
+                  .map((field) => {
+                    const raw = savedAnswers[step.key]?.[field.key] ?? "";
+                    const value = formatFieldValue(field, raw);
+                    return (
+                      <div
+                        key={field.key}
+                        className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4"
+                      >
+                        <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+                          {field.label}
+                        </p>
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white">
+                          {value || <span className="italic text-text-secondary">Left blank</span>}
+                        </p>
+                      </div>
+                    );
+                  })}
               </div>
             </article>
           ))}
@@ -170,43 +167,82 @@ export default async function PortalOnboardingPage() {
     );
   }
 
+  if (!isReadyForClient) {
+    return (
+      <main className="space-y-6">
+        <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">Almost ready</p>
+          <h2 className="mt-2 text-3xl font-semibold text-white">
+            We&apos;re preparing your onboarding.
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-text-secondary">
+            Kyle is tailoring a short set of questions to your project so you only
+            see what&apos;s relevant. You&apos;ll get an email as soon as it&apos;s ready —
+            usually within a business day. In the meantime, the portal and tickets
+            are open to you.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/portal"
+              className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs"
+            >
+              Back to dashboard
+            </Link>
+            <Link
+              href="/portal/tickets"
+              className="rounded-full bg-blue-ncs px-5 py-3 font-semibold text-white transition hover:bg-lapis-lazuli"
+            >
+              Open a ticket
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const initialAnswers = buildInitialAnswers(steps, savedAnswers);
+
   return (
     <main className="space-y-6">
       <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
         <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-          Client Onboarding
+          {onboardingStatus === "reopened" ? "Onboarding reopened" : "Client onboarding"}
         </p>
         <h2 className="mt-2 text-3xl font-semibold text-white">
-          Let&apos;s get to know your business.
+          {isV2 ? "Let’s get ready to start." : "Let’s get to know your business."}
         </h2>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
-          This one-time setup gives us everything we need to do great work for
-          you — your goals, your tools, the people involved, and how you like to
-          work. Five short steps, and you can save anytime; no need to finish in
-          one sitting.
-        </p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
-          Stuck on what to write? Click{" "}
-          <span className="text-blue-ncs">✦ Refine</span> to{" "}
-          <span className="text-blue-ncs">✦ Polish</span> a rough draft, or{" "}
-          <span className="text-blue-ncs">↗ Expand</span> to walk through a few
-          quick multiple-choice questions and have your answer drafted for you.
-          The more we know now, the smoother every step that follows will be.
-        </p>
+        {isV2 ? (
+          <>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
+              Confirm your contact details and share any project materials you
+              already have. Short answers are fine. Leave optional items blank if
+              you&apos;re unsure — we&apos;ll work through them together.
+            </p>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
+              Four short steps. Your progress is saved whenever you click Save, and
+              you can come back any time before submitting.
+              {onboardingStatus === "reopened"
+                ? " Kyle reopened this so you can update your answers — change what you need to and submit again."
+                : ""}
+            </p>
+          </>
+        ) : (
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
+            This one-time setup gives us everything we need to do great work for
+            you. Five short steps, and you can save anytime; no need to finish in
+            one sitting. Stuck on what to write? The optional{" "}
+            <span className="text-blue-ncs">✦ Refine</span> button can polish a
+            rough draft or walk you through a few multiple-choice questions.
+          </p>
+        )}
       </section>
 
       <OnboardingChecklist
         organizationId={membership.organization_id}
         status={onboardingStatus}
-        initialStep={
-          (onboarding as { current_step?: string } | null)?.current_step ||
-          onboardingSteps[0].key
-        }
-        initialCompletedSteps={
-          (onboarding as { completed_steps?: string[] } | null)
-            ?.completed_steps || []
-        }
-        initialResponses={responseMap}
+        initialStep={onboarding?.current_step || steps[0].key}
+        initialResponses={initialAnswers}
+        steps={steps}
       />
     </main>
   );

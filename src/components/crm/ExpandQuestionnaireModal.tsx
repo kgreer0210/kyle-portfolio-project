@@ -89,7 +89,14 @@ export default function ExpandQuestionnaireModal({
     setPhase("loading-compose");
     setErrorMessage("");
     try {
-      const answers = questions.map((q) => {
+      // Only answered questions are sent; skipped ones are simply left out.
+      const answers = questions
+        .filter((q) => {
+          const picked = (selections[q.id] ?? []).length > 0;
+          const typed = (customAnswers[q.id] ?? "").trim().length > 0;
+          return picked || typed;
+        })
+        .map((q) => {
         const offeredOptions = q.options.map((o) => o.label);
         const selectedValues = selections[q.id] ?? [];
         const selectedLabels = selectedValues
@@ -172,9 +179,10 @@ export default function ExpandQuestionnaireModal({
     return () => window.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
 
+  // Any single answer is enough to draft; unanswered questions are skipped.
   const allAnswered =
-    questions.length === 3 &&
-    questions.every((q) => {
+    questions.length > 0 &&
+    questions.some((q) => {
       const picked = (selections[q.id] ?? []).length > 0;
       const typed = (customAnswers[q.id] ?? "").trim().length > 0;
       return picked || typed;
@@ -428,6 +436,9 @@ export default function ExpandQuestionnaireModal({
                   >
                     Cancel
                   </button>
+                  <span className="mr-auto self-center text-xs text-text-secondary">
+                    Answer what you can — skipped questions are fine.
+                  </span>
                   <button
                     type="button"
                     onClick={() => void compose()}

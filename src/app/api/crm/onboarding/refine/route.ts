@@ -239,9 +239,9 @@ export async function POST(request: NextRequest) {
   }
 
   if (action === "compose") {
-    const parsed = z.array(answerSchema).length(3).safeParse(answers);
+    const parsed = z.array(answerSchema).min(1).max(3).safeParse(answers);
     if (!parsed.success) {
-      return jsonError("answers must contain exactly 3 entries.", 400);
+      return jsonError("answers must contain between 1 and 3 entries.", 400);
     }
     return runCompose(apiKey, fieldLabel, currentValue, parsed.data);
   }

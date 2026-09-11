@@ -41,7 +41,7 @@ export default async function PortalDashboardPage() {
   const [{ data: onboarding }, { data: openTicketsData }] = await Promise.all([
     supabase
       .from("client_onboardings")
-      .select("status, mode")
+      .select("status, mode, flow_version, plan_sent_at")
       .eq("organization_id", membership.organization_id)
       .maybeSingle(),
     supabase
@@ -62,11 +62,20 @@ export default async function PortalDashboardPage() {
   const openTicketCount = openTickets.length;
   const onboardingStatus = (onboarding as { status?: string } | null)?.status;
   const onboardingMode = (onboarding as { mode?: string } | null)?.mode;
+  const onboardingRow = onboarding as {
+    flow_version?: string | null;
+    plan_sent_at?: string | null;
+  } | null;
+  const isAwaitingPlan =
+    onboardingStatus === "not_started" &&
+    !onboardingRow?.plan_sent_at &&
+    onboardingMode !== "skipped_legacy";
   const showFinishOnboardingCard =
-    onboardingStatus === "not_started" ||
-    onboardingStatus === "in_progress" ||
-    onboardingStatus === "reopened" ||
-    !onboardingStatus;
+    !isAwaitingPlan &&
+    (onboardingStatus === "not_started" ||
+      onboardingStatus === "in_progress" ||
+      onboardingStatus === "reopened" ||
+      !onboardingStatus);
   const showUnderReviewCard = onboardingStatus === "submitted";
   const showCompletedCard = onboardingStatus === "completed";
   const shouldHideOnboardingCard = onboardingMode === "skipped_legacy";
@@ -90,7 +99,7 @@ export default async function PortalDashboardPage() {
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <p className="text-sm text-text-secondary">Onboarding status</p>
           <p className="mt-3 text-2xl font-semibold text-white">
-            {getOnboardingStatusLabel(onboardingStatus)}
+            {isAwaitingPlan ? "Being prepared" : getOnboardingStatusLabel(onboardingStatus)}
           </p>
         </div>
         <Link
@@ -110,15 +119,25 @@ export default async function PortalDashboardPage() {
 
       <section className="grid gap-6 lg:grid-cols-2">
         {!shouldHideOnboardingCard ? (
-          showFinishOnboardingCard ? (
+          isAwaitingPlan ? (
+            <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+              <h3 className="text-xl font-semibold text-white">Onboarding is being prepared</h3>
+              <p className="mt-3 text-sm leading-7 text-text-secondary">
+                Kyle is tailoring a short set of questions to your project. You&apos;ll get an
+                email when it&apos;s ready. Tickets are open to you in the meantime.
+              </p>
+            </div>
+          ) : showFinishOnboardingCard ? (
             <Link
               href="/portal/onboarding"
               className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
             >
-              <h3 className="text-xl font-semibold text-white">Finish onboarding</h3>
+              <h3 className="text-xl font-semibold text-white">
+                {onboardingStatus === "reopened" ? "Update your onboarding" : "Finish onboarding"}
+              </h3>
               <p className="mt-3 text-sm leading-7 text-text-secondary">
-                Complete the guided checklist so project context, access needs, and
-                communication preferences are documented in one place.
+                Confirm your contact details, check the project summary, and share any
+                materials you already have. Short answers are fine.
               </p>
             </Link>
           ) : showUnderReviewCard ? (

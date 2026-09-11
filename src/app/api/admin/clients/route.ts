@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAdminUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
-import {
-  getSiteUrl,
-  normalizeEmail,
-  onboardingSteps,
-  slugify,
-} from "@/lib/crm";
+import { normalizeEmail, onboardingSteps, slugify } from "@/lib/crm";
+import { inviteClientToOrganization } from "@/lib/crm-invites";
 import { sendInviteSentNotification } from "@/lib/crm-notifications";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
@@ -14,6 +10,15 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/**
+ * Creates a client organization.
+ *
+ * New clients are created WITHOUT a portal invitation by default: the invite
+ * goes out from "Prepare onboarding" once the project-specific onboarding is
+ * ready, so the client never lands on an empty or generic questionnaire. Pass
+ * `sendInviteNow: true` to keep the old invite-immediately behavior. Existing
+ * (legacy) clients are always invited immediately since they skip onboarding.
+ */
 export async function POST(request: NextRequest) {
   try {
     await requireApiAdminUser();
@@ -27,16 +32,20 @@ export async function POST(request: NextRequest) {
       slug?: string;
       primaryContactName?: string;
       primaryContactEmail?: string;
+      websiteUrl?: string;
       notes?: string;
       clientType?: "new" | "existing";
+      sendInviteNow?: boolean;
     };
 
     const organizationName = body.organizationName?.trim() || "";
     const primaryContactName = body.primaryContactName?.trim() || "";
     const primaryContactEmail = normalizeEmail(body.primaryContactEmail || "");
+    const websiteUrl = body.websiteUrl?.trim() || null;
     const notes = body.notes?.trim() || null;
     const clientType = body.clientType === "existing" ? "existing" : "new";
     const slug = slugify(body.slug?.trim() || organizationName);
+    const sendInviteNow = clientType === "existing" ? true : body.sendInviteNow === true;
 
     if (!organizationName || !primaryContactName || !primaryContactEmail) {
       return jsonError("Organization name, contact name, and contact email are required.");
@@ -51,24 +60,6 @@ export async function POST(request: NextRequest) {
     }
 
     const adminSupabase = createAdminSupabaseClient();
-    const redirectTo = new URL("/auth/callback", getSiteUrl()).toString();
-    const { data: inviteData, error: inviteError } =
-      await adminSupabase.auth.admin.inviteUserByEmail(primaryContactEmail, {
-        redirectTo,
-        data: {
-          full_name: primaryContactName,
-        },
-      });
-
-    if (inviteError || !inviteData.user?.id) {
-      console.error("CRM invite error:", inviteError);
-      return jsonError(
-        inviteError?.message || "Unable to send the client invite.",
-        400,
-      );
-    }
-
-    const userId = inviteData.user.id;
     const { data: organization, error: organizationError } = await adminSupabase
       .from("organizations")
       .insert({
@@ -77,6 +68,7 @@ export async function POST(request: NextRequest) {
         client_kind: clientType === "existing" ? "legacy" : "new",
         primary_contact_name: primaryContactName,
         primary_contact_email: primaryContactEmail,
+        website_url: websiteUrl,
         notes,
       })
       .select("id, name")
@@ -90,37 +82,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const onboardingMode =
-      clientType === "existing" ? "skipped_legacy" : "standard";
-    const onboardingStatus =
-      clientType === "existing" ? "skipped_legacy" : "not_started";
-
-    await adminSupabase.from("profiles").upsert(
-      {
-        id: userId,
-        email: primaryContactEmail,
-        full_name: primaryContactName,
-        role: "client",
-        status: "invited",
-      },
-      { onConflict: "id" },
-    );
-
-    const { error: membershipError } = await adminSupabase
-      .from("organization_members")
-      .insert({
-        organization_id: organization.id,
-        user_id: userId,
-        role: "owner",
-      });
-
-    if (membershipError) {
-      console.error("Membership creation error:", membershipError);
-      return jsonError(
-        membershipError.message || "Unable to attach the invited user to the client.",
-        400,
-      );
-    }
+    const onboardingMode = clientType === "existing" ? "skipped_legacy" : "standard";
+    const onboardingStatus = clientType === "existing" ? "skipped_legacy" : "not_started";
 
     const { error: onboardingError } = await adminSupabase
       .from("client_onboardings")
@@ -128,6 +91,7 @@ export async function POST(request: NextRequest) {
         organization_id: organization.id,
         mode: onboardingMode,
         status: onboardingStatus,
+        flow_version: "v1",
         current_step:
           clientType === "existing"
             ? onboardingSteps[onboardingSteps.length - 1]?.key || "review-and-submit"
@@ -143,15 +107,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await sendInviteSentNotification({
-      organizationName: organization.name,
-      clientEmail: primaryContactEmail,
-      clientType: clientType === "existing" ? "existing" : "new",
-    }).catch((notificationError) => {
-      console.error("Invite notification error:", notificationError);
-    });
+    let invited = false;
 
-    return NextResponse.json({ organizationId: organization.id }, { status: 201 });
+    if (sendInviteNow) {
+      try {
+        await inviteClientToOrganization({
+          organizationId: organization.id,
+          email: primaryContactEmail,
+          fullName: primaryContactName,
+          organizationName: organization.name,
+        });
+        invited = true;
+      } catch (inviteError) {
+        console.error("CRM invite error:", inviteError);
+        return NextResponse.json(
+          {
+            organizationId: organization.id,
+            invited: false,
+            error:
+              inviteError instanceof Error
+                ? `Client created, but the invite failed: ${inviteError.message}`
+                : "Client created, but the invite failed.",
+          },
+          { status: 207 },
+        );
+      }
+
+      await sendInviteSentNotification({
+        organizationName: organization.name,
+        clientEmail: primaryContactEmail,
+        clientType,
+      }).catch((notificationError) => {
+        console.error("Invite notification error:", notificationError);
+      });
+    }
+
+    return NextResponse.json(
+      { organizationId: organization.id, invited },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Create client route error:", error);
     return jsonError("An unexpected error occurred while creating the client.", 500);

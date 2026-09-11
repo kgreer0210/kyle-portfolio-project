@@ -18,7 +18,7 @@ If we both decide we're a fit, I'll draft a Statement of Work with the scope, de
 - **Structure:** 50% up front, 50% on completion
 - **Retainers:** Most projects also include a monthly retainer for ongoing support and improvements. Some smaller, well-bounded projects are one-and-done — we'll talk through what makes sense for yours.
 
-Once the deposit clears, you'll get an invite link to my client portal (CRM). You'll set up your profile, submit support tickets there, and see real-time build progress.
+Once the deposit clears, I prepare a short onboarding tailored to your project and send you an invite to my client portal (CRM). Onboarding is four quick steps: confirm your contact details, check a plain-language summary of what we agreed, share any materials you already have (or tell me you'll send them later or need a hand), and submit. It never asks you to re-explain your goals or budget, and it never asks for passwords. From the portal you can also submit support tickets and see real-time build progress.
 
 ## 5. Build phase
 I work in a staging environment from day one, so you can poke at the work as it grows — no waiting until the end to see what you're getting. We'll have regular check-ins, and you can submit feedback or questions through the portal anytime.
