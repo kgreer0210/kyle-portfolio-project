@@ -1,52 +1,104 @@
-# Kyle Greer - Portfolio Website
+# KYGR Solutions Portfolio
 
-This is a personal portfolio website for Kyle Greer, showcasing his work and projects as a software developer. The site is built using modern web technologies to create an engaging and interactive user experience.
+The production website for [KYGR Solutions](https://kygrsolutions.com). In
+addition to the public portfolio and service pages, this repository contains a
+Supabase-backed client portal, admin CRM, project onboarding, support tickets,
+passkey authentication, and AI-assisted visitor and ticket workflows.
 
-## Tech Stack
+## Stack
 
-- **[Next.js](https://nextjs.org)** - React framework for production-ready applications
-- **[Framer Motion](https://www.framer.com/motion/)** - Animation library for smooth, interactive animations
-- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS framework for rapid UI development
+- Next.js 16 App Router, React 19, and TypeScript
+- Tailwind CSS 4 and Motion
+- Supabase Auth and Postgres
+- Vercel AI SDK with OpenRouter
+- Resend email, Discord notifications, and Retell webhooks
+- Sentry monitoring
 
-## Getting Started
+The repository uses npm as its declared package manager.
 
-To run the development server locally:
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the portfolio website.
+Open <http://localhost:3000>. Before submitting changes, run:
 
-## Features
+```bash
+npm run lint
+npm run build
+```
 
-- Responsive design that works on all devices
-- Smooth animations and transitions powered by Framer Motion
-- Modern, clean UI built with Tailwind CSS
-- Showcases projects, skills, and professional experience
-- Contact information and social links
+## Configuration
 
-## Project Structure
+Create `.env.local` and configure only the integrations needed for the flow you
+are developing. Environment files are ignored by Git.
 
-The portfolio includes sections for:
+| Area | Variables |
+| --- | --- |
+| Supabase | `NEXT_PUBLIC_SUPABASE_URL` and a supported publishable key; a service-role or secret key for server-side admin work |
+| AI | `OPENROUTER_API_KEY` (legacy code also accepts `OPEN_ROUTER_API_KEY`) |
+| Email | `RESEND_API_KEY`, `CONTACT_EMAIL`, `NEXT_PUBLIC_SITE_URL` |
+| Notifications | `DISCORD_WEBHOOK_URL` |
+| Retell | `RETELL_API_KEY` |
+| CRM access | `CRM_ADMIN_EMAILS` |
+| Passkeys | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME`, `WEBAUTHN_ORIGIN`, `WEBAUTHN_CHALLENGE_SECRET` |
 
-- Hero/Introduction
-- About Kyle
-- Featured Projects
-- Contact Information
+For local passkey development, use `localhost` as the RP ID and
+`http://localhost:3000` as the origin. In production, the RP ID must be the
+serving domain without a scheme or port, and the origin must match exactly.
 
-## Development
+## Database
 
-You can start editing the components in the `src/components/` directory. The page auto-updates as you edit the files thanks to Next.js hot reloading.
+Supabase migrations live in `supabase/migrations/` and cover the CRM portal,
+passkeys, chat persistence, ticket depth, and AI triage. Apply pending
+migrations with:
 
-## Deploy on Vercel
+```bash
+supabase db push
+```
 
-The easiest way to deploy this Next.js portfolio is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Do not edit a migration that has already been applied. Add a later migration
+for schema changes.
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Application areas
+
+- Public site: home, about, services, projects, blog, and contact pages
+- Visitor assistant: streaming OpenRouter chat with Markdown knowledge in
+  `src/data/knowledge/`, Supabase persistence, lead scoring, and email digests
+- Client portal: authentication, onboarding, support tickets, and security
+  settings
+- Admin CRM: clients, onboarding review, tickets, notes, billing metadata, and
+  security settings
+- Integrations: contact and subscription email, Retell webhooks, Discord
+  notifications, and Sentry
+
+### Client onboarding
+
+When creating a client, an admin chooses either the standard guided checklist
+or immediate ticket access for an existing client. Standard clients complete
+the onboarding steps in the portal and submit their responses; an admin reviews
+the package at `/admin/onboarding/[organizationId]` and can complete or reopen
+it.
+
+### Passkeys
+
+Passkey registration and management are available from both portal and admin
+security settings, and passkey sign-in is available on the login page. A
+deployment needs both passkey migrations and the WebAuthn variables above.
+
+## Project map
+
+```text
+src/app/                 App Router pages and API routes
+src/components/          Public-site and CRM components
+src/data/                Portfolio, blog, and AI knowledge content
+src/lib/                 Auth, Supabase, CRM, onboarding, AI, and integrations
+src/types/               Shared TypeScript types
+supabase/migrations/     Ordered database migrations
+public/                  Images and project screenshots
+```
+
+Development conventions and the current architecture notes are maintained in
+`AGENTS.md`.
