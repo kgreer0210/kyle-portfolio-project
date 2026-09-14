@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import type { AuthenticatorTransportFuture } from "@simplewebauthn/server";
+import type { AuthenticatorTransport } from "@simplewebauthn/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { webAuthnConfig } from "@/lib/webauthn/config";
 import { setChallengeCookie } from "@/lib/webauthn/challenge-cookie";
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const email: string | undefined = body?.email;
 
-    let allowCredentials: { id: string; transports?: AuthenticatorTransportFuture[] }[] | undefined;
+    let allowCredentials: { id: string; transports?: AuthenticatorTransport[] }[] | undefined;
 
     if (email) {
       const admin = createAdminSupabaseClient();
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         if (creds && creds.length > 0) {
           allowCredentials = creds.map((c) => ({
             id: c.credential_id,
-            transports: (c.transports ?? undefined) as AuthenticatorTransportFuture[] | undefined,
+            transports: (c.transports ?? undefined) as AuthenticatorTransport[] | undefined,
           }));
         }
       }

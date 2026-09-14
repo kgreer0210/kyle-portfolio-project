@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import type {
   AuthenticationResponseJSON,
-  AuthenticatorTransportFuture,
+  AuthenticatorTransport,
 } from "@simplewebauthn/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         id: storedCred.credential_id,
         publicKey: Buffer.from(storedCred.public_key, "base64url"),
         counter: storedCred.counter,
-        transports: (storedCred.transports ?? undefined) as AuthenticatorTransportFuture[] | undefined,
+        transports: (storedCred.transports ?? undefined) as AuthenticatorTransport[] | undefined,
       },
     });
 
