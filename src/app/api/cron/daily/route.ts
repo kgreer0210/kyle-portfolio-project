@@ -76,7 +76,19 @@ export async function GET(request: NextRequest) {
   const summary = { nudged: 0, resolved: 0, reminded: 0, sowFilesDeleted: 0, errors: 0 };
 
   for (const ticket of plan.nudge) {
-    // Stamp first so a crash mid-send can't produce a duplicate nudge tomorrow.
+    const sent = await sendWaitingNudgeEmail({
+      organizationId: ticket.organization_id,
+      ticketId: ticket.id,
+      title: ticket.title,
+    }).catch((sendError) => {
+      console.error("Nudge email error:", sendError);
+      return false;
+    });
+    if (!sent) {
+      summary.errors += 1;
+      continue;
+    }
+
     const { error } = await supabase
       .from("tickets")
       .update({ nudged_at: nowIso })
@@ -86,14 +98,6 @@ export async function GET(request: NextRequest) {
       summary.errors += 1;
       continue;
     }
-    await sendWaitingNudgeEmail({
-      organizationId: ticket.organization_id,
-      ticketId: ticket.id,
-      title: ticket.title,
-    }).catch((sendError) => {
-      summary.errors += 1;
-      console.error("Nudge email error:", sendError);
-    });
     summary.nudged += 1;
   }
 
@@ -135,6 +139,17 @@ export async function GET(request: NextRequest) {
   }
 
   for (const [organizationId, items] of plan.remind) {
+    const sent = await sendRequestReminderEmail({ organizationId, items }).catch(
+      (sendError) => {
+        console.error("Request reminder email error:", sendError);
+        return false;
+      },
+    );
+    if (!sent) {
+      summary.errors += 1;
+      continue;
+    }
+
     const { error } = await supabase
       .from("project_requests")
       .update({ last_reminded_at: nowIso })
@@ -146,10 +161,6 @@ export async function GET(request: NextRequest) {
       summary.errors += 1;
       continue;
     }
-    await sendRequestReminderEmail({ organizationId, items }).catch((sendError) => {
-      summary.errors += 1;
-      console.error("Request reminder email error:", sendError);
-    });
     summary.reminded += items.length;
   }
 

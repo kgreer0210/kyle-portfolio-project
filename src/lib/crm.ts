@@ -13,6 +13,16 @@ export const ticketAttachmentBucket = "ticket-attachments";
 export const maxTicketAttachmentBytes = 10 * 1024 * 1024;
 export const maxTicketAttachmentsPerSubmission = 5;
 
+/** Accept only same-origin absolute paths for post-authentication redirects. */
+export function isSafeInternalPath(value: string | null | undefined): value is string {
+  return Boolean(
+    value &&
+      value.startsWith("/") &&
+      !value.startsWith("//") &&
+      !value.startsWith("/\\"),
+  );
+}
+
 export const onboardingSteps: OnboardingStepDefinition[] = [
   {
     key: "account-setup",

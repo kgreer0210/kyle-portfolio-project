@@ -114,6 +114,8 @@ describe("normalizeExtraction", () => {
     expect(result.notices.some((n) => n.includes("jane at acme"))).toBe(true);
     expect(result.notices.some((n) => n.includes("October 1st"))).toBe(true);
     expect(result.notices.some((n) => n.includes("2026-02-30"))).toBe(true);
+    expect(result.notices.some((n) => n.includes("contract amount"))).toBe(true);
+    expect(result.notices.some((n) => n.includes("deposit percent"))).toBe(true);
     expect(projectDraftSchema.safeParse(result.draft).success).toBe(true);
   });
 
@@ -141,6 +143,9 @@ describe("normalizeExtraction", () => {
     expect(result.draft.requests).toHaveLength(30);
     expect(result.draft.out_of_scope).toHaveLength(30);
     expect(result.notices.some((n) => n.includes("20 milestones"))).toBe(true);
+    expect(result.notices.some((n) => n.includes("40 tasks"))).toBe(true);
+    expect(result.notices.some((n) => n.includes("60 client requests"))).toBe(true);
+    expect(result.notices.some((n) => n.includes("50 out-of-scope items"))).toBe(true);
     expect(projectDraftSchema.safeParse(result.draft).success).toBe(true);
   });
 });

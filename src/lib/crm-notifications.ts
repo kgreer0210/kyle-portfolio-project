@@ -77,18 +77,18 @@ async function sendEmail(args: {
   html: string;
   text: string;
   replyTo?: string;
-}) {
+}): Promise<boolean> {
   const resend = getResendClient();
 
   if (!resend) {
     console.warn(
       `[crm-notifications] RESEND_API_KEY is not set; skipped email "${args.subject}".`,
     );
-    return;
+    return false;
   }
 
   if (args.to.length === 0) {
-    return;
+    return false;
   }
 
   const { error } = await resend.emails.send({
@@ -106,7 +106,10 @@ async function sendEmail(args: {
       to: args.to,
       error,
     });
+    return false;
   }
+
+  return true;
 }
 
 async function getOrganizationMemberEmails(organizationId: string) {
@@ -393,10 +396,10 @@ export async function sendWaitingNudgeEmail(args: {
   title: string;
 }) {
   const recipients = await getOrganizationMemberEmails(args.organizationId);
-  if (recipients.length === 0) return;
+  if (recipients.length === 0) return false;
   const portalUrl = getPortalTicketUrl(args.ticketId);
 
-  await sendEmail({
+  return sendEmail({
     to: recipients,
     replyTo: getTicketReplyTo(args.ticketId),
     subject: toEmailSubject(`Quick reminder: ${args.title}`),
@@ -435,11 +438,11 @@ export async function sendRequestReminderEmail(args: {
   items: Array<{ title: string; due_date: string | null }>;
 }) {
   const recipients = await getOrganizationMemberEmails(args.organizationId);
-  if (recipients.length === 0 || args.items.length === 0) return;
+  if (recipients.length === 0 || args.items.length === 0) return false;
   const portalUrl = getPortalHomeUrl();
   const count = args.items.length;
 
-  await sendEmail({
+  return sendEmail({
     to: recipients,
     subject: count === 1 ? `Still needed: ${toEmailSubject(args.items[0].title)}` : `${count} items still needed for your project`,
     html: `
@@ -463,7 +466,7 @@ export async function sendProjectUpdateEmail(args: {
   if (recipients.length === 0) return 0;
   const portalUrl = getPortalHomeUrl();
 
-  await sendEmail({
+  const sent = await sendEmail({
     to: recipients,
     subject: toEmailSubject(`Project update: ${args.projectTitle}`),
     html: `
@@ -475,5 +478,5 @@ export async function sendProjectUpdateEmail(args: {
     text: `${args.body}\n\nSee progress in your portal: ${portalUrl}`,
   });
 
-  return recipients.length;
+  return sent ? recipients.length : 0;
 }

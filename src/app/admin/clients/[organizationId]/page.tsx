@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActivityTimeline from "@/components/crm/ActivityTimeline";
 import BillingTypeForm from "@/components/crm/BillingTypeForm";
+import ClientInviteButton from "@/components/crm/ClientInviteButton";
 import OrgNoteDeleteButton from "@/components/crm/OrgNoteDeleteButton";
 import OrgNoteForm from "@/components/crm/OrgNoteForm";
 import { ProgressBar } from "@/components/crm/ProjectProgress";
@@ -123,6 +124,12 @@ export default async function AdminClientDetailPage({
     tasksByProject.set(task.project_id, list);
   }
   const lastActivityAt = activity[0]?.occurredAt;
+  const hasActiveMember = organizationMembers.some(
+    (member) => member.profiles?.status === "active",
+  );
+  const canInvite = Boolean(
+    organization.primary_contact_name && organization.primary_contact_email,
+  );
 
   return (
     <main className="space-y-8">
@@ -279,6 +286,12 @@ export default async function AdminClientDetailPage({
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <h3 className="text-xl font-semibold text-white">Members</h3>
+          {!hasActiveMember && canInvite ? (
+            <ClientInviteButton
+              organizationId={organization.id}
+              hasMember={organizationMembers.length > 0}
+            />
+          ) : null}
           <div className="mt-5 space-y-4">
             {organizationMembers.map((member, index) => (
               <div

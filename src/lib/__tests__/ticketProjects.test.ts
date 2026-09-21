@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { pickAutoProjectId, toProjectScope } from "@/lib/ticketProjects";
-import { buildReplyDraftPrompt } from "@/lib/ticketReplyDraft";
+import {
+  buildReplyDraftPrompt,
+  REPLY_DRAFT_SYSTEM_PROMPT,
+} from "@/lib/ticketReplyDraft";
 
 describe("pickAutoProjectId", () => {
   it("returns null with no projects", () => {
@@ -74,6 +77,9 @@ describe("buildReplyDraftPrompt", () => {
     expect(prompt).toContain("--- PRIVATE system/AI note");
     expect(prompt).toContain("--- PRIVATE note from Kyle");
     expect(prompt).toContain("Draft the next reply from Kyle to the client.");
+    expect(REPLY_DRAFT_SYSTEM_PROMPT).toContain(
+      "Never quote them, mention them, or reveal that an AI was involved.",
+    );
   });
 
   it("passes Kyle's steer and the out-of-scope flag", () => {

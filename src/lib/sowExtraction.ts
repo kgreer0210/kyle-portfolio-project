@@ -186,33 +186,63 @@ export function normalizeExtraction(extraction: SowExtraction): NormalizedSow {
   };
 
   const milestoneCount = extraction.milestones.length;
-  const milestones = extraction.milestones.slice(0, 12).map((milestone) => ({
-    title: clean(milestone.title, 200) || "Milestone",
-    description: cleanMultiline(milestone.description, 2000),
-    due_date: cleanDate(milestone.due_date),
-    tasks: milestone.tasks
+  const milestones = extraction.milestones.slice(0, 12).map((milestone) => {
+    const title = clean(milestone.title, 200) || "Milestone";
+    const tasks = milestone.tasks
       .map((task) => ({
         title: clean(task.title, 200),
         client_visible: task.client_visible !== false,
       }))
-      .filter((task): task is { title: string; client_visible: boolean } => Boolean(task.title))
-      .slice(0, 25),
-  }));
+      .filter((task): task is { title: string; client_visible: boolean } => Boolean(task.title));
+
+    if (tasks.length > 25) {
+      notices.push(
+        `Milestone "${title}" produced ${tasks.length} tasks; only the first 25 were kept.`,
+      );
+    }
+
+    return {
+      title,
+      description: cleanMultiline(milestone.description, 2000),
+      due_date: cleanDate(milestone.due_date),
+      tasks: tasks.slice(0, 25),
+    };
+  });
   if (milestoneCount > milestones.length) {
     notices.push(`The SOW produced ${milestoneCount} milestones; only the first ${milestones.length} were kept.`);
   }
 
-  const requests = extraction.client_requests
+  const validRequests = extraction.client_requests
     .map((request) => ({
       kind: request.kind,
       title: clean(request.title, 200),
       instructions: cleanMultiline(request.instructions, 2000),
     }))
-    .filter((request): request is typeof request & { title: string } => Boolean(request.title))
-    .slice(0, 30);
+    .filter((request): request is typeof request & { title: string } => Boolean(request.title));
+  if (validRequests.length > 30) {
+    notices.push(
+      `The SOW produced ${validRequests.length} client requests; only the first 30 were kept.`,
+    );
+  }
+  const requests = validRequests.slice(0, 30);
+
+  const validOutOfScope = extraction.out_of_scope
+    .map((line) => clean(line, 500))
+    .filter((line): line is string => Boolean(line));
+  if (validOutOfScope.length > 30) {
+    notices.push(
+      `The SOW produced ${validOutOfScope.length} out-of-scope items; only the first 30 were kept.`,
+    );
+  }
 
   const contractAmount = cleanAmount(extraction.project.contract_amount, 99_999_999);
   const depositPercent = cleanAmount(extraction.project.deposit_percent, 100);
+  if (extraction.project.contract_amount !== null && contractAmount === null) {
+    notices.push("The contract amount wasn't valid and was left blank.");
+  }
+  if (extraction.project.deposit_percent !== null && depositPercent === null) {
+    notices.push("The deposit percent wasn't valid and was left blank.");
+  }
 
   return {
     client: {
@@ -233,10 +263,7 @@ export function normalizeExtraction(extraction: SowExtraction): NormalizedSow {
       },
       milestones,
       requests,
-      out_of_scope: extraction.out_of_scope
-        .map((line) => clean(line, 500))
-        .filter((line): line is string => Boolean(line))
-        .slice(0, 30),
+      out_of_scope: validOutOfScope.slice(0, 30),
     },
     notices,
   };

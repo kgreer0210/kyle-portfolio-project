@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { getDefaultRouteForRole } from "@/lib/crm";
+import { getDefaultRouteForRole, isSafeInternalPath } from "@/lib/crm";
 
 interface AuthCallbackHandlerProps {
   code?: string;
@@ -112,8 +112,9 @@ export default function AuthCallbackHandler({
         (profile as { role?: "admin" | "client" } | null)?.role || "client";
       const profileStatus =
         (profile as { status?: string } | null)?.status;
-      const safeNext =
-        next && next.startsWith("/") ? next : getDefaultRouteForRole(role);
+      const safeNext = isSafeInternalPath(next)
+        ? next
+        : getDefaultRouteForRole(role);
       const isInviteFlow =
         authType === "invite" || profileStatus === "invited";
 

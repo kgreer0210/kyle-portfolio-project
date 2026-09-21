@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { isSafeInternalPath } from "@/lib/crm";
 
 interface PasskeyLoginProps {
   next?: string;
@@ -47,8 +48,9 @@ export default function PasskeyLogin({ next }: PasskeyLoginProps) {
         throw new Error(result.error ?? "Passkey verification failed.");
       }
 
-      const destination =
-        next && next.startsWith("/") ? next : result.redirectTo ?? "/portal";
+      const destination = isSafeInternalPath(next)
+        ? next
+        : result.redirectTo ?? "/portal";
 
       router.replace(destination);
       router.refresh();

@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { pickUniqueSlug, slugify } from "@/lib/crm";
+import { isSafeInternalPath, pickUniqueSlug, slugify } from "@/lib/crm";
+
+describe("isSafeInternalPath", () => {
+  it("accepts same-origin paths and rejects protocol-relative redirects", () => {
+    expect(isSafeInternalPath("/portal?tab=requests")).toBe(true);
+    expect(isSafeInternalPath("//attacker.example")).toBe(false);
+    expect(isSafeInternalPath("/\\attacker.example")).toBe(false);
+    expect(isSafeInternalPath("https://attacker.example")).toBe(false);
+    expect(isSafeInternalPath(undefined)).toBe(false);
+  });
+});
 
 describe("slugify", () => {
   it("lowercases and collapses non-alphanumerics into dashes", () => {

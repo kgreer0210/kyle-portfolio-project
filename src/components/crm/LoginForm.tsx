@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { getDefaultRouteForRole } from "@/lib/crm";
+import { getDefaultRouteForRole, isSafeInternalPath } from "@/lib/crm";
 
 interface LoginFormProps {
   next?: string;
@@ -56,10 +56,9 @@ export default function LoginForm({ next, initialError }: LoginFormProps) {
         throw new Error(payload.error || "Unable to load your portal profile.");
       }
 
-      const destination =
-        next && next.startsWith("/")
-          ? next
-          : getDefaultRouteForRole(payload.profile.role);
+      const destination = isSafeInternalPath(next)
+        ? next
+        : getDefaultRouteForRole(payload.profile.role);
 
       router.replace(destination);
       router.refresh();

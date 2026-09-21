@@ -3,9 +3,8 @@ import { sendPortalAccessLinkEmail } from "@/lib/crm-notifications";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
 /**
- * Portal invitations. Used both when a client is created with "invite now" and
- * when the admin sends a prepared onboarding to a client who has no portal
- * access yet.
+ * Portal invitations. Used when a client is created with "invite now" and
+ * when an admin later sends or resends portal access from the client record.
  *
  * `inviteUserByEmail` only works for brand-new auth users. If the address is
  * already registered (an earlier invite that was never accepted, for example)
