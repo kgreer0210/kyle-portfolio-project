@@ -9,6 +9,7 @@ import {
   ticketStatusLabels,
 } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
+import { findStaleProjects } from "@/lib/projects";
 import type { TicketPriority, TicketStatus } from "@/types/crm";
 
 interface ActiveTicket {
@@ -45,8 +46,10 @@ export default async function AdminDashboardPage() {
   const [
     { count: clientCount },
     { data: activeTicketsData },
-    { count: onboardingCount },
+    { count: overdueRequestCount },
     { data: recentMessagesData },
+    { data: activeProjectsData },
+    { data: projectUpdatesData },
   ] = await Promise.all([
     supabase.from("organizations").select("*", { count: "exact", head: true }),
     // Aggregations run in JS over the returned rows. A generous cap keeps the
@@ -60,9 +63,10 @@ export default async function AdminDashboardPage() {
       .order("last_activity_at", { ascending: false })
       .limit(500),
     supabase
-      .from("client_onboardings")
+      .from("project_requests")
       .select("*", { count: "exact", head: true })
-      .in("status", ["submitted", "reopened", "in_progress"]),
+      .neq("status", "done")
+      .lt("due_date", new Date().toISOString().slice(0, 10)),
     supabase
       .from("ticket_messages")
       .select(
@@ -70,7 +74,35 @@ export default async function AdminDashboardPage() {
       )
       .order("created_at", { ascending: false })
       .limit(8),
+    supabase
+      .from("projects")
+      .select("id, title, status, created_at, organization_id, organizations(name)")
+      .eq("status", "active"),
+    supabase
+      .from("project_updates")
+      .select("project_id, sent_at")
+      .order("sent_at", { ascending: false })
+      .limit(500),
   ]);
+
+  const lastUpdateByProject = new Map<string, string>();
+  for (const update of (projectUpdatesData || []) as Array<{ project_id: string; sent_at: string }>) {
+    if (!lastUpdateByProject.has(update.project_id)) {
+      lastUpdateByProject.set(update.project_id, update.sent_at);
+    }
+  }
+  const staleProjects = findStaleProjects(
+    (activeProjectsData || []) as Array<{
+      id: string;
+      title: string;
+      status: string;
+      created_at: string;
+      organization_id: string;
+      organizations?: { name?: string | null } | null;
+    }>,
+    lastUpdateByProject,
+    new Date(),
+  );
 
   const activeTickets = (activeTicketsData || []) as ActiveTicket[];
   const recentMessages = (recentMessagesData || []) as RecentMessage[];
@@ -141,16 +173,38 @@ export default async function AdminDashboardPage() {
           <p className="mt-4 text-sm font-medium text-blue-ncs">Open ticket queue</p>
         </Link>
         <Link
-          href="/admin/onboarding"
+          href="/admin/clients"
           className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
         >
-          <p className="text-sm text-text-secondary">Onboarding needing review</p>
+          <p className="text-sm text-text-secondary">Overdue from clients</p>
           <p className="mt-3 text-4xl font-semibold text-white">
-            {onboardingCount || 0}
+            {overdueRequestCount || 0}
           </p>
-          <p className="mt-4 text-sm font-medium text-blue-ncs">Review onboarding</p>
+          <p className="mt-4 text-sm font-medium text-blue-ncs">
+            Files, access, or decisions past due
+          </p>
         </Link>
       </section>
+
+      {staleProjects.length > 0 ? (
+        <section className="rounded-[2rem] border border-amber-500/30 bg-oxford-blue/80 p-6">
+          <h2 className="text-xl font-semibold text-white">
+            No client update in 7+ days
+          </h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {staleProjects.map((project) => (
+              <Link
+                key={project.id}
+                href={`/admin/clients/${project.organization_id}/projects/${project.id}`}
+                className="rounded-full border border-penn-blue bg-rich-black/40 px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
+              >
+                {project.organizations?.name ? `${project.organizations.name}: ` : ""}
+                {project.title}
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {activeTickets.length > 0 ? (
         <section className="grid gap-5 md:grid-cols-2">
@@ -332,12 +386,6 @@ export default async function AdminDashboardPage() {
               className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs"
             >
               View tickets
-            </Link>
-            <Link
-              href="/admin/onboarding"
-              className="rounded-full border border-penn-blue px-5 py-3 font-semibold text-text-primary transition hover:border-blue-ncs"
-            >
-              Review onboarding
             </Link>
           </div>
         </div>

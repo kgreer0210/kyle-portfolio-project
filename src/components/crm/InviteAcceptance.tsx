@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { startRegistration } from "@simplewebauthn/browser";
 import ResetPasswordForm from "@/components/crm/ResetPasswordForm";
+import { isSafeInternalPath } from "@/lib/crm";
 
 type View = "choose" | "password-fallback";
 
@@ -38,6 +39,7 @@ export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
   // Browsers without WebAuthn are routed straight to the password form and
   // can't navigate back to the passkey view.
   const autoFellBack = supportsPasskey === false;
+  const safeNext = isSafeInternalPath(next) ? next : undefined;
 
   async function handleCreatePasskey() {
     setIsRegistering(true);
@@ -65,7 +67,7 @@ export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
         throw new Error(result.error ?? "Registration failed.");
       }
 
-      const destination = next && next.startsWith("/") ? next : "/portal/onboarding";
+      const destination = safeNext ?? "/portal";
       router.replace(destination);
       router.refresh();
     } catch (err) {
@@ -109,7 +111,7 @@ export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
             ← Back to passkey setup
           </button>
         )}
-        <ResetPasswordForm initialMode="invite" next={next} />
+        <ResetPasswordForm initialMode="invite" next={safeNext} />
       </div>
     );
   }

@@ -72,6 +72,12 @@ export default async function AdminTicketDetailPage({
     notFound();
   }
 
+  const { data: orgProjects } = await supabase
+    .from("projects")
+    .select("id, title")
+    .eq("organization_id", ticket.organization_id)
+    .order("created_at", { ascending: false });
+
   const signedAttachments = await createSignedAttachmentUrls(
     (attachments || []) as Array<{
       id: string;
@@ -184,7 +190,7 @@ export default async function AdminTicketDetailPage({
 
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <h3 className="text-xl font-semibold text-white">
-            Priority, category &amp; cost
+            Ticket details
           </h3>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-text-secondary">
             {(ticket.organizations as { billing_type?: BillingType | null } | null)
@@ -201,6 +207,9 @@ export default async function AdminTicketDetailPage({
               currentPriority={ticket.priority || "normal"}
               currentCategory={ticket.category || null}
               currentCost={ticket.cost_amount ?? null}
+              currentOutOfScope={Boolean(ticket.out_of_scope)}
+              currentProjectId={ticket.project_id ?? null}
+              projects={(orgProjects || []) as Array<{ id: string; title: string }>}
             />
           </div>
         </div>
@@ -208,7 +217,7 @@ export default async function AdminTicketDetailPage({
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <h3 className="text-xl font-semibold text-white">Reply or add note</h3>
           <div className="mt-5">
-            <TicketReplyForm ticketId={ticket.id} allowInternalNote={true} />
+            <TicketReplyForm ticketId={ticket.id} allowInternalNote={true} allowAiDraft={true} />
           </div>
         </div>
       </aside>

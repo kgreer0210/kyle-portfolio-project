@@ -13,6 +13,16 @@ export const ticketAttachmentBucket = "ticket-attachments";
 export const maxTicketAttachmentBytes = 10 * 1024 * 1024;
 export const maxTicketAttachmentsPerSubmission = 5;
 
+/** Accept only same-origin absolute paths for post-authentication redirects. */
+export function isSafeInternalPath(value: string | null | undefined): value is string {
+  return Boolean(
+    value &&
+      value.startsWith("/") &&
+      !value.startsWith("//") &&
+      !value.startsWith("/\\"),
+  );
+}
+
 export const onboardingSteps: OnboardingStepDefinition[] = [
   {
     key: "account-setup",
@@ -386,6 +396,24 @@ export function slugify(value: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Pick the first free slug for `base`, appending -2, -3, … when `taken`
+ * already holds it. `taken` should contain every existing slug that starts
+ * with `base`.
+ */
+export function pickUniqueSlug(base: string, taken: Iterable<string>): string {
+  const used = new Set(taken);
+  if (!used.has(base)) {
+    return base;
+  }
+
+  let suffix = 2;
+  while (used.has(`${base}-${suffix}`)) {
+    suffix += 1;
+  }
+  return `${base}-${suffix}`;
 }
 
 export function normalizeEmail(email: string): string {

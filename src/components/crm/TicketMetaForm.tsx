@@ -15,11 +15,17 @@ export default function TicketMetaForm({
   currentPriority,
   currentCategory,
   currentCost,
+  currentOutOfScope = false,
+  currentProjectId = null,
+  projects = [],
 }: {
   ticketId: string;
   currentPriority: TicketPriority;
   currentCategory: TicketCategory | null;
   currentCost?: number | null;
+  currentOutOfScope?: boolean;
+  currentProjectId?: string | null;
+  projects?: Array<{ id: string; title: string }>;
 }) {
   const router = useRouter();
   const [priority, setPriority] = useState<TicketPriority>(currentPriority);
@@ -27,6 +33,8 @@ export default function TicketMetaForm({
   const [cost, setCost] = useState<string>(
     currentCost !== null && currentCost !== undefined ? String(currentCost) : "",
   );
+  const [outOfScope, setOutOfScope] = useState(currentOutOfScope);
+  const [projectId, setProjectId] = useState<string>(currentProjectId || "");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,6 +59,8 @@ export default function TicketMetaForm({
           priority,
           category: category || null,
           cost_amount: trimmedCost ? Number(trimmedCost) : null,
+          out_of_scope: outOfScope,
+          project_id: projectId || null,
         }),
       });
 
@@ -127,6 +137,42 @@ export default function TicketMetaForm({
           Visible to the client on their ticket once set.
         </p>
       </div>
+
+      {projects.length > 0 ? (
+        <div className="space-y-2">
+          <label htmlFor="ticket-project" className="text-sm font-medium text-text-primary">
+            Project
+          </label>
+          <select
+            id="ticket-project"
+            value={projectId}
+            onChange={(event) => setProjectId(event.target.value)}
+            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+          >
+            <option value="">No project</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
+      <label className="flex items-start gap-3 text-sm text-text-primary">
+        <input
+          type="checkbox"
+          checked={outOfScope}
+          onChange={(event) => setOutOfScope(event.target.checked)}
+          className="mt-1 h-4 w-4"
+        />
+        <span>
+          Out of scope: change request
+          <span className="block text-xs text-text-secondary">
+            The client sees &ldquo;Change request, will be quoted&rdquo; on this ticket.
+          </span>
+        </span>
+      </label>
 
       {error ? (
         <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">

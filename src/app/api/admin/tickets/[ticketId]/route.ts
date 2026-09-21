@@ -31,13 +31,31 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       priority?: string;
       category?: string | null;
       cost_amount?: number | string | null;
+      out_of_scope?: boolean;
+      project_id?: string | null;
     };
 
     const updates: {
       priority?: string;
       category?: string | null;
       cost_amount?: number | null;
+      out_of_scope?: boolean;
+      project_id?: string | null;
     } = {};
+
+    if (body.out_of_scope !== undefined) {
+      if (typeof body.out_of_scope !== "boolean") {
+        return jsonError("Invalid out-of-scope flag.");
+      }
+      updates.out_of_scope = body.out_of_scope;
+    }
+
+    if (body.project_id !== undefined) {
+      if (body.project_id !== null && typeof body.project_id !== "string") {
+        return jsonError("Invalid project.");
+      }
+      updates.project_id = body.project_id || null;
+    }
 
     if (body.priority !== undefined) {
       if (!isTicketPriority(body.priority)) {
@@ -77,7 +95,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const adminSupabase = createAdminSupabaseClient();
     const { data: ticket, error: ticketLookupError } = await adminSupabase
       .from("tickets")
-      .select("id, organization_id, priority, category, cost_amount")
+      .select("id, organization_id, priority, category, cost_amount, out_of_scope, project_id")
       .eq("id", ticketId)
       .maybeSingle();
 
@@ -88,6 +106,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (!ticket) {
       return jsonError("Ticket not found.", 404);
+    }
+
+    if (updates.project_id) {
+      const { data: project } = await adminSupabase
+        .from("projects")
+        .select("id")
+        .eq("id", updates.project_id)
+        .eq("organization_id", ticket.organization_id)
+        .maybeSingle();
+
+      if (!project) {
+        return jsonError("That project doesn't belong to this client.");
+      }
     }
 
     const { error: updateError } = await adminSupabase
@@ -125,6 +156,22 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           ? `Cost set to ${formatCurrency(updates.cost_amount)}`
           : "Cost cleared",
       );
+    }
+
+    if (
+      updates.out_of_scope !== undefined &&
+      updates.out_of_scope !== ticket.out_of_scope
+    ) {
+      changes.push(
+        updates.out_of_scope ? "Flagged as out of scope" : "Out-of-scope flag cleared",
+      );
+    }
+
+    if (
+      updates.project_id !== undefined &&
+      updates.project_id !== ticket.project_id
+    ) {
+      changes.push(updates.project_id ? "Linked to a project" : "Project link cleared");
     }
 
     if (changes.length > 0) {

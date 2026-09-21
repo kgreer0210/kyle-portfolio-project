@@ -67,6 +67,20 @@ clients are priced per fix for a leverage sheet; monthly-plan clients have
 minor fixes included but major work billed; per-project clients are billed
 for the work.
 
+## Project scope
+
+Clients no longer choose a priority or category. Treat the priority baseline
+as normal and infer both from the ticket itself.
+
+When the ticket belongs to a project, you get the project summary, milestone
+names, and the SOW's explicit out-of-scope list. Set likely_out_of_scope to
+true only when the request clearly asks for something new that the scope
+excludes or never covers: a new page, feature, integration, or a service
+listed as out of scope. Fixes to agreed deliverables, small content tweaks
+within agreed pages, and questions are in scope. When unsure, say in scope and
+explain the doubt in scope_reasoning. Kyle decides whether to flag the ticket;
+you only suggest.
+
 ## Missing-info checklists
 
 Flag only information that would actually change how Kyle responds. Typical

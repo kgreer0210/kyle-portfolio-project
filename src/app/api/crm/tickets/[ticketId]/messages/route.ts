@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPrimaryOrganizationMembership } from "@/lib/auth";
 import { getApiAuthContext } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
-import { sendTicketReplyNotifications } from "@/lib/crm-notifications";
 import { maxTicketAttachmentsPerSubmission } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
-import { uploadTicketAttachments } from "@/lib/ticket-attachments";
-import type { TicketMessageVisibility } from "@/types/crm";
+import { postTicketReply } from "@/lib/ticket-replies";
+import type { TicketMessageVisibility, TicketStatus } from "@/types/crm";
 
 interface RouteParams {
   params: Promise<{
@@ -77,62 +76,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       visibility = "public";
     }
 
-    const { data: message, error: messageError } = await adminSupabase
-      .from("ticket_messages")
-      .insert({
-        ticket_id: ticket.id,
-        organization_id: ticket.organization_id,
-        author_id: context.user.id,
-        visibility,
-        body,
-        is_system: false,
-      })
-      .select("id")
-      .single();
-
-    if (messageError || !message) {
-      console.error("Ticket message error:", messageError);
-      return jsonError("Unable to save the reply.", 500);
-    }
-
-    if (files.length > 0) {
-      await uploadTicketAttachments({
-        organizationId: ticket.organization_id,
-        ticketId: ticket.id,
-        uploadedBy: context.user.id,
-        visibility,
-        files,
-        messageId: message.id,
-      });
-    }
-
-    const nextTicketStatus =
-      context.profile.role === "client" && ticket.status === "waiting_on_client"
-        ? "open"
-        : ticket.status;
-
-    await adminSupabase
-      .from("tickets")
-      .update({
-        last_activity_at: new Date().toISOString(),
-        status: nextTicketStatus,
-      })
-      .eq("id", ticket.id);
-
-    if (visibility === "public") {
-      await sendTicketReplyNotifications({
-        organizationId: ticket.organization_id,
+    await postTicketReply({
+      ticket: {
+        id: ticket.id as string,
+        organization_id: ticket.organization_id as string,
+        title: ticket.title as string,
+        status: ticket.status as TicketStatus,
         organizationName:
           (ticket.organizations as { name?: string | null } | null)?.name ||
           "Unknown organization",
-        ticketId: ticket.id,
-        title: ticket.title,
-        authorEmail: context.profile.email,
-        body,
-      }).catch((notificationError) => {
-        console.error("Ticket reply notification error:", notificationError);
-      });
-    }
+      },
+      author: {
+        id: context.user.id,
+        email: context.profile.email,
+        role: context.profile.role,
+      },
+      body,
+      visibility,
+      files,
+    });
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {

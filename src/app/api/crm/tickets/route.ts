@@ -3,14 +3,13 @@ import { requireApiClientUser } from "@/lib/api-auth";
 import { jsonError, jsonFromAuthError } from "@/lib/api-response";
 import { sendTicketCreatedNotifications } from "@/lib/crm-notifications";
 import {
-  isTicketCategory,
-  isTicketPriority,
   maxTicketAttachmentsPerSubmission,
   ticketCategoryLabels,
   ticketPriorityLabels,
 } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { uploadTicketAttachments } from "@/lib/ticket-attachments";
+import { loadProjectScope, pickAutoProjectId } from "@/lib/ticketProjects";
 import {
   assessBillability,
   formatTriageNote,
@@ -19,15 +18,11 @@ import {
   triageTicket,
   type TicketTriageInput,
 } from "@/lib/ticketTriage";
-import type { TicketCategory, TicketPriority, TicketType } from "@/types/crm";
+import type { TicketCategory, TicketPriority } from "@/types/crm";
 
 // The LLM triage call runs inline; the default serverless timeout is too
 // tight once that's added.
 export const maxDuration = 60;
-
-function isTicketType(value: string): value is TicketType {
-  return value === "request" || value === "issue";
-}
 
 interface TriageOutcome {
   appliedPriority: TicketPriority;
@@ -37,6 +32,7 @@ interface TriageOutcome {
   clarifyingQuestions: string[];
   workScope: string;
   billingAssessment: string;
+  likelyOutOfScope: boolean | null;
 }
 
 /**
@@ -101,6 +97,7 @@ async function runTicketTriage(
           appliedPriority,
           appliedCategory,
           billingType: args.input.billingType,
+          hasProjectScope: Boolean(args.input.projectScope),
         }),
       });
 
@@ -115,6 +112,7 @@ async function runTicketTriage(
       missingInfo: triage.missing_info,
       clarifyingQuestions: triage.clarifying_questions,
       workScope: triage.work_scope,
+      likelyOutOfScope: args.input.projectScope ? triage.likely_out_of_scope : null,
       billingAssessment: assessBillability(
         args.input.billingType,
         triage.work_scope,
@@ -136,19 +134,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Clients describe what they need; priority and category are left to
+    // triage (and the admin), so they are not read from the form.
     const formData = await request.formData();
-    const type = String(formData.get("type") || "request");
+    const type = "request";
+    const priority: TicketPriority = "normal";
+    const clientCategory: TicketCategory | null = null;
     const title = String(formData.get("title") || "").trim();
     const description = String(formData.get("description") || "").trim();
-    const priority = String(formData.get("priority") || "normal");
-    const rawCategory = String(formData.get("category") || "").trim();
     const files = formData
       .getAll("attachments")
       .filter((entry): entry is File => entry instanceof File && entry.size > 0);
-
-    if (!isTicketType(type)) {
-      return jsonError("Invalid ticket type.");
-    }
 
     if (!title || !description) {
       return jsonError("Title and description are required.");
@@ -162,14 +158,6 @@ export async function POST(request: NextRequest) {
       return jsonError("Description must be 5000 characters or fewer.");
     }
 
-    if (!isTicketPriority(priority)) {
-      return jsonError("Invalid ticket priority.");
-    }
-
-    if (rawCategory && !isTicketCategory(rawCategory)) {
-      return jsonError("Invalid ticket category.");
-    }
-
     if (files.length > maxTicketAttachmentsPerSubmission) {
       return jsonError(
         `You can attach up to ${maxTicketAttachmentsPerSubmission} files per ticket.`,
@@ -177,6 +165,14 @@ export async function POST(request: NextRequest) {
     }
 
     const adminSupabase = createAdminSupabaseClient();
+    const { data: orgProjects } = await adminSupabase
+      .from("projects")
+      .select("id, status")
+      .eq("organization_id", context.membership.organization_id);
+    const projectId = pickAutoProjectId(
+      (orgProjects || []) as Array<{ id: string; status: string }>,
+    );
+
     const { data: ticket, error: ticketError } = await adminSupabase
       .from("tickets")
       .insert({
@@ -185,7 +181,8 @@ export async function POST(request: NextRequest) {
         type,
         status: "new",
         priority,
-        category: rawCategory || null,
+        category: clientCategory,
+        project_id: projectId,
         title,
         description,
         last_activity_at: new Date().toISOString(),
@@ -210,8 +207,6 @@ export async function POST(request: NextRequest) {
 
     const organizationName =
       context.membership.organizations?.name || "Unknown organization";
-    const clientCategory: TicketCategory | null =
-      rawCategory && isTicketCategory(rawCategory) ? rawCategory : null;
     const billingType = context.membership.organizations?.billing_type ?? null;
     const attachmentNames = files.map((file) => file.name);
     const organizationId = context.membership.organization_id;
@@ -221,6 +216,13 @@ export async function POST(request: NextRequest) {
     // 201 — after() extends the function lifetime past the response, so
     // both still complete on Vercel without fire-and-forget risk.
     after(async () => {
+      const projectScope = projectId
+        ? await loadProjectScope(adminSupabase, projectId).catch((scopeError) => {
+            console.error("Project scope load error:", scopeError);
+            return null;
+          })
+        : null;
+
       const triageOutcome = await runTicketTriage(adminSupabase, {
         ticketId: ticket.id,
         organizationId,
@@ -233,6 +235,7 @@ export async function POST(request: NextRequest) {
           organizationName,
           billingType,
           attachmentNames,
+          projectScope,
         },
       });
 
@@ -256,6 +259,7 @@ export async function POST(request: NextRequest) {
               clarifyingQuestions: triageOutcome.clarifyingQuestions,
               workScope: triageOutcome.workScope,
               billingAssessment: triageOutcome.billingAssessment,
+              likelyOutOfScope: triageOutcome.likelyOutOfScope,
             }
           : undefined,
       }).catch((notificationError) => {

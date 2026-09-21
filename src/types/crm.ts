@@ -94,3 +94,62 @@ export interface OnboardingStepDefinition {
   description: string;
   fields: OnboardingStepField[];
 }
+
+// ---------------------------------------------------------------------------
+// Projects
+// ---------------------------------------------------------------------------
+
+export type ProjectStatus = "active" | "paused" | "done";
+export type ProjectRequestKind = "material" | "access" | "decision" | "info";
+export type ProjectRequestStatus = "open" | "later" | "done";
+
+export interface Project {
+  id: string;
+  organization_id: string;
+  title: string;
+  summary: string | null;
+  status: ProjectStatus;
+  start_date: string | null;
+  target_date: string | null;
+  contract_amount: number | null;
+  deposit_percent: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectMilestone {
+  id: string;
+  project_id: string;
+  organization_id: string;
+  title: string;
+  description: string | null;
+  position: number;
+  due_date: string | null;
+}
+
+export interface ProjectTask {
+  id: string;
+  project_id: string;
+  organization_id: string;
+  milestone_id: string | null;
+  title: string;
+  position: number;
+  client_visible: boolean;
+  done_at: string | null;
+}
+
+export interface ProjectRequest {
+  id: string;
+  project_id: string;
+  organization_id: string;
+  kind: ProjectRequestKind;
+  title: string;
+  instructions: string | null;
+  status: ProjectRequestStatus;
+  client_note: string | null;
+  due_date: string | null;
+  last_reminded_at: string | null;
+  ticket_id: string | null;
+  position: number;
+  updated_at: string;
+}

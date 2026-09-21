@@ -4,7 +4,11 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { getDefaultRouteForRole, getSiteUrl } from "@/lib/crm";
+import {
+  getDefaultRouteForRole,
+  getSiteUrl,
+  isSafeInternalPath,
+} from "@/lib/crm";
 
 type ResetMode = "request" | "update";
 type PasswordFlowMode = "reset" | "invite";
@@ -369,8 +373,9 @@ export default function ResetPasswordForm({
         throw new Error(payload.error || "Unable to load your portal profile.");
       }
 
-      const destination =
-        next && next.startsWith("/") ? next : getDefaultRouteForRole(payload.profile.role);
+      const destination = isSafeInternalPath(next)
+        ? next
+        : getDefaultRouteForRole(payload.profile.role);
 
       router.replace(destination);
       router.refresh();

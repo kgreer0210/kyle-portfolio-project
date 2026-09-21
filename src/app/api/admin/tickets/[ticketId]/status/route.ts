@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const adminSupabase = createAdminSupabaseClient();
     const { data: ticket, error: ticketLookupError } = await adminSupabase
       .from("tickets")
-      .select("id, organization_id, title, status, resolved_at, organizations(name)")
+      .select("id, organization_id, title, status, resolved_at, waiting_since, organizations(name)")
       .eq("id", ticketId)
       .maybeSingle();
 
@@ -81,6 +81,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         resolved_at:
           status === "resolved" ? now : isReopening ? null : ticket.resolved_at,
         closed_at: status === "closed" ? now : null,
+        // Start the waiting clock on entry (and reset the nudge); clear it on exit.
+        waiting_since: status === "waiting_on_client" ? now : null,
+        nudged_at: null,
       })
       .eq("id", ticket.id);
 

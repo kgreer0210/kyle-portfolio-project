@@ -9,10 +9,6 @@ import {
   formatFileSize,
   maxTicketAttachmentBytes,
   maxTicketAttachmentsPerSubmission,
-  ticketCategories,
-  ticketCategoryLabels,
-  ticketPriorities,
-  ticketPriorityLabels,
   validateAttachmentSelection,
 } from "@/lib/crm";
 
@@ -97,78 +93,34 @@ export default function NewTicketForm() {
         onApplySummary={handleApplySummary}
       />
 
-      <div className="grid gap-5 md:grid-cols-[200px_1fr]">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">Type</label>
-          <select
-            name="type"
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-            defaultValue="request"
-          >
-            <option value="request">Request</option>
-            <option value="issue">Issue</option>
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">Title</label>
-          <input
-            name="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
-            Priority
-          </label>
-          <select
-            name="priority"
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-            defaultValue="normal"
-          >
-            {ticketPriorities.map((value) => (
-              <option key={value} value={value}>
-                {ticketPriorityLabels[value]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
-            Category
-          </label>
-          <select
-            name="category"
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-            defaultValue=""
-          >
-            <option value="">General</option>
-            {ticketCategories.map((value) => (
-              <option key={value} value={value}>
-                {ticketCategoryLabels[value]}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="space-y-2">
+        <label htmlFor="ticket-title" className="text-sm font-medium text-text-primary">
+          What do you need?
+        </label>
+        <input
+          id="ticket-title"
+          name="title"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          maxLength={200}
+          placeholder="e.g. Contact form isn't sending emails"
+          className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+          required
+        />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-text-primary">
-          Description
+        <label htmlFor="ticket-description" className="text-sm font-medium text-text-primary">
+          Details
         </label>
         <textarea
+          id="ticket-description"
           name="description"
           rows={5}
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           maxLength={MAX_DESCRIPTION_LENGTH}
+          placeholder="What's happening, where, and how it affects you. Links and screenshots help."
           className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
           required
         />

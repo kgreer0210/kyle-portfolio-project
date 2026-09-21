@@ -14,7 +14,8 @@ surfaces:
 - A public marketing site with portfolio, services, contact, and an AI
   visitor assistant.
 - An authenticated Supabase CRM with separate client and admin experiences,
-  project onboarding, support tickets, organization notes, billing metadata,
+  projects (milestones, tasks, client requests), support tickets, organization
+  notes, billing metadata,
   and passkey management.
 
 The application is deployed at `kygrsolutions.com`. npm is the declared package
@@ -29,17 +30,16 @@ npm run lint
 npm run build
 ```
 
-Run lint and a production build for changes that affect runtime behavior or
-dependencies. Add focused tests with an appropriate test setup when introducing
-logic that warrants automated coverage; this branch does not currently define
-a test command.
+Run tests, lint, and a production build for changes that affect runtime behavior
+or dependencies. Add focused tests when introducing logic that warrants
+automated coverage.
 
 ## Code map
 
 - `src/app/` — pages, layouts, metadata, and API route handlers
 - `src/components/` — public UI and `crm/` components
 - `src/data/` — portfolio data and live AI knowledge Markdown
-- `src/lib/` — auth, Supabase clients, CRM logic, onboarding, AI, and external
+- `src/lib/` — auth, Supabase clients, CRM logic, projects, AI, and external
   integrations
 - `src/types/` — shared domain types
 - `supabase/migrations/` — ordered database schema changes
@@ -63,13 +63,27 @@ in Supabase and finalized with lead scoring and an email digest.
 `diagnostic-questions.md` keeps its historical filename but now contains the
 visitor-intent response guide. Do not rename it without updating the loader.
 
-### Client onboarding
+### Projects (replaces onboarding)
 
-The current production flow uses the fixed step definitions in `src/lib/crm.ts`.
-When creating a client, an admin chooses the standard guided checklist or
-`skipped_legacy` for immediate ticket access. Standard clients save individual
-steps and submit the package; admins review, complete, or reopen it. Preserve
-the lock rules for submitted and completed onboarding records.
+There is no client questionnaire. An admin creates a client and project (from
+a SOW or by hand) with milestones, tasks, and "needs from client" requests. The
+portal home shows progress over client-visible tasks, the milestone timeline,
+and the requests list.
+
+- Pure logic: `src/lib/projects.ts` (progress, milestone state, request
+  actions), `src/lib/projectDraft.ts` (draft schema and row building),
+  `src/lib/projectItems.ts` (admin item edits), `src/lib/projectCreate.ts`
+  (create with compensating rollback).
+- Clients have SELECT-only RLS on project tables; hidden tasks are filtered by
+  RLS. Every client write goes through `/api/crm/projects/requests/[id]`,
+  which checks membership and uses the service role. Uploads and "help me"
+  reuse one `Materials: …` ticket per request.
+- `project_sow` is admin-only (source file, extraction, out-of-scope notes).
+  Never expose it to clients.
+- Legacy onboarding is retired. `client_onboardings` and
+  `onboarding_step_responses` are read-only history shown at
+  `/admin/clients/[id]/onboarding`; keep `onboardingSteps` and
+  `formatFieldValue` in `src/lib/crm.ts` for that page.
 
 ### Tickets and AI triage
 
@@ -114,6 +128,6 @@ Public navigation and portfolio copy are data-driven where possible. Update
 ## Verification
 
 Verify the relevant public, client, or admin flow at mobile and desktop widths
-for UI work. Pay particular attention to onboarding persistence, authorization,
+for UI work. Pay particular attention to project request actions, authorization,
 and client visibility when those areas change. Report any check that could not
 be run because it needs external credentials or deployed infrastructure.

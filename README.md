@@ -26,6 +26,7 @@ npm run dev
 Open <http://localhost:3000>. Before submitting changes, run:
 
 ```bash
+npm test
 npm run lint
 npm run build
 ```
@@ -38,10 +39,12 @@ are developing. Environment files are ignored by Git.
 | Area | Variables |
 | --- | --- |
 | Supabase | `NEXT_PUBLIC_SUPABASE_URL` and a supported publishable key; a service-role or secret key for server-side admin work |
-| AI | `OPENROUTER_API_KEY` (legacy code also accepts `OPEN_ROUTER_API_KEY`) |
+| AI | `OPENROUTER_API_KEY` (SOW extraction, ticket triage, reply and update drafts) |
 | Email | `RESEND_API_KEY`, `CONTACT_EMAIL`, `NEXT_PUBLIC_SITE_URL` |
 | Notifications | `DISCORD_WEBHOOK_URL` |
 | Retell | `RETELL_API_KEY` |
+| Daily job | `CRON_SECRET` (Vercel Cron sends it as a bearer token to `/api/cron/daily`) |
+| Email replies | `RESEND_WEBHOOK_SECRET`, `INBOUND_REPLY_DOMAIN` (e.g. `reply.kygrsolutions.com`), `INBOUND_REPLY_SECRET`; all optional, and emails stay link-only until set |
 | CRM access | `CRM_ADMIN_EMAILS` |
 | Passkeys | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME`, `WEBAUTHN_ORIGIN`, `WEBAUTHN_CHALLENGE_SECRET` |
 
@@ -52,7 +55,8 @@ serving domain without a scheme or port, and the origin must match exactly.
 ## Database
 
 Supabase migrations live in `supabase/migrations/` and cover the CRM portal,
-passkeys, chat persistence, ticket depth, and AI triage. Apply pending
+passkeys, chat persistence, ticket depth, AI triage, projects, ticket scope,
+waiting-on-client automation, project updates, and inbound email replies. Apply pending
 migrations with:
 
 ```bash
@@ -67,20 +71,20 @@ for schema changes.
 - Public site: home, about, services, projects, and contact pages
 - Visitor assistant: streaming OpenRouter chat with Markdown knowledge in
   `src/data/knowledge/`, Supabase persistence, lead scoring, and email digests
-- Client portal: authentication, onboarding, support tickets, and security
+- Client portal: authentication, project progress, requests, support tickets, and security
   settings
-- Admin CRM: clients, onboarding review, tickets, notes, billing metadata, and
+- Admin CRM: clients, projects, tickets, notes, billing metadata, and
   security settings
 - Integrations: contact email, Retell webhooks, Discord
   notifications, and Sentry
 
-### Client onboarding
+### Projects
 
-When creating a client, an admin chooses either the standard guided checklist
-or immediate ticket access for an existing client. Standard clients complete
-the onboarding steps in the portal and submit their responses; an admin reviews
-the package at `/admin/onboarding/[organizationId]` and can complete or reopen
-it.
+An admin creates a client and project with milestones, tasks, and a list of
+things needed from the client. Clients see progress over client-visible tasks
+and can upload files, mark items done, defer them, or ask for help from the
+portal home. Legacy onboarding answers remain readable at
+`/admin/clients/[organizationId]/onboarding`.
 
 ### Passkeys
 
@@ -94,7 +98,7 @@ deployment needs both passkey migrations and the WebAuthn variables above.
 src/app/                 App Router pages and API routes
 src/components/          Public-site and CRM components
 src/data/                Portfolio and AI knowledge content
-src/lib/                 Auth, Supabase, CRM, onboarding, AI, and integrations
+src/lib/                 Auth, Supabase, CRM, projects, AI, and integrations
 src/types/               Shared TypeScript types
 supabase/migrations/     Ordered database migrations
 public/                  Images and project screenshots
