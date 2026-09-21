@@ -11,7 +11,7 @@ their tool-specific files.
 The repository is a Next.js 16 App Router application with two connected
 surfaces:
 
-- A public marketing site with portfolio, services, blog, contact, and an AI
+- A public marketing site with portfolio, services, contact, and an AI
   visitor assistant.
 - An authenticated Supabase CRM with separate client and admin experiences,
   project onboarding, support tickets, organization notes, billing metadata,
@@ -38,7 +38,7 @@ a test command.
 
 - `src/app/` — pages, layouts, metadata, and API route handlers
 - `src/components/` — public UI and `crm/` components
-- `src/data/` — portfolio/blog data and live AI knowledge Markdown
+- `src/data/` — portfolio data and live AI knowledge Markdown
 - `src/lib/` — auth, Supabase clients, CRM logic, onboarding, AI, and external
   integrations
 - `src/types/` — shared domain types

@@ -1,12 +1,9 @@
 import { MetadataRoute } from "next";
-import { getBlogPosts } from "@/lib/blog";
 
-export const revalidate = 43200; // Rebuild sitemap every 12 hours
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://kygrsolutions.com";
 
-  const staticRoutes: MetadataRoute.Sitemap = [
+  return [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -37,22 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
   ];
-
-  const posts = await getBlogPosts();
-  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt),
-    changeFrequency: "yearly",
-    priority: 0.6,
-  }));
-
-  return [...staticRoutes, ...blogRoutes];
 }
 
