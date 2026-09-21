@@ -23,3 +23,20 @@ updates:
         applies-to: 'security-updates'
         patterns:
           - '*'
+    ignore:
+      # ESLint 10 installs cleanly (eslint-config-next@16 peers on
+      # eslint ">=9.0.0", typescript-eslint@8 on "^8.57.0 || ^9.0.0 || ^10.0.0")
+      # but crashes at lint time: eslint-plugin-react@7.37.5, pulled in by
+      # eslint-config-next, calls context.getFilename() for React version
+      # detection, which ESLint 10 removed. See PR #83 CI:
+      # "TypeError: Error while loading rule 'react/display-name':
+      # contextOrFilename.getFilename is not a function".
+      # Revisit when eslint-config-next ships eslint-plugin-react >= 7.38.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      # TypeScript 7 is the native (Go) compiler port. typescript-eslint@8.65.0,
+      # pinned by eslint-config-next@16, peers on typescript ">=4.8.4 <6.1.0",
+      # so TS 7 breaks `npm run lint`. We are on TS 6.0.x, which is in range.
+      # Revisit when Next ships a config built on typescript-eslint@9+.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
