@@ -28,11 +28,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </span>
               <div className="space-y-4">
                 <h1 className="text-4xl font-semibold text-white md:text-5xl">
-                  Manage onboarding and support in one place.
+                  Your project and support in one place.
                 </h1>
                 <p className="max-w-xl text-base leading-7 text-text-secondary">
-                  Clients can complete onboarding, submit requests, report
-                  issues, and track replies without jumping between email
+                  Follow your project&apos;s progress, send the files and access
+                  it needs, and track requests without jumping between email
                   threads.
                 </p>
               </div>
@@ -40,7 +40,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
             <div className="grid gap-4 pt-10 text-sm text-text-secondary md:grid-cols-2">
               <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4 flex items-center justify-center">
-                Guided onboarding
+                Live project progress
               </div>
               <div className="rounded-3xl border border-penn-blue bg-rich-black/50 p-4 flex items-center justify-center">
                 Centralized ticket history

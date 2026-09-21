@@ -3,25 +3,25 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type ClientMode = "new" | "existing";
+const inputClass =
+  "w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3";
 
+/** Contact-only client, for work that has no SOW or project yet. */
 export default function CreateClientForm() {
   const router = useRouter();
   const [organizationName, setOrganizationName] = useState("");
-  const [slug, setSlug] = useState("");
   const [primaryContactName, setPrimaryContactName] = useState("");
   const [primaryContactEmail, setPrimaryContactEmail] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [notes, setNotes] = useState("");
-  const [clientType, setClientType] = useState<ClientMode>("new");
+  const [sendInviteNow, setSendInviteNow] = useState(true);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
     setError("");
-    setSuccess("");
 
     try {
       const response = await fetch("/api/admin/clients", {
@@ -31,11 +31,11 @@ export default function CreateClientForm() {
         },
         body: JSON.stringify({
           organizationName,
-          slug,
           primaryContactName,
           primaryContactEmail,
+          websiteUrl,
           notes,
-          clientType,
+          sendInviteNow,
         }),
       });
 
@@ -44,16 +44,12 @@ export default function CreateClientForm() {
         organizationId?: string;
       };
 
-      if (!response.ok || !payload.organizationId) {
+      if (!payload.organizationId) {
         throw new Error(payload.error || "Unable to create client.");
       }
 
-      setSuccess("Client created successfully.");
-      setOrganizationName("");
-      setSlug("");
-      setPrimaryContactName("");
-      setPrimaryContactEmail("");
-      setNotes("");
+      // 207: the client exists but the invite failed. Go to the record anyway
+      // so the admin can retry from there.
       router.push(`/admin/clients/${payload.organizationId}`);
       router.refresh();
     } catch (submitError) {
@@ -62,7 +58,6 @@ export default function CreateClientForm() {
           ? submitError.message
           : "Unable to create client.",
       );
-    } finally {
       setIsSubmitting(false);
     }
   }
@@ -71,111 +66,86 @@ export default function CreateClientForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
+          <label htmlFor="new-client-org" className="text-sm font-medium text-text-primary">
             Organization name
           </label>
           <input
+            id="new-client-org"
             value={organizationName}
             onChange={(event) => setOrganizationName(event.target.value)}
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+            className={inputClass}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
-            Slug
+          <label htmlFor="new-client-website" className="text-sm font-medium text-text-primary">
+            Website (optional)
           </label>
           <input
-            value={slug}
-            onChange={(event) => setSlug(event.target.value)}
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
-            placeholder="optional-custom-slug"
+            id="new-client-website"
+            value={websiteUrl}
+            onChange={(event) => setWebsiteUrl(event.target.value)}
+            className={inputClass}
+            placeholder="https://"
           />
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
+          <label htmlFor="new-client-contact" className="text-sm font-medium text-text-primary">
             Primary contact name
           </label>
           <input
+            id="new-client-contact"
             value={primaryContactName}
             onChange={(event) => setPrimaryContactName(event.target.value)}
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+            className={inputClass}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary">
+          <label htmlFor="new-client-email" className="text-sm font-medium text-text-primary">
             Primary contact email
           </label>
           <input
+            id="new-client-email"
             type="email"
             value={primaryContactEmail}
             onChange={(event) => setPrimaryContactEmail(event.target.value)}
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+            className={inputClass}
             required
           />
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-text-primary">Client type</label>
-        <div className="grid gap-4 md:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => setClientType("new")}
-            className={`rounded-3xl border px-5 py-4 text-left transition ${
-              clientType === "new"
-                ? "border-blue-ncs bg-blue-ncs/10"
-                : "border-penn-blue bg-rich-black/50"
-            }`}
-          >
-            <div className="font-semibold text-white">New client</div>
-            <p className="mt-2 text-sm text-text-secondary">
-              Invite into the full onboarding flow before portal work begins.
-            </p>
-          </button>
-          <button
-            type="button"
-            onClick={() => setClientType("existing")}
-            className={`rounded-3xl border px-5 py-4 text-left transition ${
-              clientType === "existing"
-                ? "border-blue-ncs bg-blue-ncs/10"
-                : "border-penn-blue bg-rich-black/50"
-            }`}
-          >
-            <div className="font-semibold text-white">Existing client</div>
-            <p className="mt-2 text-sm text-text-secondary">
-              Skip onboarding and give them immediate ticket access as a legacy account.
-            </p>
-          </button>
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-text-primary">Notes</label>
+        <label htmlFor="new-client-notes" className="text-sm font-medium text-text-primary">
+          Notes
+        </label>
         <textarea
+          id="new-client-notes"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
-          rows={5}
-          className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+          rows={4}
+          className={inputClass}
           placeholder="Optional internal context for this client."
         />
       </div>
 
+      <label className="flex items-center gap-3 text-sm text-text-primary">
+        <input
+          type="checkbox"
+          checked={sendInviteNow}
+          onChange={(event) => setSendInviteNow(event.target.checked)}
+          className="h-4 w-4"
+        />
+        Invite the client to the portal now
+      </label>
+
       {error ? (
         <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {error}
-        </p>
-      ) : null}
-
-      {success ? (
-        <p className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-          {success}
         </p>
       ) : null}
 

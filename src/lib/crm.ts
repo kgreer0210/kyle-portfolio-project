@@ -388,6 +388,24 @@ export function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Pick the first free slug for `base`, appending -2, -3, … when `taken`
+ * already holds it. `taken` should contain every existing slug that starts
+ * with `base`.
+ */
+export function pickUniqueSlug(base: string, taken: Iterable<string>): string {
+  const used = new Set(taken);
+  if (!used.has(base)) {
+    return base;
+  }
+
+  let suffix = 2;
+  while (used.has(`${base}-${suffix}`)) {
+    suffix += 1;
+  }
+  return `${base}-${suffix}`;
+}
+
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }

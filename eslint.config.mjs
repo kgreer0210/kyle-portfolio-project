@@ -8,6 +8,7 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     ".worktrees/**",
     "out/**",
     "build/**",
+    "coverage/**",
     "next-env.d.ts",
   ]
 }];

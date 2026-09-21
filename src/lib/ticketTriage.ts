@@ -65,9 +65,27 @@ export const triageSchema = z.object({
     .describe(
       "One sentence explaining the work-scope estimate. Under 200 characters.",
     ),
+  likely_out_of_scope: z
+    .boolean()
+    .describe(
+      "True only when a project scope is provided AND the request clearly asks for something the scope excludes or never mentions (a new feature, page, or integration). Bug fixes to agreed deliverables are in scope. False when no project scope is provided.",
+    ),
+  scope_reasoning: z
+    .string()
+    .describe(
+      "One sentence citing the scope item or exclusion that drove the decision. Empty string when no project scope is provided. Under 200 characters.",
+    ),
 });
 
 export type TicketTriage = z.infer<typeof triageSchema>;
+
+/** Agreed scope for the project a ticket belongs to (from the SOW). */
+export interface TicketProjectScope {
+  title: string;
+  summary: string | null;
+  milestones: string[];
+  outOfScope: string[];
+}
 
 export interface TicketTriageInput {
   type: TicketType;
@@ -78,6 +96,7 @@ export interface TicketTriageInput {
   organizationName: string;
   billingType: BillingType | null;
   attachmentNames: string[];
+  projectScope?: TicketProjectScope | null;
 }
 
 // Read fresh per request, matching chatKnowledge.ts — edits to the markdown
@@ -186,11 +205,9 @@ export function formatTriageNote(
     appliedPriority: TicketPriority;
     appliedCategory: TicketCategory | null;
     billingType: BillingType | null;
+    hasProjectScope?: boolean;
   },
 ): string {
-  const clientCategoryLabel = applied.clientCategory
-    ? ticketCategoryLabels[applied.clientCategory]
-    : "General";
   const appliedCategoryLabel = applied.appliedCategory
     ? ticketCategoryLabels[applied.appliedCategory]
     : "General";
@@ -200,9 +217,18 @@ export function formatTriageNote(
     "",
     `Summary: ${triage.summary}`,
     "",
-    `Priority: ${ticketPriorityLabels[applied.appliedPriority]} (client selected: ${ticketPriorityLabels[applied.clientPriority]}) — ${triage.priority_reasoning}`,
-    `Category: ${appliedCategoryLabel} (client selected: ${clientCategoryLabel}, confidence: ${triage.category_confidence})`,
+    `Priority: ${ticketPriorityLabels[applied.appliedPriority]} — ${triage.priority_reasoning}`,
+    `Category: ${appliedCategoryLabel} (confidence: ${triage.category_confidence})`,
     `Work scope: ${triage.work_scope} — ${triage.work_scope_reasoning}`,
+    ...(applied.hasProjectScope
+      ? [
+          `Project scope: ${
+            triage.likely_out_of_scope
+              ? "LIKELY OUT OF SCOPE (consider flagging as a change request)"
+              : "looks in scope"
+          }${triage.scope_reasoning ? ` — ${triage.scope_reasoning}` : ""}`,
+        ]
+      : []),
     `Billing: ${assessBillability(applied.billingType, triage.work_scope)}${
       applied.billingType
         ? ` (arrangement: ${billingTypeLabels[applied.billingType]})`
@@ -227,6 +253,41 @@ export function formatTriageNote(
   return lines.join("\n");
 }
 
+/** The per-ticket prompt. Exported for tests. */
+export function buildTriageUserPrompt(input: TicketTriageInput): string {
+  const lines = [
+    `Organization: ${input.organizationName}`,
+    `Ticket type: ${input.type}`,
+    `Billing arrangement: ${
+      input.billingType ? billingTypeLabels[input.billingType] : "not set"
+    }`,
+    `Attachments: ${
+      input.attachmentNames.length > 0 ? input.attachmentNames.join(", ") : "none"
+    }`,
+  ];
+
+  if (input.projectScope) {
+    const scope = input.projectScope;
+    lines.push(
+      "",
+      "Project scope (agreed in the SOW):",
+      `Project: ${scope.title}`,
+      ...(scope.summary ? [`Summary: ${scope.summary.slice(0, 1500)}`] : []),
+      ...(scope.milestones.length > 0
+        ? [`Milestones: ${scope.milestones.slice(0, 20).join("; ")}`]
+        : []),
+      `Explicitly out of scope: ${
+        scope.outOfScope.length > 0 ? scope.outOfScope.slice(0, 30).join("; ") : "none listed"
+      }`,
+    );
+  } else {
+    lines.push("", "Project scope: none provided");
+  }
+
+  lines.push("", `Title: ${input.title}`, "", "Description:", input.description.slice(0, 5000));
+  return lines.join("\n");
+}
+
 /**
  * Run AI triage on a new ticket. Uses Claude Haiku 4.5 via OpenRouter for
  * speed + cost. Returns null if the OpenRouter key is missing or the call
@@ -243,31 +304,7 @@ export async function triageTicket(
 
   try {
     const openrouter = createOpenRouter({ apiKey });
-    const userPrompt = [
-      `Organization: ${input.organizationName}`,
-      `Ticket type: ${input.type}`,
-      `Client-selected priority: ${ticketPriorityLabels[input.clientPriority]}`,
-      `Client-selected category: ${
-        input.clientCategory
-          ? ticketCategoryLabels[input.clientCategory]
-          : "General (none chosen)"
-      }`,
-      `Billing arrangement: ${
-        input.billingType
-          ? billingTypeLabels[input.billingType]
-          : "not set"
-      }`,
-      `Attachments: ${
-        input.attachmentNames.length > 0
-          ? input.attachmentNames.join(", ")
-          : "none"
-      }`,
-      "",
-      `Title: ${input.title}`,
-      "",
-      "Description:",
-      input.description.slice(0, 5000),
-    ].join("\n");
+    const userPrompt = buildTriageUserPrompt(input);
 
     const { output } = await generateText({
       model: openrouter.chat("anthropic/claude-haiku-4.5"),
@@ -293,6 +330,8 @@ export async function triageTicket(
       summary: output.summary.slice(0, 400),
       priority_reasoning: output.priority_reasoning.slice(0, 200),
       work_scope_reasoning: output.work_scope_reasoning.slice(0, 200),
+      likely_out_of_scope: input.projectScope ? output.likely_out_of_scope : false,
+      scope_reasoning: input.projectScope ? output.scope_reasoning.slice(0, 200) : "",
       missing_info: output.missing_info
         .slice(0, 5)
         .map((item) => item.slice(0, 200)),

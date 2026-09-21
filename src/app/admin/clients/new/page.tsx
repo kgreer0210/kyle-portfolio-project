@@ -1,4 +1,4 @@
-import CreateClientForm from "@/components/crm/CreateClientForm";
+import NewClientFlow from "@/components/crm/NewClientFlow";
 
 export default function AdminCreateClientPage() {
   return (
@@ -8,18 +8,16 @@ export default function AdminCreateClientPage() {
           New Client
         </p>
         <h2 className="mt-2 text-3xl font-semibold text-white">
-          Create and invite a client
+          Create a client
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
-          Choose whether this is a brand-new client that should complete the
-          full onboarding checklist or an existing client that should skip
-          onboarding and go straight into ticket access.
+          Upload the signed SOW and review the draft, or enter it by hand. The
+          client sees the summary, visible tasks, and requests. Scope notes stay
+          internal.
         </p>
       </div>
 
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
-        <CreateClientForm />
-      </section>
+      <NewClientFlow />
     </main>
   );
 }

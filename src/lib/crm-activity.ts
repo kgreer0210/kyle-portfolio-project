@@ -8,6 +8,7 @@ export type ActivityEventType =
   | "internal_note"
   | "status_change"
   | "onboarding"
+  | "project"
   | "admin_note";
 
 export interface ActivityEvent {
@@ -25,6 +26,7 @@ export const activityEventTypeLabels: Record<ActivityEventType, string> = {
   internal_note: "Internal note",
   status_change: "Status change",
   onboarding: "Onboarding",
+  project: "Project",
   admin_note: "Admin note",
 };
 
@@ -44,6 +46,7 @@ export async function getOrganizationActivity(
     { data: messages },
     { data: onboarding },
     { data: notes },
+    { data: projects },
   ] = await Promise.all([
     supabase
       .from("tickets")
@@ -67,6 +70,12 @@ export async function getOrganizationActivity(
     supabase
       .from("organization_notes")
       .select("id, body, created_at, profiles:author_id(full_name, email)")
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    supabase
+      .from("projects")
+      .select("id, title, created_at")
       .eq("organization_id", organizationId)
       .order("created_at", { ascending: false })
       .limit(limit),
@@ -133,7 +142,7 @@ export async function getOrganizationActivity(
           occurredAt: entry.at,
           title: entry.label,
           detail: "",
-          href: `/admin/onboarding/${organizationId}`,
+          href: `/admin/clients/${organizationId}/onboarding`,
         });
       }
     });
@@ -152,6 +161,17 @@ export async function getOrganizationActivity(
       occurredAt: note.created_at,
       title: author?.full_name || author?.email || "Admin",
       detail: truncate(note.body),
+    });
+  });
+
+  (projects || []).forEach((project) => {
+    events.push({
+      id: `project-${project.id}`,
+      type: "project",
+      occurredAt: project.created_at,
+      title: project.title,
+      detail: "Project created",
+      href: `/admin/clients/${organizationId}/projects/${project.id}`,
     });
   });
 

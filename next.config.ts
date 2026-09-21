@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/chat": ["./src/data/knowledge/**/*.md"],
     "/api/chat/end": ["./src/data/knowledge/**/*.md"],
+    // Ticket triage and the ticket assistant read ticket-triage.md the same way.
+    "/api/crm/tickets": ["./src/data/knowledge/**/*.md"],
+    "/api/crm/tickets/assist": ["./src/data/knowledge/**/*.md"],
   },
 };
 

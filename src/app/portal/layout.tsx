@@ -5,7 +5,6 @@ import { requireClientUser } from "@/lib/auth";
 
 const navItems = [
   { href: "/portal", label: "Dashboard" },
-  { href: "/portal/onboarding", label: "Onboarding" },
   { href: "/portal/tickets", label: "Tickets" },
   { href: "/portal/settings/security", label: "Settings" },
 ];

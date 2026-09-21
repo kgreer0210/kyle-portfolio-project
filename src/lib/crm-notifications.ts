@@ -5,6 +5,7 @@ import {
   getSiteUrl,
   ticketStatusLabels,
 } from "@/lib/crm";
+import { buildReplyAddress, getInboundConfig } from "@/lib/inboundEmail";
 import { escapeHtml } from "@/lib/notifications";
 import type { TicketStatus } from "@/types/crm";
 
@@ -30,7 +31,21 @@ function getPortalTicketUrl(ticketId: string) {
  * reply to the notification itself, which lands in a mailbox instead of on the
  * ticket and leaves the thread out of sync with the real conversation.
  */
+/** Reply-To for a ticket email, when inbound email replies are configured. */
+function getTicketReplyTo(ticketId: string): string | undefined {
+  const config = getInboundConfig();
+  return config ? buildReplyAddress(ticketId, config) : undefined;
+}
+
 function ticketCallToActionHtml(url: string, label: string) {
+  if (getInboundConfig()) {
+    return `
+      <p style="margin:24px 0;">
+        <a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">${escapeHtml(label)}</a>
+      </p>
+      <p style="font-size:12px;color:#6b7280;">You can reply directly to this email, or use the link above. Either way your message lands on the ticket.</p>
+    `;
+  }
   return `
       <p style="margin:24px 0;">
         <a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">${escapeHtml(label)}</a>
@@ -40,6 +55,9 @@ function ticketCallToActionHtml(url: string, label: string) {
 }
 
 function ticketCallToActionText(url: string, label: string) {
+  if (getInboundConfig()) {
+    return `${label}: ${url}\n\nYou can reply directly to this email, or use the link above. Either way your message lands on the ticket.`;
+  }
   return `${label}: ${url}\n\nReplying to this email won't add your message to the ticket - please use the link above so everything stays in one place.`;
 }
 
@@ -58,6 +76,7 @@ async function sendEmail(args: {
   subject: string;
   html: string;
   text: string;
+  replyTo?: string;
 }) {
   const resend = getResendClient();
 
@@ -78,6 +97,7 @@ async function sendEmail(args: {
     subject: args.subject,
     html: args.html,
     text: args.text,
+    ...(args.replyTo ? { replyTo: args.replyTo } : {}),
   });
 
   if (error) {
@@ -155,24 +175,6 @@ export async function sendInviteAcceptedNotification(args: {
   });
 }
 
-export async function sendOnboardingSubmittedNotification(args: {
-  organizationId: string;
-  organizationName: string;
-  submittedByEmail: string;
-}) {
-  const recipients = getAdminNotificationEmails();
-
-  await sendEmail({
-    to: recipients,
-    subject: `Onboarding submitted: ${args.organizationName}`,
-    html: `
-      <p><strong>${escapeHtml(args.organizationName)}</strong> submitted onboarding.</p>
-      <p>Submitted by: ${escapeHtml(args.submittedByEmail)}</p>
-    `,
-    text: `${args.organizationName} submitted onboarding. Submitted by ${args.submittedByEmail}.`,
-  });
-}
-
 export interface TicketTriageEmailData {
   summary: string;
   appliedPriorityLabel: string;
@@ -181,6 +183,8 @@ export interface TicketTriageEmailData {
   clarifyingQuestions: string[];
   workScope: string;
   billingAssessment: string;
+  /** null when the ticket isn't tied to a project with known scope. */
+  likelyOutOfScope?: boolean | null;
 }
 
 function formatTriageEmailHtml(triage: TicketTriageEmailData): string {
@@ -205,6 +209,7 @@ function formatTriageEmailHtml(triage: TicketTriageEmailData): string {
           : ""
       }</p>
       <p>Work scope: ${escapeHtml(triage.workScope)} · ${escapeHtml(triage.billingAssessment)}</p>
+      ${triage.likelyOutOfScope ? "<p><strong>Likely out of project scope</strong>: consider flagging as a change request.</p>" : ""}
       ${missingInfoHtml}
       ${questionsHtml}
     `;
@@ -220,6 +225,10 @@ function formatTriageEmailText(triage: TicketTriageEmailData): string {
     }.`,
     `Work scope: ${triage.workScope}. ${triage.billingAssessment}`,
   ];
+
+  if (triage.likelyOutOfScope) {
+    parts.push("Likely out of project scope: consider flagging as a change request.");
+  }
 
   if (triage.missingInfo.length) {
     parts.push(`Missing info: ${triage.missingInfo.join("; ")}`);
@@ -248,6 +257,7 @@ export async function sendTicketCreatedNotifications(args: {
 
   await sendEmail({
     to: recipients,
+    replyTo: getTicketReplyTo(args.ticketId),
     subject: toEmailSubject(`${subjectPrefix}New client ticket: ${args.title}`),
     html: `
       <p><strong>${escapeHtml(args.organizationName)}</strong> created a new ticket.</p>
@@ -288,6 +298,7 @@ export async function sendTicketReplyNotifications(args: {
   await Promise.all([
     sendEmail({
       to: [...adminRecipients],
+      replyTo: getTicketReplyTo(args.ticketId),
       subject,
       html: `
       <p><strong>${escapeHtml(args.organizationName)}</strong> has a new public reply.</p>
@@ -300,6 +311,7 @@ export async function sendTicketReplyNotifications(args: {
     }),
     sendEmail({
       to: [...clientRecipients],
+      replyTo: getTicketReplyTo(args.ticketId),
       subject,
       html: `
       <p>There&rsquo;s a new reply on your ticket <strong>${escapeHtml(args.title)}</strong>.</p>
@@ -328,6 +340,7 @@ export async function sendTicketStatusChangeNotifications(args: {
 
   await sendEmail({
     to: recipients,
+    replyTo: getTicketReplyTo(args.ticketId),
     subject: toEmailSubject(`Ticket update: ${args.title}`),
     html: `
       <p>Your ticket <strong>${escapeHtml(args.title)}</strong> was updated.</p>
@@ -337,4 +350,130 @@ export async function sendTicketStatusChangeNotifications(args: {
     `,
     text: `Your ticket "${args.title}" is now ${statusLabel}.${prompt ? ` ${prompt}` : ""}\n\n${ticketCallToActionText(portalUrl, needsClientReply ? "View and reply in the portal" : "View ticket")}`,
   });
+}
+
+/**
+ * Fallback delivery for portal access when Supabase's built-in invite email
+ * can't be used (the address is already registered).
+ */
+export async function sendPortalAccessLinkEmail(args: {
+  to: string;
+  clientName?: string | null;
+  organizationName: string;
+  actionLink: string;
+}) {
+  const greeting = args.clientName ? `Hi ${escapeHtml(args.clientName)},` : "Hi,";
+
+  await sendEmail({
+    to: [args.to],
+    subject: `Your client portal access for ${args.organizationName}`,
+    html: `
+      <p>${greeting}</p>
+      <p>Here's your sign-in link for the <strong>${escapeHtml(args.organizationName)}</strong> client portal. Use it once to set up your access, then you can follow your project and send requests from there.</p>
+      <p style="margin:24px 0;">
+        <a href="${escapeHtml(args.actionLink)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">Set up portal access</a>
+      </p>
+      <p style="font-size:12px;color:#6b7280;">This link is single-use and expires. If it has expired, reply to this email and we'll send a new one.</p>
+    `,
+    text: `${args.clientName ? `Hi ${args.clientName},` : "Hi,"}\n\nHere's your sign-in link for the ${args.organizationName} client portal. Use it once to set up your access, then you can follow your project and send requests from there.\n\n${args.actionLink}\n\nThis link is single-use and expires. If it has expired, reply to this email and we'll send a new one.`,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Daily automation and project updates (client-facing)
+// ---------------------------------------------------------------------------
+
+function getPortalHomeUrl() {
+  return `${getSiteUrl()}/portal`;
+}
+
+export async function sendWaitingNudgeEmail(args: {
+  organizationId: string;
+  ticketId: string;
+  title: string;
+}) {
+  const recipients = await getOrganizationMemberEmails(args.organizationId);
+  if (recipients.length === 0) return;
+  const portalUrl = getPortalTicketUrl(args.ticketId);
+
+  await sendEmail({
+    to: recipients,
+    replyTo: getTicketReplyTo(args.ticketId),
+    subject: toEmailSubject(`Quick reminder: ${args.title}`),
+    html: `
+      <p>Just a friendly reminder: your ticket <strong>${escapeHtml(args.title)}</strong> is waiting on a reply from you before Kyle can keep going.</p>
+      ${ticketCallToActionHtml(portalUrl, "View and reply in the portal")}
+    `,
+    text: `Just a friendly reminder: your ticket "${args.title}" is waiting on a reply from you before Kyle can keep going.\n\n${ticketCallToActionText(portalUrl, "View and reply in the portal")}`,
+  });
+}
+
+export async function sendAutoResolvedEmail(args: {
+  organizationId: string;
+  ticketId: string;
+  title: string;
+}) {
+  const recipients = await getOrganizationMemberEmails(args.organizationId);
+  if (recipients.length === 0) return;
+  const portalUrl = getPortalTicketUrl(args.ticketId);
+
+  await sendEmail({
+    to: recipients,
+    replyTo: getTicketReplyTo(args.ticketId),
+    subject: toEmailSubject(`Ticket closed for now: ${args.title}`),
+    html: `
+      <p>We haven't heard back on <strong>${escapeHtml(args.title)}</strong>, so it's been marked resolved for now.</p>
+      <p>Still need help? Reply on the ticket and it reopens automatically.</p>
+      ${ticketCallToActionHtml(portalUrl, "View ticket")}
+    `,
+    text: `We haven't heard back on "${args.title}", so it's been marked resolved for now. Still need help? Reply on the ticket and it reopens automatically.\n\n${ticketCallToActionText(portalUrl, "View ticket")}`,
+  });
+}
+
+export async function sendRequestReminderEmail(args: {
+  organizationId: string;
+  items: Array<{ title: string; due_date: string | null }>;
+}) {
+  const recipients = await getOrganizationMemberEmails(args.organizationId);
+  if (recipients.length === 0 || args.items.length === 0) return;
+  const portalUrl = getPortalHomeUrl();
+  const count = args.items.length;
+
+  await sendEmail({
+    to: recipients,
+    subject: count === 1 ? `Still needed: ${toEmailSubject(args.items[0].title)}` : `${count} items still needed for your project`,
+    html: `
+      <p>A few things are still needed to keep your project moving:</p>
+      <ul>${args.items.map((item) => `<li>${escapeHtml(item.title)}${item.due_date ? ` (was due ${escapeHtml(item.due_date)})` : ""}</li>`).join("")}</ul>
+      <p>You can upload files, mark items done, or ask for help right from your portal.</p>
+      <p style="margin:24px 0;">
+        <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">Open your portal</a>
+      </p>
+    `,
+    text: `A few things are still needed to keep your project moving:\n${args.items.map((item) => `- ${item.title}${item.due_date ? ` (was due ${item.due_date})` : ""}`).join("\n")}\n\nYou can upload files, mark items done, or ask for help from your portal: ${portalUrl}`,
+  });
+}
+
+export async function sendProjectUpdateEmail(args: {
+  organizationId: string;
+  projectTitle: string;
+  body: string;
+}) {
+  const recipients = await getOrganizationMemberEmails(args.organizationId);
+  if (recipients.length === 0) return 0;
+  const portalUrl = getPortalHomeUrl();
+
+  await sendEmail({
+    to: recipients,
+    subject: toEmailSubject(`Project update: ${args.projectTitle}`),
+    html: `
+      <p style="white-space:pre-wrap;">${escapeHtml(args.body)}</p>
+      <p style="margin:24px 0;">
+        <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0b3c6b;color:#ffffff;text-decoration:none;font-weight:600;">See progress in your portal</a>
+      </p>
+    `,
+    text: `${args.body}\n\nSee progress in your portal: ${portalUrl}`,
+  });
+
+  return recipients.length;
 }

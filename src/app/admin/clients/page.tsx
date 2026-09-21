@@ -7,7 +7,7 @@ export default async function AdminClientsPage() {
   const { data } = await supabase
     .from("organizations")
     .select(
-      "id, name, slug, client_kind, primary_contact_name, primary_contact_email, created_at, client_onboardings(status)",
+      "id, name, slug, client_kind, primary_contact_name, primary_contact_email, created_at, projects(status)",
     )
     .order("created_at", { ascending: false });
 
@@ -19,7 +19,7 @@ export default async function AdminClientsPage() {
     primary_contact_name: string | null;
     primary_contact_email: string | null;
     created_at?: string;
-    client_onboardings?: Array<{ status?: string | null }> | null;
+    projects?: Array<{ status?: string | null }> | null;
   }>;
 
   return (
@@ -46,7 +46,7 @@ export default async function AdminClientsPage() {
               <th className="px-6 py-4 font-medium">Organization</th>
               <th className="px-6 py-4 font-medium">Type</th>
               <th className="px-6 py-4 font-medium">Primary contact</th>
-              <th className="px-6 py-4 font-medium">Onboarding</th>
+              <th className="px-6 py-4 font-medium">Active projects</th>
               <th className="px-6 py-4 font-medium">Created</th>
             </tr>
           </thead>
@@ -74,7 +74,7 @@ export default async function AdminClientsPage() {
                   </div>
                 </td>
                 <td className="px-6 py-5 text-text-secondary">
-                  {organization.client_onboardings?.[0]?.status || "N/A"}
+                  {organization.projects?.filter((project) => project.status === "active").length ?? 0}
                 </td>
                 <td className="px-6 py-5 text-text-secondary">
                   {formatDateTime(organization.created_at)}

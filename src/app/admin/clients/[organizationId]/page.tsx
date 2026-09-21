@@ -2,14 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActivityTimeline from "@/components/crm/ActivityTimeline";
 import BillingTypeForm from "@/components/crm/BillingTypeForm";
-import OnboardingStatusBadge from "@/components/crm/OnboardingStatusBadge";
 import OrgNoteDeleteButton from "@/components/crm/OrgNoteDeleteButton";
 import OrgNoteForm from "@/components/crm/OrgNoteForm";
+import { ProgressBar } from "@/components/crm/ProjectProgress";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
 import { getOrganizationActivity } from "@/lib/crm-activity";
 import { requireAdminUser } from "@/lib/auth";
-import type { BillingType, TicketStatus } from "@/types/crm";
+import { computeProgress, projectStatusLabels } from "@/lib/projects";
+import type { BillingType, ProjectStatus, TicketStatus } from "@/types/crm";
 
 interface ClientDetailPageProps {
   params: Promise<{
@@ -26,7 +27,9 @@ export default async function AdminClientDetailPage({
   const [
     { data: organization },
     { data: members },
-    { data: onboarding },
+    { data: onboardingResponses },
+    { data: projects },
+    { data: projectTasks },
     { data: tickets },
     { count: openTicketCount },
     { count: totalTicketCount },
@@ -43,10 +46,19 @@ export default async function AdminClientDetailPage({
       .select("role, profiles(full_name, email, status)")
       .eq("organization_id", organizationId),
     supabase
-      .from("client_onboardings")
-      .select("*")
+      .from("onboarding_step_responses")
+      .select("id")
       .eq("organization_id", organizationId)
-      .maybeSingle(),
+      .limit(1),
+    supabase
+      .from("projects")
+      .select("id, title, status, target_date, created_at")
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("project_tasks")
+      .select("project_id, client_visible, done_at")
+      .eq("organization_id", organizationId),
     supabase
       .from("tickets")
       .select("id, title, status, created_at")
@@ -90,15 +102,26 @@ export default async function AdminClientDetailPage({
     created_at: string;
     profiles?: { full_name?: string | null; email?: string | null } | null;
   }>;
-  const onboardingStatus =
-    ((onboarding as { status?: string } | null)?.status as
-      | "not_started"
-      | "in_progress"
-      | "submitted"
-      | "completed"
-      | "reopened"
-      | "skipped_legacy"
-      | undefined) || "not_started";
+  const hasArchivedOnboarding = (onboardingResponses || []).length > 0;
+  const clientProjects = (projects || []) as Array<{
+    id: string;
+    title: string;
+    status: ProjectStatus;
+    target_date: string | null;
+  }>;
+  const tasksByProject = new Map<
+    string,
+    Array<{ client_visible: boolean; done_at: string | null }>
+  >();
+  for (const task of (projectTasks || []) as Array<{
+    project_id: string;
+    client_visible: boolean;
+    done_at: string | null;
+  }>) {
+    const list = tasksByProject.get(task.project_id) ?? [];
+    list.push(task);
+    tasksByProject.set(task.project_id, list);
+  }
   const lastActivityAt = activity[0]?.occurredAt;
 
   return (
@@ -137,17 +160,19 @@ export default async function AdminClientDetailPage({
           </div>
           <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-              Onboarding
+              Active projects
             </p>
-            <div className="mt-3">
-              <OnboardingStatusBadge status={onboardingStatus} />
-            </div>
-            <Link
-              href={`/admin/onboarding/${organization.id}`}
-              className="mt-4 inline-flex text-sm font-medium text-blue-ncs transition hover:text-white"
-            >
-              Review onboarding
-            </Link>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {clientProjects.filter((project) => project.status === "active").length}
+            </p>
+            {hasArchivedOnboarding ? (
+              <Link
+                href={`/admin/clients/${organization.id}/onboarding`}
+                className="mt-2 inline-flex text-xs font-medium text-blue-ncs transition hover:text-white"
+              >
+                Onboarding answers (archived)
+              </Link>
+            ) : null}
           </div>
         </div>
 
@@ -210,6 +235,45 @@ export default async function AdminClientDetailPage({
             />
           </div>
         </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-xl font-semibold text-white">Projects</h3>
+          <Link
+            href={`/admin/clients/${organization.id}/projects/new`}
+            className="rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs"
+          >
+            + Add project
+          </Link>
+        </div>
+        {clientProjects.length === 0 ? (
+          <p className="mt-4 text-sm text-text-secondary">
+            No projects yet. The client portal shows a welcome message until one exists.
+          </p>
+        ) : (
+          <div className="mt-5 space-y-3">
+            {clientProjects.map((project) => (
+              <Link
+                key={project.id}
+                href={`/admin/clients/${organization.id}/projects/${project.id}`}
+                className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-semibold text-white">{project.title}</p>
+                  <span className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+                    {projectStatusLabels[project.status]}
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <ProgressBar
+                    progress={computeProgress(tasksByProject.get(project.id) ?? [])}
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -309,7 +373,7 @@ export default async function AdminClientDetailPage({
         <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
           <h3 className="text-xl font-semibold text-white">Activity timeline</h3>
           <p className="mt-2 text-sm text-text-secondary">
-            Tickets, replies, status changes, onboarding milestones, and notes.
+            Tickets, replies, status changes, and notes.
           </p>
           <div className="mt-5">
             <ActivityTimeline events={activity} />

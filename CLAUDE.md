@@ -9,8 +9,8 @@ verification expectations.
 - Keep this file short; put shared project guidance in `AGENTS.md`.
 - Preserve the visitor assistant's answer-first voice and hard scoping rules in
   `src/data/knowledge/` and `src/lib/chatKnowledge.ts`.
-- The current production onboarding flow uses the fixed definitions in
-  `src/lib/crm.ts`; do not assume the unreleased project-specific flow exists.
+- Onboarding is retired; projects replace it (see `AGENTS.md`). Never expose
+  `project_sow` rows or hidden (`client_visible = false`) tasks to clients.
 - Never expose Supabase service credentials or internal ticket-triage notes to
   browser code or client-visible responses.
 

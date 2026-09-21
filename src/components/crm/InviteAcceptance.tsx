@@ -65,7 +65,7 @@ export default function InviteAcceptance({ next }: InviteAcceptanceProps) {
         throw new Error(result.error ?? "Registration failed.");
       }
 
-      const destination = next && next.startsWith("/") ? next : "/portal/onboarding";
+      const destination = next && next.startsWith("/") ? next : "/portal";
       router.replace(destination);
       router.refresh();
     } catch (err) {

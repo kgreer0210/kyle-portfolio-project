@@ -105,6 +105,11 @@ export default async function PortalTicketDetailPage({
             <div className="flex flex-col items-start gap-2 md:items-end">
               <StatusBadge status={ticket.status} />
               <PriorityBadge priority={ticket.priority || "normal"} />
+              {ticket.out_of_scope ? (
+                <span className="inline-flex rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">
+                  Change request, will be quoted
+                </span>
+              ) : null}
             </div>
           </div>
 
