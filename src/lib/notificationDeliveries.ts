@@ -10,6 +10,11 @@ export interface NotificationDeliveryClaim {
   deliveryId: string;
   claimed: boolean;
   alreadySent: boolean;
+  /**
+   * Monotonic claim token for this attempt. A delivery can be reclaimed by a
+   * later run, so completing one has to prove it still owns the claim.
+   */
+  attempt: number;
 }
 
 export function waitingNudgePeriodKey(ticket: WaitingTicket): string {
@@ -54,37 +59,45 @@ export async function claimNotificationDelivery(
     delivery_id: string;
     claimed: boolean;
     already_sent: boolean;
+    attempt: number;
   };
 
   return {
     deliveryId: row.delivery_id,
     claimed: row.claimed,
     alreadySent: row.already_sent,
+    attempt: row.attempt,
   };
 }
 
+/** Returns false when a newer claim has taken the delivery over. */
 export async function markNotificationDeliverySent(
   supabase: SupabaseClient,
-  deliveryId: string,
+  claim: NotificationDeliveryClaim,
   now: string,
-) {
-  const { error } = await supabase.rpc("mark_notification_delivery_sent", {
-    p_delivery_id: deliveryId,
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc("mark_notification_delivery_sent", {
+    p_delivery_id: claim.deliveryId,
+    p_attempt: claim.attempt,
     p_now: now,
   });
   if (error) throw error;
+  return data === true;
 }
 
+/** Returns false when a newer claim has taken the delivery over. */
 export async function markNotificationDeliveryFailed(
   supabase: SupabaseClient,
-  deliveryId: string,
+  claim: NotificationDeliveryClaim,
   reason: string,
   now: string,
-) {
-  const { error } = await supabase.rpc("mark_notification_delivery_failed", {
-    p_delivery_id: deliveryId,
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc("mark_notification_delivery_failed", {
+    p_delivery_id: claim.deliveryId,
+    p_attempt: claim.attempt,
     p_error: reason,
     p_now: now,
   });
   if (error) throw error;
+  return data === true;
 }

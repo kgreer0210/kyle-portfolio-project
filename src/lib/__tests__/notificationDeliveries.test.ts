@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
+  claimNotificationDelivery,
+  markNotificationDeliveryFailed,
+  markNotificationDeliverySent,
   requestReminderPeriodKey,
   waitingNudgePeriodKey,
 } from "@/lib/notificationDeliveries";
@@ -62,5 +65,94 @@ describe("notification delivery periods", () => {
         { ...item, last_reminded_at: "2026-09-21T12:00:00.000Z" },
       ]),
     );
+  });
+});
+
+describe("notification delivery claim fencing", () => {
+  it("carries the attempt token off the claim", async () => {
+    const single = vi.fn().mockResolvedValue({
+      data: {
+        delivery_id: "delivery-1",
+        claimed: true,
+        already_sent: false,
+        attempt: 2,
+      },
+      error: null,
+    });
+    const rpc = vi.fn().mockReturnValue({ single });
+    const supabase = { rpc } as unknown as Parameters<
+      typeof claimNotificationDelivery
+    >[0];
+
+    const claim = await claimNotificationDelivery(supabase, {
+      kind: "waiting_ticket_nudge",
+      resourceId: "ticket-1",
+      periodKey: "2026-09-18T12:00:00.000Z",
+      now: "2026-09-21T12:00:00.000Z",
+    });
+
+    expect(claim).toEqual({
+      deliveryId: "delivery-1",
+      claimed: true,
+      alreadySent: false,
+      attempt: 2,
+    });
+  });
+
+  it("sends the attempt token with both completions", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: true, error: null });
+    const supabase = { rpc } as unknown as Parameters<
+      typeof markNotificationDeliverySent
+    >[0];
+    const claim = {
+      deliveryId: "delivery-1",
+      claimed: true,
+      alreadySent: false,
+      attempt: 3,
+    };
+
+    await expect(
+      markNotificationDeliverySent(supabase, claim, "2026-09-21T12:00:00.000Z"),
+    ).resolves.toBe(true);
+    expect(rpc).toHaveBeenCalledWith("mark_notification_delivery_sent", {
+      p_delivery_id: "delivery-1",
+      p_attempt: 3,
+      p_now: "2026-09-21T12:00:00.000Z",
+    });
+
+    await expect(
+      markNotificationDeliveryFailed(
+        supabase,
+        claim,
+        "provider rejected",
+        "2026-09-21T12:00:00.000Z",
+      ),
+    ).resolves.toBe(true);
+    expect(rpc).toHaveBeenCalledWith("mark_notification_delivery_failed", {
+      p_delivery_id: "delivery-1",
+      p_attempt: 3,
+      p_error: "provider rejected",
+      p_now: "2026-09-21T12:00:00.000Z",
+    });
+  });
+
+  it("reports a lost claim when the fenced update matches no row", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: false, error: null });
+    const supabase = { rpc } as unknown as Parameters<
+      typeof markNotificationDeliverySent
+    >[0];
+
+    await expect(
+      markNotificationDeliverySent(
+        supabase,
+        {
+          deliveryId: "delivery-1",
+          claimed: true,
+          alreadySent: false,
+          attempt: 1,
+        },
+        "2026-09-21T12:00:00.000Z",
+      ),
+    ).resolves.toBe(false);
   });
 });

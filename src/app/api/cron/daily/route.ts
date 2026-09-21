@@ -111,19 +111,25 @@ export async function GET(request: NextRequest) {
       if (!sent) {
         await markNotificationDeliveryFailed(
           supabase,
-          delivery.deliveryId,
+          delivery,
           "Waiting-ticket nudge was not accepted by the email provider",
           nowIso,
         ).catch((markError) => console.error("Nudge delivery release error:", markError));
         summary.errors += 1;
         continue;
       }
-      await markNotificationDeliverySent(supabase, delivery.deliveryId, nowIso).catch(
-        (markError) => {
-          summary.errors += 1;
-          console.error("Nudge delivery completion error:", markError);
-        },
-      );
+      // Only a definitive "lost the claim" answer skips the business-state
+      // update; an RPC error leaves it to the reconcile path below.
+      let lostClaim = false;
+      try {
+        lostClaim = !(await markNotificationDeliverySent(supabase, delivery, nowIso));
+      } catch (markError) {
+        summary.errors += 1;
+        console.error("Nudge delivery completion error:", markError);
+      }
+      if (lostClaim) {
+        continue;
+      }
     }
 
     const { error } = await supabase
@@ -204,7 +210,7 @@ export async function GET(request: NextRequest) {
       if (!sent) {
         await markNotificationDeliveryFailed(
           supabase,
-          delivery.deliveryId,
+          delivery,
           "Project-request reminder was not accepted by the email provider",
           nowIso,
         ).catch((markError) =>
@@ -213,12 +219,18 @@ export async function GET(request: NextRequest) {
         summary.errors += 1;
         continue;
       }
-      await markNotificationDeliverySent(supabase, delivery.deliveryId, nowIso).catch(
-        (markError) => {
-          summary.errors += 1;
-          console.error("Request reminder delivery completion error:", markError);
-        },
-      );
+      // Only a definitive "lost the claim" answer skips the business-state
+      // update; an RPC error leaves it to the reconcile path below.
+      let lostClaim = false;
+      try {
+        lostClaim = !(await markNotificationDeliverySent(supabase, delivery, nowIso));
+      } catch (markError) {
+        summary.errors += 1;
+        console.error("Request reminder delivery completion error:", markError);
+      }
+      if (lostClaim) {
+        continue;
+      }
     }
 
     const { error } = await supabase
