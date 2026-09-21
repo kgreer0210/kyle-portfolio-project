@@ -68,14 +68,14 @@ for schema changes.
 
 ## Application areas
 
-- Public site: home, about, services, projects, blog, and contact pages
+- Public site: home, about, services, projects, and contact pages
 - Visitor assistant: streaming OpenRouter chat with Markdown knowledge in
   `src/data/knowledge/`, Supabase persistence, lead scoring, and email digests
 - Client portal: authentication, project progress, requests, support tickets, and security
   settings
 - Admin CRM: clients, projects, tickets, notes, billing metadata, and
   security settings
-- Integrations: contact and subscription email, Retell webhooks, Discord
+- Integrations: contact email, Retell webhooks, Discord
   notifications, and Sentry
 
 ### Projects
@@ -97,7 +97,7 @@ deployment needs both passkey migrations and the WebAuthn variables above.
 ```text
 src/app/                 App Router pages and API routes
 src/components/          Public-site and CRM components
-src/data/                Portfolio, blog, and AI knowledge content
+src/data/                Portfolio and AI knowledge content
 src/lib/                 Auth, Supabase, CRM, projects, AI, and integrations
 src/types/               Shared TypeScript types
 supabase/migrations/     Ordered database migrations

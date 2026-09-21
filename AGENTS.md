@@ -11,7 +11,7 @@ their tool-specific files.
 The repository is a Next.js 16 App Router application with two connected
 surfaces:
 
-- A public marketing site with portfolio, services, blog, contact, and an AI
+- A public marketing site with portfolio, services, contact, and an AI
   visitor assistant.
 - An authenticated Supabase CRM with separate client and admin experiences,
   projects (milestones, tasks, client requests), support tickets, organization
@@ -30,16 +30,15 @@ npm run lint
 npm run build
 ```
 
-Run lint and a production build for changes that affect runtime behavior or
-dependencies. Add focused tests with an appropriate test setup when introducing
-logic that warrants automated coverage; this branch does not currently define
-a test command.
+Run tests, lint, and a production build for changes that affect runtime behavior
+or dependencies. Add focused tests when introducing logic that warrants
+automated coverage.
 
 ## Code map
 
 - `src/app/` — pages, layouts, metadata, and API route handlers
 - `src/components/` — public UI and `crm/` components
-- `src/data/` — portfolio/blog data and live AI knowledge Markdown
+- `src/data/` — portfolio data and live AI knowledge Markdown
 - `src/lib/` — auth, Supabase clients, CRM logic, projects, AI, and external
   integrations
 - `src/types/` — shared domain types

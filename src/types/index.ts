@@ -50,16 +50,4 @@ export interface NavItem {
   href: string;
 }
 
-export interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  content: string[];
-  category: "Technical Tutorial" | "Case Study" | "Industry Insights" | "General";
-  tags: string[];
-  readTime: string;
-  publishedAt: string;
-  featured: boolean;
-}
 
