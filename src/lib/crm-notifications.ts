@@ -77,6 +77,7 @@ async function sendEmail(args: {
   html: string;
   text: string;
   replyTo?: string;
+  idempotencyKey?: string;
 }): Promise<boolean> {
   const resend = getResendClient();
 
@@ -91,14 +92,17 @@ async function sendEmail(args: {
     return false;
   }
 
-  const { error } = await resend.emails.send({
-    from: "KYGR CRM <info@kygrsolutions.com>",
-    to: args.to,
-    subject: args.subject,
-    html: args.html,
-    text: args.text,
-    ...(args.replyTo ? { replyTo: args.replyTo } : {}),
-  });
+  const { error } = await resend.emails.send(
+    {
+      from: "KYGR CRM <info@kygrsolutions.com>",
+      to: args.to,
+      subject: args.subject,
+      html: args.html,
+      text: args.text,
+      ...(args.replyTo ? { replyTo: args.replyTo } : {}),
+    },
+    args.idempotencyKey ? { idempotencyKey: args.idempotencyKey } : undefined,
+  );
 
   if (error) {
     console.error("[crm-notifications] Resend send failed", {
@@ -394,6 +398,7 @@ export async function sendWaitingNudgeEmail(args: {
   organizationId: string;
   ticketId: string;
   title: string;
+  idempotencyKey?: string;
 }) {
   const recipients = await getOrganizationMemberEmails(args.organizationId);
   if (recipients.length === 0) return false;
@@ -408,6 +413,7 @@ export async function sendWaitingNudgeEmail(args: {
       ${ticketCallToActionHtml(portalUrl, "View and reply in the portal")}
     `,
     text: `Just a friendly reminder: your ticket "${args.title}" is waiting on a reply from you before Kyle can keep going.\n\n${ticketCallToActionText(portalUrl, "View and reply in the portal")}`,
+    idempotencyKey: args.idempotencyKey,
   });
 }
 
@@ -436,6 +442,7 @@ export async function sendAutoResolvedEmail(args: {
 export async function sendRequestReminderEmail(args: {
   organizationId: string;
   items: Array<{ title: string; due_date: string | null }>;
+  idempotencyKey?: string;
 }) {
   const recipients = await getOrganizationMemberEmails(args.organizationId);
   if (recipients.length === 0 || args.items.length === 0) return false;
@@ -454,6 +461,7 @@ export async function sendRequestReminderEmail(args: {
       </p>
     `,
     text: `A few things are still needed to keep your project moving:\n${args.items.map((item) => `- ${item.title}${item.due_date ? ` (was due ${item.due_date})` : ""}`).join("\n")}\n\nYou can upload files, mark items done, or ask for help from your portal: ${portalUrl}`,
+    idempotencyKey: args.idempotencyKey,
   });
 }
 

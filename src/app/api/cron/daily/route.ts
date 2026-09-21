@@ -12,6 +12,13 @@ import {
 } from "@/lib/crm-notifications";
 import { sowBucket } from "@/lib/sowStorage";
 import { createAdminSupabaseClient } from "@/lib/supabase";
+import {
+  claimNotificationDelivery,
+  markNotificationDeliveryFailed,
+  markNotificationDeliverySent,
+  requestReminderPeriodKey,
+  waitingNudgePeriodKey,
+} from "@/lib/notificationDeliveries";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -76,17 +83,47 @@ export async function GET(request: NextRequest) {
   const summary = { nudged: 0, resolved: 0, reminded: 0, sowFilesDeleted: 0, errors: 0 };
 
   for (const ticket of plan.nudge) {
-    const sent = await sendWaitingNudgeEmail({
-      organizationId: ticket.organization_id,
-      ticketId: ticket.id,
-      title: ticket.title,
-    }).catch((sendError) => {
-      console.error("Nudge email error:", sendError);
-      return false;
+    const delivery = await claimNotificationDelivery(supabase, {
+      kind: "waiting_ticket_nudge",
+      resourceId: ticket.id,
+      periodKey: waitingNudgePeriodKey(ticket),
+      now: nowIso,
+    }).catch((claimError) => {
+      console.error("Nudge delivery claim error:", claimError);
+      return null;
     });
-    if (!sent) {
+    if (!delivery) {
       summary.errors += 1;
       continue;
+    }
+    if (!delivery.claimed && !delivery.alreadySent) continue;
+
+    if (delivery.claimed) {
+      const sent = await sendWaitingNudgeEmail({
+        organizationId: ticket.organization_id,
+        ticketId: ticket.id,
+        title: ticket.title,
+        idempotencyKey: `crm-delivery/${delivery.deliveryId}`,
+      }).catch((sendError) => {
+        console.error("Nudge email error:", sendError);
+        return false;
+      });
+      if (!sent) {
+        await markNotificationDeliveryFailed(
+          supabase,
+          delivery.deliveryId,
+          "Waiting-ticket nudge was not accepted by the email provider",
+          nowIso,
+        ).catch((markError) => console.error("Nudge delivery release error:", markError));
+        summary.errors += 1;
+        continue;
+      }
+      await markNotificationDeliverySent(supabase, delivery.deliveryId, nowIso).catch(
+        (markError) => {
+          summary.errors += 1;
+          console.error("Nudge delivery completion error:", markError);
+        },
+      );
     }
 
     const { error } = await supabase
@@ -139,15 +176,49 @@ export async function GET(request: NextRequest) {
   }
 
   for (const [organizationId, items] of plan.remind) {
-    const sent = await sendRequestReminderEmail({ organizationId, items }).catch(
-      (sendError) => {
-        console.error("Request reminder email error:", sendError);
-        return false;
-      },
-    );
-    if (!sent) {
+    const sortedItems = [...items].sort((a, b) => a.id.localeCompare(b.id));
+    const delivery = await claimNotificationDelivery(supabase, {
+      kind: "project_request_reminder",
+      resourceId: organizationId,
+      periodKey: requestReminderPeriodKey(sortedItems),
+      now: nowIso,
+    }).catch((claimError) => {
+      console.error("Request reminder delivery claim error:", claimError);
+      return null;
+    });
+    if (!delivery) {
       summary.errors += 1;
       continue;
+    }
+    if (!delivery.claimed && !delivery.alreadySent) continue;
+
+    if (delivery.claimed) {
+      const sent = await sendRequestReminderEmail({
+        organizationId,
+        items: sortedItems,
+        idempotencyKey: `crm-delivery/${delivery.deliveryId}`,
+      }).catch((sendError) => {
+        console.error("Request reminder email error:", sendError);
+        return false;
+      });
+      if (!sent) {
+        await markNotificationDeliveryFailed(
+          supabase,
+          delivery.deliveryId,
+          "Project-request reminder was not accepted by the email provider",
+          nowIso,
+        ).catch((markError) =>
+          console.error("Request reminder delivery release error:", markError),
+        );
+        summary.errors += 1;
+        continue;
+      }
+      await markNotificationDeliverySent(supabase, delivery.deliveryId, nowIso).catch(
+        (markError) => {
+          summary.errors += 1;
+          console.error("Request reminder delivery completion error:", markError);
+        },
+      );
     }
 
     const { error } = await supabase
@@ -155,7 +226,7 @@ export async function GET(request: NextRequest) {
       .update({ last_reminded_at: nowIso })
       .in(
         "id",
-        items.map((item) => item.id),
+        sortedItems.map((item) => item.id),
       );
     if (error) {
       summary.errors += 1;
