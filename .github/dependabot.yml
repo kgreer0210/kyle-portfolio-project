@@ -40,3 +40,17 @@ updates:
       # Revisit when Next ships a config built on typescript-eslint@9+.
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
+
+  # Keeps the action versions in .github/workflows current.
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+      timezone: 'America/New_York'
+    labels:
+      - 'dependencies'
+      - 'automated'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
