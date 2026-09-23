@@ -26,13 +26,13 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Nothing after checkout needs authenticated git, and npm ci runs
           # package lifecycle scripts — don't leave the token in .git/config.
           persist-credentials: false
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           # The repo declares no Node version (.nvmrc/engines absent);
           # 22 matches the environment the dependency upgrades were
