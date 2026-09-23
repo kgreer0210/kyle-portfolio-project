@@ -38,3 +38,13 @@ export function verifyRetellSignature(
   if (expectedBuf.length !== digestBuf.length) return false;
   return timingSafeEqual(expectedBuf, digestBuf);
 }
+
+// Retell's post-call analysis sets `is_spam` (a boolean custom field configured
+// on the agent) for robocalls and other junk. Only a real boolean `true` counts,
+// so a missing or malformed field still notifies rather than dropping a lead.
+export function isSpamCall(customAnalysisData: unknown): boolean {
+  if (!customAnalysisData || typeof customAnalysisData !== "object") {
+    return false;
+  }
+  return (customAnalysisData as Record<string, unknown>).is_spam === true;
+}
