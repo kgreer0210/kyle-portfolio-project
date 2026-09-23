@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyRetellSignature } from "@/lib/retellWebhook";
+import { isSpamCall, verifyRetellSignature } from "@/lib/retellWebhook";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { sendEmailNotification, sendDiscordNotification } from "@/lib/notifications";
 
@@ -78,6 +78,12 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           console.error("Supabase update error (call_analyzed):", error);
+        }
+
+        // The call is still stored above; spam just doesn't page anyone.
+        if (isSpamCall(customData)) {
+          console.log("Skipping notifications for spam call:", call.call_id);
+          break;
         }
 
         // Send notifications with full analysis data
