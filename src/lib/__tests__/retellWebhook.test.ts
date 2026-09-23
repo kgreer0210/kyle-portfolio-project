@@ -1,6 +1,6 @@
 import { createHmac } from "crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { verifyRetellSignature } from "@/lib/retellWebhook";
+import { isSpamCall, verifyRetellSignature } from "@/lib/retellWebhook";
 
 const apiKey = "test-api-key";
 const body = JSON.stringify({ event: "call_ended", call: { call_id: "abc" } });
@@ -47,5 +47,19 @@ describe("verifyRetellSignature", () => {
     expect(
       verifyRetellSignature(body, apiKey, `v=${timestamp},d=abcé`),
     ).toBe(false);
+  });
+});
+
+describe("isSpamCall", () => {
+  it("flags only a boolean true is_spam", () => {
+    expect(isSpamCall({ is_spam: true })).toBe(true);
+    expect(isSpamCall({ is_spam: false })).toBe(false);
+    expect(isSpamCall({ is_spam: "true" })).toBe(false);
+  });
+
+  it("treats missing analysis data as not spam", () => {
+    expect(isSpamCall(undefined)).toBe(false);
+    expect(isSpamCall(null)).toBe(false);
+    expect(isSpamCall({})).toBe(false);
   });
 });
