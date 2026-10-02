@@ -9,7 +9,12 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev:context": "doppler run -- node scripts/context-local.mjs dev",
+    "build:context": "doppler run -- node scripts/context-local.mjs build",
+    "context:seed": "doppler run -- node scripts/context-local.mjs seed",
+    "context:test-db": "node scripts/context-local.mjs test-db",
+    "context:worker": "node scripts/context-worker.mjs"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^3.1.0",
@@ -19,6 +24,8 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
     "ai": "^7.0.114",
+    "cheerio": "1.2.0",
+    "ipaddr.js": "2.5.0",
     "motion": "^13.4.4",
     "next": "^16.3.6",
     "ogl": "^1.0.11",

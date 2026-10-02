@@ -1,5 +1,6 @@
 "use client";
 
+import { pickAutoProjectId } from "@/lib/ticketProjects";
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import TicketAssistPanel, {
@@ -14,7 +15,12 @@ import {
 
 const MAX_DESCRIPTION_LENGTH = 5000;
 
-export default function NewTicketForm() {
+export default function NewTicketForm({
+  projects = [],
+}: {
+  projects?: Array<{ id: string; title: string; status: string }>;
+}) {
+  const [projectId, setProjectId] = useState(pickAutoProjectId(projects) || "");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [title, setTitle] = useState("");
@@ -87,14 +93,39 @@ export default function NewTicketForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      {projects.length > 0 ? (
+        <label className="block space-y-2 text-sm font-medium text-text-primary">
+          Project
+          <select
+            name="project_id"
+            aria-label="Ticket project"
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-3"
+          >
+            <option value="">General support / not sure</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+
       <TicketAssistPanel
+        key={projectId}
+        projectId={projectId || null}
         draftTitle={title}
         draftDescription={description}
         onApplySummary={handleApplySummary}
       />
 
       <div className="space-y-2">
-        <label htmlFor="ticket-title" className="text-sm font-medium text-text-primary">
+        <label
+          htmlFor="ticket-title"
+          className="text-sm font-medium text-text-primary"
+        >
           What do you need?
         </label>
         <input
@@ -110,7 +141,10 @@ export default function NewTicketForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="ticket-description" className="text-sm font-medium text-text-primary">
+        <label
+          htmlFor="ticket-description"
+          className="text-sm font-medium text-text-primary"
+        >
           Details
         </label>
         <textarea

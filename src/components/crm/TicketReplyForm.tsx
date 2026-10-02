@@ -8,7 +8,8 @@ import {
   maxTicketAttachmentsPerSubmission,
   validateAttachmentSelection,
 } from "@/lib/crm";
-import { readTextStream } from "@/lib/readTextStream";
+import { readContextDraft } from "@/lib/readContextDraft";
+import type { ContextEvidence } from "@/lib/project-context/types";
 
 interface TicketReplyFormProps {
   ticketId: string;
@@ -25,6 +26,8 @@ export default function TicketReplyForm({
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [evidence, setEvidence] = useState<ContextEvidence[]>([]);
+  const [contextNotice, setContextNotice] = useState("");
   const [body, setBody] = useState("");
   const [instructions, setInstructions] = useState("");
   const [error, setError] = useState("");
@@ -32,7 +35,10 @@ export default function TicketReplyForm({
   const [isDrafting, setIsDrafting] = useState(false);
 
   async function handleDraft() {
-    if (body.trim() && !window.confirm("Replace the current message with an AI draft?")) {
+    if (
+      body.trim() &&
+      !window.confirm("Replace the current message with an AI draft?")
+    ) {
       return;
     }
 
@@ -42,25 +48,43 @@ export default function TicketReplyForm({
     setError("");
     setIsDrafting(true);
     setBody("");
+    setEvidence([]);
+    setContextNotice("");
 
     try {
-      const response = await fetch(`/api/admin/tickets/${ticketId}/draft-reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ instructions: instructions.trim() || null }),
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        `/api/admin/tickets/${ticketId}/draft-reply`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ instructions: instructions.trim() || null }),
+          signal: controller.signal,
+        },
+      );
 
       if (!response.ok || !response.body) {
-        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        const payload = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
         throw new Error(payload.error || "Couldn't draft a reply.");
       }
 
-      const draft = await readTextStream(response, setBody);
+      const draft = await readContextDraft(
+        response,
+        setBody,
+        (items, notice) => {
+          setEvidence(items);
+          setContextNotice(notice);
+        },
+      );
       setBody(draft.trim());
     } catch (draftError) {
       if (controller.signal.aborted) return;
-      setError(draftError instanceof Error ? draftError.message : "Couldn't draft a reply.");
+      setError(
+        draftError instanceof Error
+          ? draftError.message
+          : "Couldn't draft a reply.",
+      );
     } finally {
       if (abortRef.current === controller) {
         abortRef.current = null;
@@ -103,6 +127,8 @@ export default function TicketReplyForm({
       formRef.current?.reset();
       setBody("");
       setInstructions("");
+      setEvidence([]);
+      setContextNotice("");
       router.refresh();
     } catch (submitError) {
       setError(
@@ -163,10 +189,47 @@ export default function TicketReplyForm({
               {isDrafting ? "Drafting..." : "Draft reply"}
             </button>
             <p className="text-xs text-text-secondary">
-              Uses the thread, internal notes, and project scope. Review before sending.
+              Uses the thread, project scope, and available project context.
+              Review before sending.
             </p>
           </div>
         </div>
+      ) : null}
+
+      {allowAiDraft && contextNotice ? (
+        <details className="rounded-2xl border border-penn-blue bg-rich-black/40 p-4 text-sm">
+          <summary className="cursor-pointer font-medium text-text-primary">
+            Project evidence · {evidence.length} sources
+          </summary>
+          <p className="mt-3 text-xs text-text-secondary">{contextNotice}</p>
+          <ul className="mt-3 space-y-3">
+            {evidence.map((item) => (
+              <li key={item.id} className="min-w-0">
+                <p className="break-words font-medium">
+                  {/^https:\/\//.test(item.locator) ? (
+                    <a
+                      href={item.locator}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-ncs"
+                    >
+                      {item.title} ↗
+                    </a>
+                  ) : (
+                    item.title
+                  )}
+                </p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  Checked {new Date(item.observedAt).toLocaleString()}
+                  {item.stale ? " · Older snapshot" : ""}
+                </p>
+                <p className="mt-1 break-words text-xs text-text-secondary">
+                  {item.coverage}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </details>
       ) : null}
 
       <div className="space-y-2">

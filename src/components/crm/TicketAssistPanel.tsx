@@ -54,10 +54,12 @@ function stripSummaryBlock(content: string): string {
 }
 
 export default function TicketAssistPanel({
+  projectId,
   draftTitle,
   draftDescription,
   onApplySummary,
 }: {
+  projectId?: string | null;
   draftTitle: string;
   draftDescription: string;
   onApplySummary: (summary: AssistSummary) => void;
@@ -104,8 +106,7 @@ export default function TicketAssistPanel({
       const focusableElements = Array.from(
         drawer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
       ).filter(
-        (element) =>
-          element.offsetWidth > 0 || element.offsetHeight > 0,
+        (element) => element.offsetWidth > 0 || element.offsetHeight > 0,
       );
 
       if (focusableElements.length === 0) {
@@ -178,6 +179,7 @@ export default function TicketAssistPanel({
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
+          projectId,
           messages: nextMessages,
           draftTitle,
           draftDescription,
@@ -185,9 +187,9 @@ export default function TicketAssistPanel({
       });
 
       if (!response.ok || !response.body) {
-        const errBody = (await response
-          .json()
-          .catch(() => ({}))) as { error?: string };
+        const errBody = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
         throw new Error(
           errBody.error || `Assistant request failed (${response.status})`,
         );
@@ -319,9 +321,9 @@ export default function TicketAssistPanel({
             {messages.length === 0 && !isStreaming ? (
               <div className="rounded-2xl bg-oxford-blue px-4 py-3">
                 <p className="text-sm leading-6 text-text-secondary">
-                  Tell me what&apos;s going on in your own words — I&apos;ll ask a
-                  couple of quick questions if anything&apos;s missing, then prepare
-                  a description you can add to the ticket.
+                  Tell me what&apos;s going on in your own words — I&apos;ll ask
+                  a couple of quick questions if anything&apos;s missing, then
+                  prepare a description you can add to the ticket.
                 </p>
               </div>
             ) : null}
