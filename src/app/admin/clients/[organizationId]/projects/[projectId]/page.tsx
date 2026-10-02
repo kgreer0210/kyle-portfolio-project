@@ -1,3 +1,5 @@
+import ProjectContextPanel from "@/components/crm/ProjectContextPanel";
+import { contextEnabled } from "@/lib/project-context/schema";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProjectEditor from "@/components/crm/ProjectEditor";
@@ -30,34 +32,43 @@ export default async function AdminProjectPage({
   const { inviteError } = await searchParams;
   const { supabase } = await requireAdminUser();
 
-  const [bundle, { data: organization }, { data: sow }, { data: tickets }, { data: updates }] =
-    await Promise.all([
-      loadProjectBundle(supabase, projectId),
-      supabase
-        .from("organizations")
-        .select("id, name")
-        .eq("id", organizationId)
-        .maybeSingle(),
-      supabase
-        .from("project_sow")
-        .select("storage_path, file_name, extraction")
-        .eq("project_id", projectId)
-        .maybeSingle(),
-      supabase
-        .from("tickets")
-        .select("id, title, status, last_activity_at")
-        .eq("project_id", projectId)
-        .order("last_activity_at", { ascending: false })
-        .limit(10),
-      supabase
-        .from("project_updates")
-        .select("id, body, sent_at")
-        .eq("project_id", projectId)
-        .order("sent_at", { ascending: false })
-        .limit(20),
-    ]);
+  const [
+    bundle,
+    { data: organization },
+    { data: sow },
+    { data: tickets },
+    { data: updates },
+  ] = await Promise.all([
+    loadProjectBundle(supabase, projectId),
+    supabase
+      .from("organizations")
+      .select("id, name, website_url")
+      .eq("id", organizationId)
+      .maybeSingle(),
+    supabase
+      .from("project_sow")
+      .select("storage_path, file_name, extraction")
+      .eq("project_id", projectId)
+      .maybeSingle(),
+    supabase
+      .from("tickets")
+      .select("id, title, status, last_activity_at")
+      .eq("project_id", projectId)
+      .order("last_activity_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("project_updates")
+      .select("id, body, sent_at")
+      .eq("project_id", projectId)
+      .order("sent_at", { ascending: false })
+      .limit(20),
+  ]);
 
-  if (!bundle || !organization || bundle.project.organization_id !== organizationId) {
+  if (
+    !bundle ||
+    !organization ||
+    bundle.project.organization_id !== organizationId
+  ) {
     notFound();
   }
 
@@ -111,6 +122,13 @@ export default async function AdminProjectPage({
         </p>
       ) : null}
 
+      {contextEnabled() ? (
+        <ProjectContextPanel
+          projectId={projectId}
+          websiteUrl={organization.website_url}
+        />
+      ) : null}
+
       <ProjectEditor
         project={bundle.project}
         milestones={bundle.milestones}
@@ -128,9 +146,13 @@ export default async function AdminProjectPage({
       />
 
       <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-        <h3 className="text-xl font-semibold text-white">Tickets on this project</h3>
+        <h3 className="text-xl font-semibold text-white">
+          Tickets on this project
+        </h3>
         {projectTickets.length === 0 ? (
-          <p className="mt-4 text-sm text-text-secondary">No tickets linked yet.</p>
+          <p className="mt-4 text-sm text-text-secondary">
+            No tickets linked yet.
+          </p>
         ) : (
           <div className="mt-5 space-y-3">
             {projectTickets.map((ticket) => (

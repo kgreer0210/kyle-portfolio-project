@@ -92,6 +92,26 @@ analysis note, raise priority, infer category, and enrich the admin email. A
 triage failure must not block ticket creation. Never return internal notes to a
 client. The editable rubric is `src/data/knowledge/ticket-triage.md`.
 
+### Project context for support
+
+`PROJECT_CONTEXT_ENABLED` gates project source settings and AI context retrieval;
+its default is off. Context code lives under `src/lib/project-context/`. Sources,
+sync runs, and entries are private tables. Client assistance retrieves only
+explicitly approved manual workflow notes through a membership-checked server
+route; never give private website/code entries to the client model. Preserve
+organization/project/source ownership constraints and service-only search/worker
+RPC permissions.
+
+Scans publish complete snapshots atomically and preserve the last successful
+snapshot on failure. Workers use expiring, fenced claims; refreshes arriving
+mid-scan schedule a follow-up. GitHub code is pinned to a commit, not presumed
+live. Context is evidence, not instructions or proof of reproduction/fixes.
+
+Use `npm run dev:context` and the isolated Supabase config for local testing;
+see `docs/project-context-local-testing.md`. This launcher overrides Doppler's
+Supabase variables with local credentials and disables outbound notifications.
+Do not apply context migrations to production as part of local testing.
+
 ### Authentication and passkeys
 
 Supabase Auth supplies sessions and role profiles. WebAuthn routes live under

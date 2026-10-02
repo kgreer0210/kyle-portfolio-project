@@ -1,3 +1,5 @@
+import { retrieveProjectContext } from "@/lib/project-context/server";
+import { contextDraftResponse } from "@/lib/project-context/stream";
 import { NextRequest } from "next/server";
 import { streamText } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
@@ -57,7 +59,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .maybeSingle(),
     adminSupabase
       .from("ticket_messages")
-      .select("body, visibility, is_system, created_at, profiles:author_id(role)")
+      .select(
+        "body, visibility, is_system, created_at, profiles:author_id(role)",
+      )
       .eq("ticket_id", ticketId)
       .order("created_at", { ascending: true }),
   ]);
@@ -92,8 +96,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   });
 
   const projectScope = ticket.project_id
-    ? await loadProjectScope(adminSupabase, ticket.project_id as string).catch(() => null)
+    ? await loadProjectScope(adminSupabase, ticket.project_id as string).catch(
+        () => null,
+      )
     : null;
+
+  const context = await retrieveProjectContext(
+    adminSupabase,
+    ticket.project_id,
+    ticket.organization_id,
+    [
+      ticket.title,
+      ticket.description,
+      ...thread.slice(-4).map((m) => m.body),
+      parsed.data.instructions || "",
+    ].join(" "),
+  );
 
   try {
     const result = streamText({
@@ -112,11 +130,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         messages: thread,
         projectScope,
         instructions: parsed.data.instructions || null,
+        projectContext: context.text,
       }),
       temperature: 0.4,
     });
 
-    return result.toTextStreamResponse();
+    return contextDraftResponse(result.textStream, context);
   } catch (error) {
     console.error("Reply draft error:", error);
     return jsonError("Couldn't draft a reply right now.", 500);

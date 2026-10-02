@@ -1,9 +1,13 @@
+import { contextEnabled } from "@/lib/project-context/schema";
 import Link from "next/link";
 import NewTicketForm from "@/components/crm/NewTicketForm";
 import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { formatDateTime } from "@/lib/crm";
-import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import {
+  requireClientUser,
+  getPrimaryOrganizationMembership,
+} from "@/lib/auth";
 import type { TicketPriority, TicketStatus } from "@/types/crm";
 
 export default async function PortalTicketsPage() {
@@ -26,6 +30,14 @@ export default async function PortalTicketsPage() {
     .eq("organization_id", membership.organization_id)
     .order("created_at", { ascending: false });
 
+  const { data: projects } = contextEnabled()
+    ? await supabase
+        .from("projects")
+        .select("id, title, status")
+        .eq("organization_id", membership.organization_id)
+        .order("created_at", { ascending: false })
+    : { data: [] };
+
   const tickets = (data || []) as Array<{
     id: string;
     title: string;
@@ -47,7 +59,7 @@ export default async function PortalTicketsPage() {
           </h3>
         </div>
         <div className="mt-6">
-          <NewTicketForm />
+          <NewTicketForm projects={projects || []} />
         </div>
       </section>
 
@@ -56,13 +68,16 @@ export default async function PortalTicketsPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
             Recent Activity
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Your tickets</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-white">
+            Your tickets
+          </h2>
         </div>
 
         <div className="divide-y divide-penn-blue overflow-hidden rounded-[2rem] border border-penn-blue bg-oxford-blue/80">
           {tickets.length === 0 ? (
             <p className="p-6 text-sm leading-6 text-text-secondary">
-              No tickets yet. Use the form to create your first request or issue.
+              No tickets yet. Use the form to create your first request or
+              issue.
             </p>
           ) : (
             tickets.map((ticket) => (

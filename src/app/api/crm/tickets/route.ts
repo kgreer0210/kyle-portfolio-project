@@ -112,7 +112,9 @@ async function runTicketTriage(
       missingInfo: triage.missing_info,
       clarifyingQuestions: triage.clarifying_questions,
       workScope: triage.work_scope,
-      likelyOutOfScope: args.input.projectScope ? triage.likely_out_of_scope : null,
+      likelyOutOfScope: args.input.projectScope
+        ? triage.likely_out_of_scope
+        : null,
       billingAssessment: assessBillability(
         args.input.billingType,
         triage.work_scope,
@@ -144,7 +146,9 @@ export async function POST(request: NextRequest) {
     const description = String(formData.get("description") || "").trim();
     const files = formData
       .getAll("attachments")
-      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
 
     if (!title || !description) {
       return jsonError("Title and description are required.");
@@ -169,9 +173,20 @@ export async function POST(request: NextRequest) {
       .from("projects")
       .select("id, status")
       .eq("organization_id", context.membership.organization_id);
-    const projectId = pickAutoProjectId(
-      (orgProjects || []) as Array<{ id: string; status: string }>,
-    );
+    const submittedProject = formData.get("project_id");
+    if (
+      submittedProject &&
+      (typeof submittedProject !== "string" ||
+        !(orgProjects || []).some((project) => project.id === submittedProject))
+    )
+      return jsonError("Invalid project for your organization.", 403);
+    const projectId = formData.has("project_id")
+      ? typeof submittedProject === "string" && submittedProject
+        ? submittedProject
+        : null
+      : pickAutoProjectId(
+          (orgProjects || []) as Array<{ id: string; status: string }>,
+        );
 
     const { data: ticket, error: ticketError } = await adminSupabase
       .from("tickets")
@@ -217,10 +232,12 @@ export async function POST(request: NextRequest) {
     // both still complete on Vercel without fire-and-forget risk.
     after(async () => {
       const projectScope = projectId
-        ? await loadProjectScope(adminSupabase, projectId).catch((scopeError) => {
-            console.error("Project scope load error:", scopeError);
-            return null;
-          })
+        ? await loadProjectScope(adminSupabase, projectId).catch(
+            (scopeError) => {
+              console.error("Project scope load error:", scopeError);
+              return null;
+            },
+          )
         : null;
 
       const triageOutcome = await runTicketTriage(adminSupabase, {
@@ -270,6 +287,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ticketId: ticket.id }, { status: 201 });
   } catch (error) {
     console.error("Ticket create route error:", error);
-    return jsonError("An unexpected error occurred while creating the ticket.", 500);
+    return jsonError(
+      "An unexpected error occurred while creating the ticket.",
+      500,
+    );
   }
 }
