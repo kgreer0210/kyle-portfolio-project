@@ -1,15 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import AdminNavigation from "@/components/crm/AdminNavigation";
 import SignOutButton from "@/components/crm/SignOutButton";
 import { requireAdminUser } from "@/lib/auth";
-
-const navItems = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/tickets", label: "Tickets" },
-  { href: "/admin/clients", label: "Clients" },
-  { href: "/admin/clients/new", label: "New Client" },
-  { href: "/admin/settings/security", label: "Security" },
-];
 
 export default async function AdminLayout({
   children,
@@ -17,37 +10,66 @@ export default async function AdminLayout({
   children: ReactNode;
 }) {
   const { profile } = await requireAdminUser();
-
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#000022_0%,#040f16_60%,#040f16_100%)] text-text-primary">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="mb-8 flex flex-col gap-6 rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-              Admin CRM
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold text-white">
-              Welcome back, {profile.full_name || profile.email}
-            </h1>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <nav className="flex flex-wrap gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-full border border-penn-blue px-4 py-2 text-sm text-text-secondary transition hover:border-blue-ncs hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+    <div className="admin-workspace min-h-screen bg-rich-black text-text-primary lg:grid lg:grid-cols-[216px_minmax(0,1fr)]">
+      <a
+        href="#admin-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-rich-black focus:p-3"
+      >
+        Skip to content
+      </a>
+      <aside className="border-b border-penn-blue bg-oxford-blue/40 px-4 py-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-r lg:border-b-0 lg:py-6">
+        <Link
+          href="/admin"
+          className="mb-4 flex items-center gap-3 px-2 lg:mb-8"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-ncs font-semibold text-white">
+            K
+          </span>
+          <span className="text-sm font-semibold text-white">
+            KYGR Solutions
+            <span className="block text-xs font-normal text-text-secondary">
+              Workspace
+            </span>
+          </span>
+        </Link>
+        <AdminNavigation />
+        <div className="mt-auto hidden border-t border-penn-blue px-2 pt-5 lg:block">
+          <p className="truncate text-sm font-medium text-white">
+            {profile.full_name || "Administrator"}
+          </p>
+          <p className="mt-1 truncate text-xs text-text-secondary">
+            {profile.email}
+          </p>
+          <div className="mt-3">
             <SignOutButton />
           </div>
+        </div>
+      </aside>
+      <div className="min-w-0">
+        <header className="flex h-14 items-center justify-between border-b border-penn-blue px-5 lg:px-8">
+          <p className="text-xs font-medium text-text-secondary">
+            Client operations
+          </p>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-xs text-text-secondary hover:text-white"
+            >
+              View website ↗
+            </Link>
+            <div className="lg:hidden">
+              <SignOutButton />
+            </div>
+          </div>
         </header>
-
-        {children}
+        <div
+          id="admin-content"
+          tabIndex={-1}
+          className="mx-auto max-w-[1600px] px-4 py-6 outline-none sm:px-6 lg:px-8 lg:py-8"
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

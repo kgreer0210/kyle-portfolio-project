@@ -12,6 +12,7 @@ if (!/^http:\/\/(127\.0\.0\.1|localhost):55421\/?$/.test(status.API_URL))
   throw new Error(
     "Expected the isolated context Supabase instance on port 55421.",
   );
+const devPort = process.env.CONTEXT_DEV_PORT || "3100";
 const env = {
   ...process.env,
   NEXT_PUBLIC_SUPABASE_URL: status.API_URL,
@@ -26,8 +27,8 @@ const env = {
   DISCORD_WEBHOOK_URL: "",
   RETELL_API_KEY: "",
   CRON_SECRET: "context-local-worker",
-  NEXT_PUBLIC_SITE_URL: "http://localhost:3100",
-  WEBAUTHN_ORIGIN: "http://localhost:3100",
+  NEXT_PUBLIC_SITE_URL: `http://localhost:${devPort}`,
+  WEBAUTHN_ORIGIN: `http://localhost:${devPort}`,
   WEBAUTHN_RP_ID: "localhost",
 };
 const mode = process.argv[2] || "dev";
@@ -265,7 +266,7 @@ if (mode === "seed") {
   const args =
     mode === "build"
       ? ["run", "build"]
-      : ["run", "dev", "--", "--port", "3100"];
+      : ["run", "dev", "--", "--port", devPort];
   const child = spawn("npm", args, { env, stdio: "inherit" });
   for (const signal of ["SIGINT", "SIGTERM"])
     process.on(signal, () => child.kill(signal));

@@ -10,7 +10,7 @@ export default async function SecuritySettingsPage() {
   await requireAuthenticatedUser();
 
   return (
-    <main className="mx-auto max-w-2xl space-y-8 px-4 py-10">
+    <main className="mx-auto max-w-2xl space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold text-text-primary">Security</h1>
         <p className="text-sm text-text-secondary">
@@ -18,7 +18,7 @@ export default async function SecuritySettingsPage() {
         </p>
       </div>
 
-      <section className="rounded-2xl border border-penn-blue bg-oxford-blue/80 p-6">
+      <section className="client-panel p-6">
         <PasskeyRegistration />
       </section>
     </main>
