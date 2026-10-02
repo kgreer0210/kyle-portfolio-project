@@ -162,12 +162,12 @@ export default function ProjectContextPanel({
   }
   return (
     <section
-      className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8"
+      className="admin-panel p-6 md:p-8"
       aria-labelledby="project-context-heading"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+          <p className="text-xs font-medium text-blue-ncs">
             Support knowledge
           </p>
           <h3
@@ -207,7 +207,7 @@ export default function ProjectContextPanel({
       {showAdd ? (
         <form
           onSubmit={add}
-          className="mt-6 space-y-4 rounded-3xl border border-penn-blue bg-rich-black/40 p-5"
+          className="mt-6 space-y-4 rounded-lg border border-penn-blue bg-rich-black/40 p-5"
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2 text-sm">
@@ -338,7 +338,7 @@ export default function ProjectContextPanel({
           <p className="text-sm text-text-secondary">Loading sources…</p>
         ) : null}
         {data?.sources.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-penn-blue p-6">
+          <div className="rounded-lg border border-dashed border-penn-blue p-6">
             <p className="font-medium text-white">
               Add context before the next ticket arrives.
             </p>
@@ -357,7 +357,7 @@ export default function ProjectContextPanel({
           return (
             <article
               key={source.id}
-              className="rounded-3xl border border-penn-blue bg-rich-black/40 p-5"
+              className="rounded-lg border border-penn-blue bg-rich-black/40 p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">

@@ -1,3 +1,4 @@
+import WorkspaceTabs from "@/components/crm/WorkspaceTabs";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ActivityTimeline from "@/components/crm/ActivityTimeline";
@@ -89,7 +90,11 @@ export default async function AdminClientDetailPage({
 
   const organizationMembers = (members || []) as Array<{
     role: string;
-    profiles?: { full_name?: string | null; email?: string | null; status?: string | null } | null;
+    profiles?: {
+      full_name?: string | null;
+      email?: string | null;
+      status?: string | null;
+    } | null;
   }>;
   const recentTickets = (tickets || []) as Array<{
     id: string;
@@ -132,45 +137,52 @@ export default async function AdminClientDetailPage({
   );
 
   return (
-    <main className="space-y-8">
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
-        <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-          Client Profile
-        </p>
+    <main className="space-y-6">
+      <Link
+        href="/admin/clients"
+        className="inline-flex text-sm text-text-secondary hover:text-white"
+      >
+        ← Clients
+      </Link>
+      <section className="admin-panel p-6 md:p-8">
+        <p className="text-xs font-medium text-blue-ncs">Client Profile</p>
         <h2 className="mt-2 text-3xl font-semibold text-white">
           {organization.name}
         </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Open tickets
             </p>
             <p className="mt-2 text-2xl font-semibold text-white">
               {openTicketCount || 0}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Total tickets
             </p>
             <p className="mt-2 text-2xl font-semibold text-white">
               {totalTicketCount || 0}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Last activity
             </p>
             <p className="mt-2 text-sm font-semibold text-white">
               {lastActivityAt ? formatDateTime(lastActivityAt) : "None yet"}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Active projects
             </p>
             <p className="mt-2 text-2xl font-semibold text-white">
-              {clientProjects.filter((project) => project.status === "active").length}
+              {
+                clientProjects.filter((project) => project.status === "active")
+                  .length
+              }
             </p>
             {hasArchivedOnboarding ? (
               <Link
@@ -182,217 +194,271 @@ export default async function AdminClientDetailPage({
             ) : null}
           </div>
         </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-              Contact
-            </p>
-            <p className="mt-2 font-semibold text-white">
-              {organization.primary_contact_name || "No contact on file"}
-            </p>
-            {organization.primary_contact_email ? (
-              <a
-                href={`mailto:${organization.primary_contact_email}`}
-                className="mt-1 block text-sm text-blue-ncs transition hover:text-white"
-              >
-                {organization.primary_contact_email}
-              </a>
-            ) : null}
-            {organization.website_url ? (
-              <a
-                href={organization.website_url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 block text-sm text-text-secondary transition hover:text-white"
-              >
-                {organization.website_url}
-              </a>
-            ) : null}
-            <p className="mt-2 text-xs capitalize text-text-secondary">
-              {organization.client_kind} client · since{" "}
-              {formatDateTime(organization.created_at)}
-            </p>
-          </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-              General notes
-            </p>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-primary">
-              {organization.notes || "No general notes."}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-            Billing arrangement
-          </p>
-          <p className="mt-2 text-sm leading-6 text-text-secondary">
-            Trade agreement clients get every fix priced out; monthly-plan
-            clients include small fixes but pay for major work. AI ticket
-            triage uses this to flag likely-billable tickets.
-          </p>
-          <div className="mt-4 max-w-sm">
-            <BillingTypeForm
-              organizationId={organization.id}
-              currentBillingType={
-                (organization.billing_type as BillingType | null) || null
-              }
-            />
-          </div>
-        </div>
       </section>
 
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-xl font-semibold text-white">Projects</h3>
-          <Link
-            href={`/admin/clients/${organization.id}/projects/new`}
-            className="rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs"
-          >
-            + Add project
-          </Link>
-        </div>
-        {clientProjects.length === 0 ? (
-          <p className="mt-4 text-sm text-text-secondary">
-            No projects yet. The client portal shows a welcome message until one exists.
-          </p>
-        ) : (
-          <div className="mt-5 space-y-3">
-            {clientProjects.map((project) => (
-              <Link
-                key={project.id}
-                href={`/admin/clients/${organization.id}/projects/${project.id}`}
-                className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold text-white">{project.title}</p>
-                  <span className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                    {projectStatusLabels[project.status]}
-                  </span>
+      <WorkspaceTabs
+        label="Client sections"
+        sections={[
+          {
+            id: "projects",
+            label: "Projects",
+            content: (
+              <section className="admin-panel p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="text-xl font-semibold text-white">Projects</h3>
+                  <Link
+                    href={`/admin/clients/${organization.id}/projects/new`}
+                    className="rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs"
+                  >
+                    + Add project
+                  </Link>
                 </div>
-                <div className="mt-3">
-                  <ProgressBar
-                    progress={computeProgress(tasksByProject.get(project.id) ?? [])}
+                {clientProjects.length === 0 ? (
+                  <p className="mt-4 text-sm text-text-secondary">
+                    No projects yet. The client portal shows a welcome message
+                    until one exists.
+                  </p>
+                ) : (
+                  <div className="mt-5 space-y-3">
+                    {clientProjects.map((project) => (
+                      <Link
+                        key={project.id}
+                        href={`/admin/clients/${organization.id}/projects/${project.id}`}
+                        className="block rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="font-semibold text-white">
+                            {project.title}
+                          </p>
+                          <span className="text-xs font-medium text-text-secondary">
+                            {projectStatusLabels[project.status]}
+                          </span>
+                        </div>
+                        <div className="mt-3">
+                          <ProgressBar
+                            progress={computeProgress(
+                              tasksByProject.get(project.id) ?? [],
+                            )}
+                          />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
+            ),
+          },
+          {
+            id: "people",
+            label: "People",
+            content: (
+              <div className="admin-panel p-6">
+                <h3 className="text-xl font-semibold text-white">Members</h3>
+                {!hasActiveMember && canInvite ? (
+                  <ClientInviteButton
+                    organizationId={organization.id}
+                    hasMember={organizationMembers.length > 0}
                   />
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Members</h3>
-          {!hasActiveMember && canInvite ? (
-            <ClientInviteButton
-              organizationId={organization.id}
-              hasMember={organizationMembers.length > 0}
-            />
-          ) : null}
-          <div className="mt-5 space-y-4">
-            {organizationMembers.map((member, index) => (
-              <div
-                key={`${member.profiles?.email || "member"}-${index}`}
-                className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-white">
-                      {member.profiles?.full_name || member.profiles?.email || "Unknown"}
-                    </p>
-                    <p className="mt-1 text-sm text-text-secondary">
-                      {member.profiles?.email || "No email"}
-                    </p>
-                  </div>
-                  <div className="text-right text-xs uppercase tracking-[0.18em] text-text-secondary">
-                    <div>{member.role}</div>
-                    <div className="mt-2">{member.profiles?.status || "active"}</div>
-                  </div>
+                ) : null}
+                <div className="mt-5 space-y-4">
+                  {organizationMembers.map((member, index) => (
+                    <div
+                      key={`${member.profiles?.email || "member"}-${index}`}
+                      className="rounded-lg border border-penn-blue bg-rich-black/40 p-4"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="font-semibold text-white">
+                            {member.profiles?.full_name ||
+                              member.profiles?.email ||
+                              "Unknown"}
+                          </p>
+                          <p className="mt-1 text-sm text-text-secondary">
+                            {member.profiles?.email || "No email"}
+                          </p>
+                        </div>
+                        <div className="text-right text-xs font-medium text-text-secondary">
+                          <div>{member.role}</div>
+                          <div className="mt-2">
+                            {member.profiles?.status || "active"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Recent tickets</h3>
-          <div className="mt-5 space-y-3">
-            {recentTickets.length === 0 ? (
-              <p className="text-sm text-text-secondary">
-                No tickets yet for this client.
-              </p>
-            ) : (
-              recentTickets.map((ticket) => (
-                <Link
-                  key={ticket.id}
-                  href={`/admin/tickets/${ticket.id}`}
-                  className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-white">{ticket.title}</p>
-                      <p className="mt-1 text-sm text-text-secondary">
-                        {formatDateTime(ticket.created_at)}
-                      </p>
-                    </div>
-                    <StatusBadge status={ticket.status} />
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Admin notes</h3>
-          <p className="mt-2 text-sm text-text-secondary">
-            Private to you — clients never see these.
-          </p>
-          <div className="mt-5">
-            <OrgNoteForm organizationId={organization.id} />
-          </div>
-          <div className="mt-6 space-y-3">
-            {adminNotes.length === 0 ? (
-              <p className="text-sm text-text-secondary">No notes yet.</p>
-            ) : (
-              adminNotes.map((note) => (
-                <div
-                  key={note.id}
-                  className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-xs text-text-secondary">
-                      {formatDateTime(note.created_at)}
+            ),
+          },
+          {
+            id: "tickets",
+            label: "Tickets",
+            content: (
+              <div className="admin-panel p-6">
+                <h3 className="text-xl font-semibold text-white">
+                  Recent tickets
+                </h3>
+                <div className="mt-5 space-y-3">
+                  {recentTickets.length === 0 ? (
+                    <p className="text-sm text-text-secondary">
+                      No tickets yet for this client.
                     </p>
-                    <OrgNoteDeleteButton
+                  ) : (
+                    recentTickets.map((ticket) => (
+                      <Link
+                        key={ticket.id}
+                        href={`/admin/tickets/${ticket.id}`}
+                        className="block rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="font-semibold text-white">
+                              {ticket.title}
+                            </p>
+                            <p className="mt-1 text-sm text-text-secondary">
+                              {formatDateTime(ticket.created_at)}
+                            </p>
+                          </div>
+                          <StatusBadge status={ticket.status} />
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            ),
+          },
+          {
+            id: "notes",
+            label: "Notes",
+            content: (
+              <div className="admin-panel p-6">
+                <h3 className="text-xl font-semibold text-white">
+                  Admin notes
+                </h3>
+                <p className="mt-2 text-sm text-text-secondary">
+                  Private to you — clients never see these.
+                </p>
+                <div className="mt-5">
+                  <OrgNoteForm organizationId={organization.id} />
+                </div>
+                <div className="mt-6 space-y-3">
+                  {adminNotes.length === 0 ? (
+                    <p className="text-sm text-text-secondary">No notes yet.</p>
+                  ) : (
+                    adminNotes.map((note) => (
+                      <div
+                        key={note.id}
+                        className="rounded-lg border border-penn-blue bg-rich-black/40 p-4"
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <p className="text-xs text-text-secondary">
+                            {formatDateTime(note.created_at)}
+                          </p>
+                          <OrgNoteDeleteButton
+                            organizationId={organization.id}
+                            noteId={note.id}
+                          />
+                        </div>
+                        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-primary">
+                          {note.body}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ),
+          },
+          {
+            id: "activity",
+            label: "Activity",
+            content: (
+              <div className="admin-panel p-6">
+                <h3 className="text-xl font-semibold text-white">
+                  Activity timeline
+                </h3>
+                <p className="mt-2 text-sm text-text-secondary">
+                  Tickets, replies, status changes, and notes.
+                </p>
+                <div className="mt-5">
+                  <ActivityTimeline events={activity} />
+                </div>
+              </div>
+            ),
+          },
+          {
+            id: "details",
+            label: "Contact & billing",
+            content: (
+              <section className="admin-panel p-6">
+                {" "}
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+                    <p className="text-xs font-medium text-text-secondary">
+                      Contact
+                    </p>
+                    <p className="mt-2 font-semibold text-white">
+                      {organization.primary_contact_name ||
+                        "No contact on file"}
+                    </p>
+                    {organization.primary_contact_email ? (
+                      <a
+                        href={`mailto:${organization.primary_contact_email}`}
+                        className="mt-1 block text-sm text-blue-ncs transition hover:text-white"
+                      >
+                        {organization.primary_contact_email}
+                      </a>
+                    ) : null}
+                    {organization.website_url ? (
+                      <a
+                        href={organization.website_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 block text-sm text-text-secondary transition hover:text-white"
+                      >
+                        {organization.website_url}
+                      </a>
+                    ) : null}
+                    <p className="mt-2 text-xs capitalize text-text-secondary">
+                      {organization.client_kind} client · since{" "}
+                      {formatDateTime(organization.created_at)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+                    <p className="text-xs font-medium text-text-secondary">
+                      General notes
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-primary">
+                      {organization.notes || "No general notes."}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+                  <p className="text-xs font-medium text-text-secondary">
+                    Billing arrangement
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-text-secondary">
+                    Trade agreement clients get every fix priced out;
+                    monthly-plan clients include small fixes but pay for major
+                    work. AI ticket triage uses this to flag likely-billable
+                    tickets.
+                  </p>
+                  <div className="mt-4 max-w-sm">
+                    <BillingTypeForm
                       organizationId={organization.id}
-                      noteId={note.id}
+                      currentBillingType={
+                        (organization.billing_type as BillingType | null) ||
+                        null
+                      }
                     />
                   </div>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-primary">
-                    {note.body}
-                  </p>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Activity timeline</h3>
-          <p className="mt-2 text-sm text-text-secondary">
-            Tickets, replies, status changes, and notes.
-          </p>
-          <div className="mt-5">
-            <ActivityTimeline events={activity} />
-          </div>
-        </div>
-      </section>
+              </section>
+            ),
+          },
+        ]}
+      />
     </main>
   );
 }

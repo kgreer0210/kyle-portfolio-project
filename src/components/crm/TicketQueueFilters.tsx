@@ -59,16 +59,17 @@ export default function TicketQueueFilters({
   }
 
   const selectClasses =
-    "rounded-2xl border border-penn-blue bg-rich-black px-4 py-2.5 text-sm text-text-primary";
+    "rounded-lg border border-penn-blue bg-rich-black px-4 py-2.5 text-sm text-text-primary";
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
+      <form onSubmit={handleSearchSubmit} className="flex min-w-0 max-w-full items-center gap-2">
         <input
+          aria-label="Search ticket titles"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search titles..."
-          className="w-52 rounded-2xl border border-penn-blue bg-rich-black px-4 py-2.5 text-sm text-text-primary"
+          className="w-52 min-w-0 rounded-lg border border-penn-blue bg-rich-black px-4 py-2.5 text-sm text-text-primary"
         />
         <button
           type="submit"
@@ -79,6 +80,7 @@ export default function TicketQueueFilters({
       </form>
 
       <select
+        aria-label="Ticket status"
         value={status}
         onChange={(event) => applyFilters({ status: event.target.value })}
         className={selectClasses}
@@ -92,6 +94,7 @@ export default function TicketQueueFilters({
       </select>
 
       <select
+        aria-label="Ticket priority"
         value={priority}
         onChange={(event) => applyFilters({ priority: event.target.value })}
         className={selectClasses}
@@ -105,6 +108,7 @@ export default function TicketQueueFilters({
       </select>
 
       <select
+        aria-label="Client organization"
         value={org}
         onChange={(event) => applyFilters({ org: event.target.value })}
         className={selectClasses}

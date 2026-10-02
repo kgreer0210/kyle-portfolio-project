@@ -128,13 +128,12 @@ export default async function AdminTicketsPage({
     <main className="space-y-6">
       <div className="flex flex-col gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+          <p className="text-xs font-medium text-blue-ncs">
             Admin Ticket Queue
           </p>
           <h2 className="mt-2 text-3xl font-semibold text-white">Tickets</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
-            Review client requests by most recent activity. Search, filter, and
-            jump directly into the ticket detail workflow.
+            Search and manage client conversations.
           </p>
         </div>
 
@@ -149,7 +148,7 @@ export default async function AdminTicketsPage({
       </div>
 
       {tickets.length === 0 ? (
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8 text-sm text-text-secondary">
+        <div className="admin-panel p-8 text-sm text-text-secondary">
           {q || statusFilter || priorityFilter || orgFilter
             ? "No tickets match the current filters."
             : view === "active"
@@ -157,7 +156,7 @@ export default async function AdminTicketsPage({
               : "No tickets have been submitted yet."}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-[2rem] border border-penn-blue bg-oxford-blue/80">
+        <div className="overflow-hidden admin-panel">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-penn-blue text-left text-sm">
               <thead className="bg-rich-black/40 text-text-secondary">

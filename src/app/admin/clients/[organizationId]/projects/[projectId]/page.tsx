@@ -122,13 +122,6 @@ export default async function AdminProjectPage({
         </p>
       ) : null}
 
-      {contextEnabled() ? (
-        <ProjectContextPanel
-          projectId={projectId}
-          websiteUrl={organization.website_url}
-        />
-      ) : null}
-
       <ProjectEditor
         project={bundle.project}
         milestones={bundle.milestones}
@@ -138,41 +131,51 @@ export default async function AdminProjectPage({
         sowFileUrl={sowFileUrl}
         sowFileName={sowRecord?.file_name ?? null}
         outOfScope={outOfScope}
+        context={
+          contextEnabled() ? (
+            <ProjectContextPanel
+              projectId={projectId}
+              websiteUrl={organization.website_url}
+            />
+          ) : undefined
+        }
+        updates={
+          <ProjectUpdatesPanel
+            projectId={bundle.project.id}
+            updates={(updates || []) as ProjectUpdateItem[]}
+          />
+        }
+        tickets={
+          <section className="admin-panel p-6">
+            <h3 className="text-xl font-semibold text-white">
+              Tickets on this project
+            </h3>
+            {projectTickets.length === 0 ? (
+              <p className="mt-4 text-sm text-text-secondary">
+                No tickets linked yet.
+              </p>
+            ) : (
+              <div className="mt-5 space-y-3">
+                {projectTickets.map((ticket) => (
+                  <Link
+                    key={ticket.id}
+                    href={`/admin/tickets/${ticket.id}`}
+                    className="flex flex-col gap-2 rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
+                      <p className="font-semibold text-white">{ticket.title}</p>
+                      <p className="mt-1 text-sm text-text-secondary">
+                        Last activity {formatDateTime(ticket.last_activity_at)}
+                      </p>
+                    </div>
+                    <StatusBadge status={ticket.status} />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        }
       />
-
-      <ProjectUpdatesPanel
-        projectId={bundle.project.id}
-        updates={(updates || []) as ProjectUpdateItem[]}
-      />
-
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-        <h3 className="text-xl font-semibold text-white">
-          Tickets on this project
-        </h3>
-        {projectTickets.length === 0 ? (
-          <p className="mt-4 text-sm text-text-secondary">
-            No tickets linked yet.
-          </p>
-        ) : (
-          <div className="mt-5 space-y-3">
-            {projectTickets.map((ticket) => (
-              <Link
-                key={ticket.id}
-                href={`/admin/tickets/${ticket.id}`}
-                className="flex flex-col gap-2 rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs md:flex-row md:items-center md:justify-between"
-              >
-                <div>
-                  <p className="font-semibold text-white">{ticket.title}</p>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    Last activity {formatDateTime(ticket.last_activity_at)}
-                  </p>
-                </div>
-                <StatusBadge status={ticket.status} />
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
     </main>
   );
 }

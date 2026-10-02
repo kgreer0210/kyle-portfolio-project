@@ -100,7 +100,7 @@ export default function ProjectUpdatesPanel({
   const busy = status !== "idle";
 
   return (
-    <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+    <section className="admin-panel p-6">
       <h3 className="text-xl font-semibold text-white">Updates</h3>
       <p className="mt-2 text-sm text-text-secondary">
         {updates[0]
