@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Particles, { homepageParticleProps } from "@/Particles/Particles";
 
 const steps = [
   {
@@ -30,9 +31,12 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className="scroll-mt-24 border-y border-white/10 bg-oxford-blue py-20 md:py-28"
+      className="relative isolate scroll-mt-24 overflow-hidden border-y border-white/10 bg-oxford-blue py-20 md:py-28"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+        <Particles {...homepageParticleProps} className="opacity-50" />
+      </div>
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
         <motion.header
           className="max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
@@ -59,7 +63,7 @@ export default function HowItWorks() {
           {steps.map((step, index) => (
             <motion.li
               key={step.number}
-              className="flex flex-col gap-3.5 rounded-2xl border border-white/10 bg-white/3 p-7"
+              className="relative flex flex-col gap-3.5 rounded-2xl border border-white/10 bg-[#0c1830] p-7"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.08 }}

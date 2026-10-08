@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import Particles from "@/Particles/Particles";
+import Particles, { homepageParticleProps } from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 import ChatWidget from "@/components/ChatWidget";
 
@@ -31,20 +31,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <Particles
-          particleCount={1000}
-          particleSpread={22}
-          speed={1}
-          particleColors={["#0094c6", "#005e7c", "#001242", "#e0e6f0", "#a8b2d1"]}
-          moveParticlesOnHover={true}
-          particleHoverFactor={1}
-          alphaParticles={true}
-          particleBaseSize={500}
-          sizeRandomness={0.8}
-          cameraDistance={25}
-          disableRotation={true}
-          className="opacity-50 pointer-events-auto"
-        />
+        <Particles {...homepageParticleProps} />
       </div>
 
       <Header />
