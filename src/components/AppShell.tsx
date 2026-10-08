@@ -30,8 +30,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <Particles {...homepageParticleProps} />
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        aria-hidden="true"
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(148deg,var(--color-penn-blue)_14%,#03203a_54%,var(--color-rich-black)_86%)]" />
+        <Particles
+          {...homepageParticleProps}
+          className="pointer-events-none opacity-50"
+        />
       </div>
 
       <Header />

@@ -32,7 +32,7 @@ export const homepageParticleProps: ParticlesProps = {
   sizeRandomness: 0.8,
   cameraDistance: 25,
   disableRotation: true,
-  className: "opacity-50 pointer-events-auto",
+  className: "pointer-events-none opacity-50",
 };
 
 const hexToRgb = (hex: string): [number, number, number] => {
@@ -132,6 +132,7 @@ const Particles: React.FC<ParticlesProps> = ({
 
     const renderer = new Renderer({ depth: false, alpha: true });
     const gl = renderer.gl;
+    gl.canvas.style.pointerEvents = "none";
     container.appendChild(gl.canvas);
     gl.clearColor(0, 0, 0, 0);
 

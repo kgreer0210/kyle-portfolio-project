@@ -64,7 +64,7 @@ export default function HomeClient() {
         </section>
 
         {/* Services Summary */}
-        <section className="py-20 border-t border-penn-blue/30">
+        <section className="py-20">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
@@ -117,7 +117,7 @@ export default function HomeClient() {
         </section>
 
         {/* Tech Stack Review Spotlight */}
-        <section className="py-20 border-t border-penn-blue/30">
+        <section className="py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -193,7 +193,7 @@ export default function HomeClient() {
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Featured Projects */}
-        <section className="py-20 border-t border-penn-blue/30">
+        <section className="py-20">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
@@ -265,14 +265,14 @@ export default function HomeClient() {
         </section>
 
         {/* Testimonials */}
-        <section className="py-20 border-t border-penn-blue/30">
+        <section className="py-20">
           <Testimonials />
         </section>
 
         {/* Final CTA */}
-        <section className="py-20 border-t border-penn-blue/30 text-center">
+        <section className="py-20 text-center">
           <motion.div
-            className="bg-linear-to-br from-oxford-blue to-rich-black p-12 md:p-20 rounded-[3rem] border border-blue-ncs/20 shadow-2xl relative overflow-hidden"
+            className="relative overflow-hidden rounded-[3rem] border border-blue-ncs/20 bg-oxford-blue/70 p-12 shadow-2xl backdrop-blur-sm md:p-20"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}

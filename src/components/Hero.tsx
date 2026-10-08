@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import Particles, { homepageParticleProps } from "@/Particles/Particles";
 import { projects } from "../data/projects";
 
 const MotionLink = motion.create(Link);
@@ -23,15 +22,12 @@ const lexisProject = projects.find(
 export default function Hero() {
   return (
     <motion.section
-      className="relative isolate overflow-hidden bg-[linear-gradient(148deg,var(--color-penn-blue)_14%,#03203a_54%,var(--color-rich-black)_86%)] px-4 pt-32 pb-16 sm:px-6 md:pt-40 md:pb-24 xl:pb-28"
+      className="px-4 pt-32 pb-16 sm:px-6 md:pt-40 md:pb-24 xl:pb-28"
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.15 }}
     >
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <Particles {...homepageParticleProps} className="opacity-50" />
-      </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-12 xl:flex-row xl:items-center xl:gap-16">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 xl:flex-row xl:items-center xl:gap-16">
         <div className="flex w-full max-w-[620px] flex-col items-start gap-7 xl:max-w-none xl:flex-1">
           <motion.p
             className="inline-flex items-center gap-2 rounded-full border border-blue-ncs/35 bg-blue-ncs/10 py-2 pr-4 pl-3.5 font-mono text-xs font-medium tracking-[0.08em] text-[#7fd3f0]! uppercase"

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import Particles, { homepageParticleProps } from "@/Particles/Particles";
 
 const steps = [
   {
@@ -31,13 +30,10 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className="relative isolate scroll-mt-24 overflow-hidden border-y border-white/10 bg-oxford-blue py-20 md:py-28"
+      className="scroll-mt-24 py-20 md:py-28"
     >
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <Particles {...homepageParticleProps} className="opacity-50" />
-      </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
-        <motion.header
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
+        <motion.div
           className="max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +53,7 @@ export default function HowItWorks() {
             A simple, collaborative process built around how your business
             actually works.
           </p>
-        </motion.header>
+        </motion.div>
 
         <ol className="grid list-none grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
           {steps.map((step, index) => (

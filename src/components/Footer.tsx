@@ -7,7 +7,7 @@ const currentYear = new Date().getFullYear();
 export default function Footer() {
   return (
     <motion.footer
-      className="bg-oxford-blue/80 backdrop-blur-sm border-t border-penn-blue py-6 md:py-8 mt-12 md:mt-20"
+      className="mt-12 border-t border-white/10 bg-transparent! py-6 md:mt-20 md:py-8"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
