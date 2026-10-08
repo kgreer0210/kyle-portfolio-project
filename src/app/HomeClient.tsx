@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Hero, Testimonials } from "../components";
+import { Hero, HowItWorks, Testimonials } from "../components";
 import { projects } from "../data/projects";
 import { services } from "../data/services";
 
@@ -41,7 +41,8 @@ export default function HomeClient() {
         <Hero />
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <main className="relative z-10">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Value Proposition / Intro */}
         <section className="py-20 text-center">
           <motion.div
@@ -186,7 +187,11 @@ export default function HomeClient() {
             </motion.div>
           </div>
         </section>
+        </div>
 
+        <HowItWorks />
+
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Featured Projects */}
         <section className="py-20 border-t border-penn-blue/30">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
@@ -306,6 +311,7 @@ export default function HomeClient() {
             </div>
           </motion.div>
         </section>
+        </div>
       </main>
     </motion.div>
   );

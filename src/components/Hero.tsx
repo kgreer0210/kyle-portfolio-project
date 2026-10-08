@@ -1,140 +1,153 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
+import { projects } from "../data/projects";
+
+const MotionLink = motion.create(Link);
+
+const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
+
+const serviceHighlights = [
+  "Conversion-focused websites",
+  "Web & mobile apps",
+  "Automation & integrations",
+];
+
+const lexisProject = projects.find(
+  (project) => project.id === "lexisFreshSlateCleanings",
+);
 
 export default function Hero() {
-  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
-
-  const serviceChips = [
-    "Conversion-focused websites",
-    "Web & mobile apps",
-    "Automation & integrations",
-  ];
-
   return (
     <motion.section
-      className="min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-32 pb-20"
-      initial={{ opacity: 0, y: 50 }}
+      className="relative overflow-hidden bg-[linear-gradient(148deg,var(--color-penn-blue)_14%,#03203a_54%,var(--color-rich-black)_86%)] px-4 pt-32 pb-16 sm:px-6 md:pt-40 md:pb-24 xl:pb-28"
+      initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.3 }}
+      transition={{ duration: 0.6, delay: 0.15 }}
     >
-      {/* Main heading section */}
-      <motion.div
-        className="flex flex-col justify-center items-center w-full mb-12"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
-        {/* Company Name */}
-        <motion.h1
-          className="text-4xl sm:text-5xl md:text-7xl font-bold text-text-headings mb-4 md:mb-5 drop-shadow-lg px-2"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          KYGR Solutions
-        </motion.h1>
-
-        <motion.p
-          className="text-lg sm:text-xl md:text-2xl text-blue-ncs font-semibold mb-4 md:mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-        >
-          Websites, web & mobile apps, and automations for businesses ready to grow
-        </motion.p>
-
-        {/* Strategic Tagline */}
-        <motion.div
-          className="mb-6 md:mb-8 w-full px-2 flex justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }} // Faster timing
-        >
-          <motion.pre
-            className="text-sm sm:text-lg md:text-xl lg:text-2xl font-mono text-blue-ncs bg-background-secondary px-3 sm:px-4 md:px-5 lg:px-6 py-2 sm:py-3 rounded-lg border border-blue-ncs/20 shadow-lg overflow-x-auto max-w-full md:max-w-2xl lg:max-w-3xl mx-auto"
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 10px 25px rgba(0, 94, 124, 0.2)",
-            }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 xl:flex-row xl:items-center xl:gap-16">
+        <div className="flex w-full max-w-[620px] flex-col items-start gap-7 xl:max-w-none xl:flex-1">
+          <motion.p
+            className="inline-flex items-center gap-2 rounded-full border border-blue-ncs/35 bg-blue-ncs/10 py-2 pr-4 pl-3.5 font-mono text-xs font-medium tracking-[0.08em] text-[#7fd3f0]! uppercase"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
           >
-            <motion.span
-              className="text-lapis-lazuli font-semibold"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 1.4 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              Strategic Software & Automation Partner
-            </motion.span>
-          </motion.pre>
-        </motion.div>
-
-        {/* Quick service chips */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-2 mb-6 md:mb-8 px-2"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.5 }}
-        >
-          {serviceChips.map((chip) => (
             <span
-              key={chip}
-              className="px-3 py-2 rounded-full bg-penn-blue/60 text-text-primary text-xs sm:text-sm border border-blue-ncs/30"
+              className="size-2 shrink-0 rounded-full bg-[#7fd3f0]"
+              aria-hidden="true"
+            />
+            Strategic Software & Automation Partner
+          </motion.p>
+
+          <motion.h1
+            className="text-4xl leading-[1.08] font-bold tracking-tight text-balance text-text-headings! sm:text-5xl xl:text-6xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.35 }}
+          >
+            Websites, web & mobile apps, and automations for businesses ready
+            to grow
+          </motion.h1>
+
+          <motion.p
+            className="max-w-[580px] text-base leading-relaxed text-text-secondary! sm:text-lg"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.45 }}
+          >
+            We help businesses convert more visitors, streamline operations, and
+            reclaim time with custom websites, modern web/mobile apps, and
+            practical automations — whether you&apos;re down the street or
+            across the country.
+          </motion.p>
+
+          <motion.div
+            className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.55 }}
+          >
+            <MotionLink
+              href={consultLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {chip}
-            </span>
-          ))}
-        </motion.div>
+              Book a 30-min call
+              <span className="sr-only"> (opens in a new tab)</span>
+            </MotionLink>
+            <MotionLink
+              href="/contact"
+              className="inline-flex w-full items-center justify-center rounded-[10px] border border-white/25 bg-transparent px-7 py-4 text-center text-base font-semibold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Send us an email
+            </MotionLink>
+          </motion.div>
 
-        <motion.p
-          className="text-base sm:text-lg md:text-xl text-text-secondary mb-6 md:mb-8 max-w-2xl mx-auto drop-shadow-md px-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.8 }}
-        >
-          We help businesses convert more visitors, streamline operations, and
-          reclaim time with custom websites, modern web/mobile apps, and
-          practical automations — whether you&apos;re down the street or across
-          the country.
-        </motion.p>
-      </motion.div>
+          <motion.ul
+            className="flex flex-wrap gap-x-6 gap-y-3"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.65 }}
+          >
+            {serviceHighlights.map((highlight) => (
+              <li
+                key={highlight}
+                className="flex items-center gap-2.5 text-sm font-medium text-text-primary"
+              >
+                <span
+                  className="size-1.5 shrink-0 rounded-full bg-blue-ncs"
+                  aria-hidden="true"
+                />
+                {highlight}
+              </li>
+            ))}
+          </motion.ul>
+        </div>
 
-      {/* Button section */}
-      <motion.div
-        className="flex gap-3 sm:gap-4 justify-center flex-col sm:flex-row mb-12 md:mb-16 w-full px-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 2.0 }}
-      >
-        <Link
-          href={consultLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full sm:w-auto"
-        >
-          <motion.button
-            className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-blue-ncs text-white rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl text-center"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        {lexisProject ? (
+          <motion.figure
+            className="w-full max-w-[620px] overflow-hidden rounded-2xl border border-white/10 bg-[#0a1824] shadow-[0_24px_64px_rgba(0,148,198,0.25)] xl:w-[516px] xl:max-w-[516px] xl:shrink-0"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.35 }}
           >
-            Book a 30-min call
-          </motion.button>
-        </Link>
-        <Link href="/contact" className="w-full sm:w-auto">
-          <motion.button
-            className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-blue-ncs text-blue-ncs hover:bg-penn-blue hover:text-white rounded-lg font-medium text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            Send us an email
-          </motion.button>
-        </Link>
-      </motion.div>
+            <div
+              className="flex items-center gap-2 px-4 py-3"
+              aria-hidden="true"
+            >
+              <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+              <span className="size-2.5 rounded-full bg-[#febc2e]" />
+              <span className="size-2.5 rounded-full bg-[#28c840]" />
+            </div>
+            <div className="relative mx-3 h-56 overflow-hidden rounded-lg sm:h-72 xl:h-[340px]">
+              <Image
+                src={lexisProject.image}
+                alt="Screenshot of the Lexis Fresh Slate Cleanings website homepage"
+                fill
+                preload
+                sizes="(min-width: 1280px) 516px, (min-width: 640px) 620px, 100vw"
+                className="object-cover object-top"
+              />
+            </div>
+            <figcaption className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3.5 sm:px-5">
+              <span className="text-sm font-semibold text-text-headings">
+                {lexisProject.title}
+              </span>
+              <span className="text-[13px] text-text-secondary">
+                Client & staff portals
+              </span>
+            </figcaption>
+          </motion.figure>
+        ) : null}
+      </div>
     </motion.section>
   );
 }
