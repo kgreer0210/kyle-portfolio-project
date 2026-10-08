@@ -20,6 +20,21 @@ interface ParticlesProps {
 
 const defaultColors: string[] = ["#ffffff", "#ffffff", "#ffffff"];
 
+export const homepageParticleProps: ParticlesProps = {
+  particleCount: 1000,
+  particleSpread: 22,
+  speed: 1,
+  particleColors: ["#0094c6", "#005e7c", "#001242", "#e0e6f0", "#a8b2d1"],
+  moveParticlesOnHover: true,
+  particleHoverFactor: 1,
+  alphaParticles: true,
+  particleBaseSize: 500,
+  sizeRandomness: 0.8,
+  cameraDistance: 25,
+  disableRotation: true,
+  className: "pointer-events-none opacity-50",
+};
+
 const hexToRgb = (hex: string): [number, number, number] => {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
@@ -117,6 +132,7 @@ const Particles: React.FC<ParticlesProps> = ({
 
     const renderer = new Renderer({ depth: false, alpha: true });
     const gl = renderer.gl;
+    gl.canvas.style.pointerEvents = "none";
     container.appendChild(gl.canvas);
     gl.clearColor(0, 0, 0, 0);
 
@@ -191,12 +207,15 @@ const Particles: React.FC<ParticlesProps> = ({
 
     const particles = new Mesh(gl, { mode: gl.POINTS, geometry, program });
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
+    let running = false;
+    let visible = true;
     let lastTime = performance.now();
     let elapsed = 0;
 
-    const update = (t: number) => {
-      animationFrameId = requestAnimationFrame(update);
+    const renderFrame = (t: number) => {
+      if (!running) return;
+      animationFrameId = requestAnimationFrame(renderFrame);
       const delta = t - lastTime;
       lastTime = t;
       elapsed += delta * speed;
@@ -220,14 +239,39 @@ const Particles: React.FC<ParticlesProps> = ({
       renderer.render({ scene: particles, camera });
     };
 
-    animationFrameId = requestAnimationFrame(update);
+    const start = () => {
+      if (running) return;
+      running = true;
+      lastTime = performance.now();
+      animationFrameId = requestAnimationFrame(renderFrame);
+    };
+
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    const syncPlayback = () => {
+      if (visible && document.visibilityState !== "hidden") start();
+      else stop();
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry?.isIntersecting ?? false;
+      syncPlayback();
+    });
+    observer.observe(container);
+    document.addEventListener("visibilitychange", syncPlayback);
+    syncPlayback();
 
     return () => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", syncPlayback);
+      observer.disconnect();
       if (moveParticlesOnHover) {
         document.removeEventListener("mousemove", handleMouseMove);
       }
-      cancelAnimationFrame(animationFrameId);
+      stop();
       if (container.contains(gl.canvas)) {
         container.removeChild(gl.canvas);
       }
