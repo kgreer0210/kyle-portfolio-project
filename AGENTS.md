@@ -67,8 +67,9 @@ visitor-intent response guide. Do not rename it without updating the loader.
 
 There is no client questionnaire. An admin creates a client and project (from
 a SOW or by hand) with milestones, tasks, and "needs from client" requests. The
-portal home shows progress over client-visible tasks, the milestone timeline,
-and the requests list.
+portal home summarizes client-visible progress, outstanding requests, and
+recent updates. `/portal/projects/[projectId]` shows the milestone roadmap,
+client-visible tasks, requests, updates, and project support in separate tabs.
 
 - Pure logic: `src/lib/projects.ts` (progress, milestone state, request
   actions), `src/lib/projectDraft.ts` (draft schema and row building),
@@ -104,6 +105,28 @@ log secrets, challenges, magic links, or full authentication assertions.
 Use a new timestamped file in `supabase/migrations/` for schema changes. Do not
 rewrite an applied migration. Preserve RLS and grants, and consider both admin
 and organization-member access for CRM tables.
+
+## Client workspace
+
+`PortalNavigation` links Home, Projects, Support, and Settings. The project
+index includes completed projects. New tickets are created at
+`/portal/tickets/new`; `/portal/tickets` is searchable support history with open
+and all views. Replies stay below the conversation. Keep portal surface styling
+scoped under `.client-workspace` / `.client-panel`, and reuse request/assistant
+components instead of introducing new write paths. All project reads must use
+the signed-in client's RLS-scoped connection; never expose SOW, internal tasks,
+or admin notes in client tab content.
+
+## Admin workspace
+
+Admin navigation lives in `AdminNavigation`; the authenticated layout provides
+its persistent sidebar and compact header. `/admin/projects` lists projects
+across clients. Client profiles and project work use `WorkspaceTabs`, which
+supports keyboard navigation and retains mounted form state when changing tabs.
+Keep admin surface styles scoped under `.admin-workspace` or `.admin-panel`;
+shared portal forms must retain their client behavior. Ticket reply composition
+belongs below the conversation, with secondary editing and AI instructions
+available through disclosures.
 
 ## UI and content
 

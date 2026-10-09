@@ -76,7 +76,9 @@ export default async function AdminDashboardPage() {
       .limit(8),
     supabase
       .from("projects")
-      .select("id, title, status, created_at, organization_id, organizations(name)")
+      .select(
+        "id, title, status, created_at, organization_id, organizations(name)",
+      )
       .eq("status", "active"),
     supabase
       .from("project_updates")
@@ -86,7 +88,10 @@ export default async function AdminDashboardPage() {
   ]);
 
   const lastUpdateByProject = new Map<string, string>();
-  for (const update of (projectUpdatesData || []) as Array<{ project_id: string; sent_at: string }>) {
+  for (const update of (projectUpdatesData || []) as Array<{
+    project_id: string;
+    sent_at: string;
+  }>) {
     if (!lastUpdateByProject.has(update.project_id)) {
       lastUpdateByProject.set(update.project_id, update.sent_at);
     }
@@ -150,11 +155,17 @@ export default async function AdminDashboardPage() {
   );
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold text-white">Overview</h1>
+        <p className="mt-2 text-sm text-text-secondary">
+          Your client work, at a glance.
+        </p>
+      </div>
       <section className="grid gap-5 md:grid-cols-3">
         <Link
           href="/admin/clients"
-          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+          className="admin-panel p-6 transition hover:border-blue-ncs"
         >
           <p className="text-sm text-text-secondary">Client organizations</p>
           <p className="mt-3 text-4xl font-semibold text-white">
@@ -164,17 +175,19 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/tickets"
-          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+          className="admin-panel p-6 transition hover:border-blue-ncs"
         >
           <p className="text-sm text-text-secondary">Active tickets</p>
           <p className="mt-3 text-4xl font-semibold text-white">
             {activeTickets.length}
           </p>
-          <p className="mt-4 text-sm font-medium text-blue-ncs">Open ticket queue</p>
+          <p className="mt-4 text-sm font-medium text-blue-ncs">
+            Open ticket queue
+          </p>
         </Link>
         <Link
           href="/admin/clients"
-          className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 transition hover:border-blue-ncs"
+          className="admin-panel p-6 transition hover:border-blue-ncs"
         >
           <p className="text-sm text-text-secondary">Overdue from clients</p>
           <p className="mt-3 text-4xl font-semibold text-white">
@@ -187,7 +200,7 @@ export default async function AdminDashboardPage() {
       </section>
 
       {staleProjects.length > 0 ? (
-        <section className="rounded-[2rem] border border-amber-500/30 bg-oxford-blue/80 p-6">
+        <section className="rounded-xl border border-amber-500/30 bg-oxford-blue/80 p-6">
           <h2 className="text-xl font-semibold text-white">
             No client update in 7+ days
           </h2>
@@ -198,7 +211,9 @@ export default async function AdminDashboardPage() {
                 href={`/admin/clients/${project.organization_id}/projects/${project.id}`}
                 className="rounded-full border border-penn-blue bg-rich-black/40 px-4 py-2 text-sm text-text-primary transition hover:border-blue-ncs"
               >
-                {project.organizations?.name ? `${project.organizations.name}: ` : ""}
+                {project.organizations?.name
+                  ? `${project.organizations.name}: `
+                  : ""}
                 {project.title}
               </Link>
             ))}
@@ -206,53 +221,11 @@ export default async function AdminDashboardPage() {
         </section>
       ) : null}
 
-      {activeTickets.length > 0 ? (
-        <section className="grid gap-5 md:grid-cols-2">
-          <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-            <h2 className="text-xl font-semibold text-white">By status</h2>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              {activeTicketStatuses.map((status) => (
-                <Link
-                  key={status}
-                  href={`/admin/tickets?status=${status}`}
-                  className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
-                >
-                  <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                    {ticketStatusLabels[status]}
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">
-                    {statusCounts.get(status) || 0}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-            <h2 className="text-xl font-semibold text-white">By priority</h2>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              {[...ticketPriorities].reverse().map((priority) => (
-                <Link
-                  key={priority}
-                  href={`/admin/tickets?priority=${priority}`}
-                  className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
-                >
-                  <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                    {ticketPriorityLabels[priority]}
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">
-                    {priorityCounts.get(priority) || 0}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h2 className="text-xl font-semibold text-white">Awaiting your reply</h2>
+        <div className="admin-panel p-6">
+          <h2 className="text-xl font-semibold text-white">
+            Awaiting your reply
+          </h2>
           <p className="mt-2 text-sm text-text-secondary">
             New and open tickets, oldest activity first.
           </p>
@@ -266,7 +239,7 @@ export default async function AdminDashboardPage() {
                 <Link
                   key={ticket.id}
                   href={`/admin/tickets/${ticket.id}`}
-                  className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                  className="block rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
@@ -287,7 +260,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+        <div className="admin-panel p-6">
           <h2 className="text-xl font-semibold text-white">Recent activity</h2>
           <p className="mt-2 text-sm text-text-secondary">
             The latest messages across every ticket.
@@ -310,7 +283,7 @@ export default async function AdminDashboardPage() {
                   <Link
                     key={message.id}
                     href={`/admin/tickets/${message.ticket_id}`}
-                    className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                    className="block rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <p className="font-semibold text-white">
@@ -337,8 +310,10 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h2 className="text-xl font-semibold text-white">Clients with open work</h2>
+        <div className="admin-panel p-6">
+          <h2 className="text-xl font-semibold text-white">
+            Clients with open work
+          </h2>
           <div className="mt-5 space-y-3">
             {rollupList.length === 0 ? (
               <p className="text-sm text-text-secondary">
@@ -349,13 +324,14 @@ export default async function AdminDashboardPage() {
                 <Link
                   key={organizationId}
                   href={`/admin/clients/${organizationId}`}
-                  className="block rounded-3xl border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                  className="block rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="font-semibold text-white">{rollup.name}</p>
                       <p className="mt-1 text-sm text-text-secondary">
-                        {rollup.count} active ticket{rollup.count === 1 ? "" : "s"}
+                        {rollup.count} active ticket
+                        {rollup.count === 1 ? "" : "s"}
                       </p>
                     </div>
                     <PriorityBadge priority={rollup.worstPriority} />
@@ -366,7 +342,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
+        <div className="admin-panel p-6">
           <h2 className="text-xl font-semibold text-white">Fast actions</h2>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -390,6 +366,59 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </section>
+      <details className="admin-panel p-5">
+        <summary className="cursor-pointer text-sm font-medium text-text-secondary">
+          Ticket breakdown by status and priority
+        </summary>
+        <div className="mt-5">
+          {" "}
+          {activeTickets.length > 0 ? (
+            <section className="grid gap-5 md:grid-cols-2">
+              <div className="admin-panel p-6">
+                <h2 className="text-xl font-semibold text-white">By status</h2>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {activeTicketStatuses.map((status) => (
+                    <Link
+                      key={status}
+                      href={`/admin/tickets?status=${status}`}
+                      className="rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                    >
+                      <p className="text-xs font-medium text-text-secondary">
+                        {ticketStatusLabels[status]}
+                      </p>
+                      <p className="mt-2 text-2xl font-semibold text-white">
+                        {statusCounts.get(status) || 0}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className="admin-panel p-6">
+                <h2 className="text-xl font-semibold text-white">
+                  By priority
+                </h2>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {[...ticketPriorities].reverse().map((priority) => (
+                    <Link
+                      key={priority}
+                      href={`/admin/tickets?priority=${priority}`}
+                      className="rounded-lg border border-penn-blue bg-rich-black/40 p-4 transition hover:border-blue-ncs"
+                    >
+                      <p className="text-xs font-medium text-text-secondary">
+                        {ticketPriorityLabels[priority]}
+                      </p>
+                      <p className="mt-2 text-2xl font-semibold text-white">
+                        {priorityCounts.get(priority) || 0}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          ) : null}
+        </div>
+      </details>
     </main>
   );
 }

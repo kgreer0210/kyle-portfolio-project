@@ -180,3 +180,46 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--blue-ncs);
 }
+
+/* Admin workspace: quieter surfaces and consistent focus treatment. */
+.admin-panel {
+  border: 1px solid var(--penn-blue);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--oxford-blue) 25%, var(--rich-black));
+}
+.admin-workspace :is(button, a, input, select, textarea, summary, [role="tabpanel"]):focus-visible {
+  outline: 2px solid var(--blue-ncs);
+  outline-offset: 3px;
+}
+.admin-workspace :is(input, select, textarea) { max-width: 100%; }
+.admin-workspace table { width: 100%; }
+.admin-workspace th { white-space: nowrap; font-size: 0.75rem; }
+.admin-workspace tbody tr:hover { background: color-mix(in srgb, var(--blue-ncs) 5%, transparent); }
+.admin-workspace [hidden] { display: none !important; }
+
+.admin-workspace :is(input, select, textarea, button) { border-radius: 0.5rem; }
+.admin-workspace :is(h1, h2) { overflow-wrap: anywhere; }
+.admin-workspace p, .admin-workspace a { overflow-wrap: break-word; }
+
+/* Client portal: readable project and support surfaces. */
+.client-panel {
+  border: 1px solid var(--penn-blue);
+  border-radius: 0.875rem;
+  background: color-mix(in srgb, var(--oxford-blue) 25%, var(--rich-black));
+}
+.client-primary, .client-secondary {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 0.5rem; padding: 0.625rem 1rem;
+  font-size: 0.875rem; font-weight: 600; transition: background 150ms, border-color 150ms;
+}
+.client-primary { background: var(--blue-ncs); color: white; }
+.client-primary:hover { background: var(--lapis-lazuli); }
+.client-secondary { border: 1px solid var(--penn-blue); color: var(--text-primary); }
+.client-secondary:hover { border-color: var(--blue-ncs); }
+.client-workspace :is(button, a, input, select, textarea, summary, [role="tabpanel"]):focus-visible { outline: 2px solid var(--blue-ncs); outline-offset: 3px; }
+.client-workspace :is(input, select, textarea, button) { border-radius: 0.5rem; max-width: 100%; }
+.client-workspace :is(h1, h2, h3, p, a) { overflow-wrap: anywhere; }
+.client-workspace [hidden] { display: none !important; }
+.client-workspace [role="tab"] { border-radius: 0; }
+.client-workspace .rounded-3xl { border-radius: 0.75rem; }
+.client-workspace [role="progressbar"] { background: var(--penn-blue); }

@@ -138,35 +138,40 @@ export default function TicketReplyForm({
       ) : null}
 
       {allowAiDraft ? (
-        <div className="space-y-2 rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-          <label
-            htmlFor={`reply-instructions-${ticketId}`}
-            className="text-sm font-medium text-text-primary"
-          >
+        <details className="rounded-lg border border-penn-blue p-3">
+          <summary className="cursor-pointer text-sm font-medium text-blue-ncs">
             Draft with AI
-          </label>
-          <input
-            id={`reply-instructions-${ticketId}`}
-            value={instructions}
-            onChange={(event) => setInstructions(event.target.value)}
-            maxLength={1000}
-            placeholder="Optional steer, e.g. “fixed and deployed, ask them to confirm”"
-            className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-2.5 text-sm"
-          />
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => void handleDraft()}
-              disabled={isDrafting || isSubmitting}
-              className="rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs disabled:cursor-not-allowed disabled:opacity-60"
+          </summary>
+          <div className="mt-3 space-y-3">
+            <label
+              htmlFor={`reply-instructions-${ticketId}`}
+              className="text-sm font-medium text-text-primary"
             >
-              {isDrafting ? "Drafting..." : "Draft reply"}
-            </button>
-            <p className="text-xs text-text-secondary">
-              Uses the thread, internal notes, and project scope. Review before sending.
-            </p>
+              Instructions for the draft
+            </label>
+            <input
+              id={`reply-instructions-${ticketId}`}
+              value={instructions}
+              onChange={(event) => setInstructions(event.target.value)}
+              maxLength={1000}
+              placeholder="Optional steer, e.g. “fixed and deployed, ask them to confirm”"
+              className="w-full rounded-2xl border border-penn-blue bg-rich-black px-4 py-2.5 text-sm"
+            />
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void handleDraft()}
+                disabled={isDrafting || isSubmitting}
+                className="rounded-full border border-penn-blue px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-blue-ncs disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDrafting ? "Drafting..." : "Draft reply"}
+              </button>
+              <p className="text-xs text-text-secondary">
+                Uses the thread, internal notes, and project scope. Review before sending.
+              </p>
+            </div>
           </div>
-        </div>
+        </details>
       ) : null}
 
       <div className="space-y-2">
