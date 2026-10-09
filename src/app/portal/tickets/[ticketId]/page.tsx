@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import AttachmentChip from "@/components/crm/AttachmentChip";
 import PriorityBadge from "@/components/crm/PriorityBadge";
@@ -5,7 +6,10 @@ import StatusBadge from "@/components/crm/StatusBadge";
 import TicketReplyForm from "@/components/crm/TicketReplyForm";
 import { createSignedAttachmentUrls } from "@/lib/ticket-attachments";
 import { formatCurrency, formatDateTime } from "@/lib/crm";
-import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
+import {
+  requireClientUser,
+  getPrimaryOrganizationMembership,
+} from "@/lib/auth";
 import {
   getTicketAuthorLabel,
   resolveTicketAuthorNames,
@@ -90,17 +94,21 @@ export default async function PortalTicketDetailPage({
   const rootAttachments = signedAttachments.filter((item) => !item.message_id);
 
   return (
-    <main className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="mx-auto max-w-3xl space-y-6">
+      <Link
+        href="/portal/tickets"
+        className="inline-flex text-sm text-text-secondary hover:text-white"
+      >
+        ← Your support tickets
+      </Link>
       <section className="space-y-6">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
+        <div className="client-panel p-6 md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-                {ticket.type}
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold text-white">
+              <p className="text-xs font-medium text-blue-ncs">{ticket.type}</p>
+              <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
                 {ticket.title}
-              </h2>
+              </h1>
             </div>
             <div className="flex flex-col items-start gap-2 md:items-end">
               <StatusBadge status={ticket.status} />
@@ -113,18 +121,18 @@ export default async function PortalTicketDetailPage({
             </div>
           </div>
 
-          <div className="mt-6 rounded-3xl border border-penn-blue bg-rich-black/40 p-5">
+          <div className="mt-6 rounded-lg border border-penn-blue bg-rich-black/40 p-5">
             <p className="whitespace-pre-wrap text-sm leading-7 text-text-primary">
               {ticket.description}
             </p>
-            <p className="mt-4 text-xs uppercase tracking-[0.18em] text-text-secondary">
+            <p className="mt-4 text-xs font-medium text-text-secondary">
               Opened {formatDateTime(ticket.created_at)}
             </p>
           </div>
 
           {ticket.cost_amount !== null && ticket.cost_amount !== undefined ? (
-            <div className="mt-5 rounded-3xl border border-penn-blue bg-rich-black/40 p-5">
-              <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+            <div className="mt-5 rounded-lg border border-penn-blue bg-rich-black/40 p-5">
+              <p className="text-xs font-medium text-text-secondary">
                 Cost for this work
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">
@@ -143,54 +151,53 @@ export default async function PortalTicketDetailPage({
         </div>
 
         <div className="space-y-4">
-          {(messages || []).map((message) => {
-            const authorLabel = getTicketAuthorLabel({
-              authorId: message.author_id,
-              isSystem: message.is_system,
-              names: authorNames,
-            });
-            const inlineAttachments = signedAttachments.filter(
-              (attachment) => attachment.message_id === message.id,
-            );
+          {(messages || [])
+            .filter((message) => message.visibility === "public")
+            .map((message) => {
+              const authorLabel = getTicketAuthorLabel({
+                authorId: message.author_id,
+                isSystem: message.is_system,
+                names: authorNames,
+              });
+              const inlineAttachments = signedAttachments.filter(
+                (attachment) => attachment.message_id === message.id,
+              );
 
-            return (
-              <div
-                key={message.id}
-                className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6"
-              >
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-semibold text-white">{authorLabel}</p>
+              return (
+                <div key={message.id} className="client-panel p-6">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="font-semibold text-white">{authorLabel}</p>
+                    </div>
+                    <p className="text-sm text-text-secondary">
+                      {formatDateTime(message.created_at)}
+                    </p>
                   </div>
-                  <p className="text-sm text-text-secondary">
-                    {formatDateTime(message.created_at)}
+                  <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-text-primary">
+                    {message.body}
                   </p>
+                  {inlineAttachments.length > 0 ? (
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {inlineAttachments.map((attachment) => (
+                        <AttachmentChip
+                          key={attachment.id}
+                          attachment={attachment}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-text-primary">
-                  {message.body}
-                </p>
-                {inlineAttachments.length > 0 ? (
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {inlineAttachments.map((attachment) => (
-                      <AttachmentChip
-                        key={attachment.id}
-                        attachment={attachment}
-                      />
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </section>
 
-      <aside className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-        <h3 className="text-xl font-semibold text-white">Reply</h3>
+      <section className="client-panel p-5 sm:p-6">
+        <h2 className="text-lg font-semibold text-white">Reply to Kyle</h2>
         <div className="mt-5">
           <TicketReplyForm ticketId={ticket.id} />
         </div>
-      </aside>
+      </section>
     </main>
   );
 }

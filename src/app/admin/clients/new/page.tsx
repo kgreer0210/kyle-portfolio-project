@@ -4,7 +4,7 @@ export default function AdminCreateClientPage() {
   return (
     <main className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+        <p className="text-xs font-medium text-blue-ncs">
           New Client
         </p>
         <h2 className="mt-2 text-3xl font-semibold text-white">

@@ -9,7 +9,7 @@ import {
 } from "@/lib/crm";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { uploadTicketAttachments } from "@/lib/ticket-attachments";
-import { loadProjectScope, pickAutoProjectId } from "@/lib/ticketProjects";
+import { loadProjectScope, resolveTicketProjectId } from "@/lib/ticketProjects";
 import {
   assessBillability,
   formatTriageNote,
@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
     const clientCategory: TicketCategory | null = null;
     const title = String(formData.get("title") || "").trim();
     const description = String(formData.get("description") || "").trim();
+    const requestedProjectId = formData.get("projectId");
     const files = formData
       .getAll("attachments")
       .filter((entry): entry is File => entry instanceof File && entry.size > 0);
@@ -169,7 +170,8 @@ export async function POST(request: NextRequest) {
       .from("projects")
       .select("id, status")
       .eq("organization_id", context.membership.organization_id);
-    const projectId = pickAutoProjectId(
+    const projectId = resolveTicketProjectId(
+      typeof requestedProjectId === "string" ? requestedProjectId : null,
       (orgProjects || []) as Array<{ id: string; status: string }>,
     );
 

@@ -1,90 +1,168 @@
 import Link from "next/link";
-import NewTicketForm from "@/components/crm/NewTicketForm";
-import PriorityBadge from "@/components/crm/PriorityBadge";
 import StatusBadge from "@/components/crm/StatusBadge";
-import { formatDateTime } from "@/lib/crm";
-import { requireClientUser, getPrimaryOrganizationMembership } from "@/lib/auth";
-import type { TicketPriority, TicketStatus } from "@/types/crm";
+import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
+import { firstParam } from "@/lib/searchParams";
+import {
+  requireClientUser,
+  getPrimaryOrganizationMembership,
+} from "@/lib/auth";
+import type { TicketStatus } from "@/types/crm";
 
-export default async function PortalTicketsPage() {
+interface SupportTicket {
+  id: string;
+  title: string;
+  type: "request" | "issue";
+  status: TicketStatus;
+  last_activity_at: string;
+}
+
+export default async function PortalTicketsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string | string[]; q?: string | string[] }>;
+}) {
   const { supabase, user } = await requireClientUser();
   const membership = await getPrimaryOrganizationMembership(user.id, supabase);
-
-  if (!membership?.organizations) {
+  if (!membership?.organizations)
     return (
-      <main className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8">
-        <p className="text-sm text-text-secondary">
-          Your account is not connected to an organization yet.
-        </p>
+      <main className="client-panel p-6">
+        Your account is not connected to an organization yet. Contact Kyle for
+        help.
       </main>
     );
-  }
-
-  const { data } = await supabase
+  const params = await searchParams;
+  const view = firstParam(params.view) === "all" ? "all" : "active";
+  const q = firstParam(params.q).trim();
+  let query = supabase
     .from("tickets")
-    .select("id, title, type, status, priority, created_at")
+    .select("id, title, type, status, last_activity_at")
     .eq("organization_id", membership.organization_id)
-    .order("created_at", { ascending: false });
-
-  const tickets = (data || []) as Array<{
-    id: string;
-    title: string;
-    type: "request" | "issue";
-    status: TicketStatus;
-    priority: TicketPriority;
-    created_at?: string;
-  }>;
-
+    .order("last_activity_at", { ascending: false });
+  if (view === "active") query = query.in("status", activeTicketStatuses);
+  if (q)
+    query = query.ilike(
+      "title",
+      `%${q.replace(/[\\%_]/g, (match) => `\\${match}`)}%`,
+    );
+  const { data: tickets, error } = await query.returns<SupportTicket[]>();
+  if (error)
+    throw new Error("Unable to load your support tickets.", { cause: error });
+  const searchSuffix = q ? `&q=${encodeURIComponent(q)}` : "";
   return (
-    <main className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
+    <main className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-            New Ticket
+          <h1 className="text-3xl font-semibold text-white">Support</h1>
+          <p className="mt-2 text-sm leading-6 text-text-secondary">
+            Your questions, requests, and conversations with Kyle.
           </p>
-          <h3 className="mt-2 text-2xl font-semibold text-white">
-            Start a support thread
-          </h3>
         </div>
-        <div className="mt-6">
-          <NewTicketForm />
-        </div>
-      </section>
-
-      <section className="space-y-6">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-            Recent Activity
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Your tickets</h2>
-        </div>
-
-        <div className="divide-y divide-penn-blue overflow-hidden rounded-[2rem] border border-penn-blue bg-oxford-blue/80">
-          {tickets.length === 0 ? (
-            <p className="p-6 text-sm leading-6 text-text-secondary">
-              No tickets yet. Use the form to create your first request or issue.
-            </p>
-          ) : (
-            tickets.map((ticket) => (
+        <Link href="/portal/tickets/new" className="client-primary">
+          New ticket
+        </Link>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <nav
+          aria-label="Support views"
+          className="flex rounded-lg border border-penn-blue p-1"
+        >
+          <Link
+            href={`/portal/tickets?view=active${searchSuffix}`}
+            aria-current={view === "active" ? "page" : undefined}
+            className={`rounded-md px-4 py-2 text-sm ${view === "active" ? "bg-blue-ncs/15 text-white" : "text-text-secondary"}`}
+          >
+            Open tickets
+          </Link>
+          <Link
+            href={`/portal/tickets?view=all${searchSuffix}`}
+            aria-current={view === "all" ? "page" : undefined}
+            className={`rounded-md px-4 py-2 text-sm ${view === "all" ? "bg-blue-ncs/15 text-white" : "text-text-secondary"}`}
+          >
+            All tickets
+          </Link>
+        </nav>
+        <form
+          action="/portal/tickets"
+          className="flex min-w-0 max-w-full gap-2"
+        >
+          <input type="hidden" name="view" value={view} />
+          <label htmlFor="support-search" className="sr-only">
+            Search your tickets
+          </label>
+          <input
+            id="support-search"
+            name="q"
+            defaultValue={q}
+            placeholder="Search your tickets…"
+            className="min-w-0 rounded-lg border border-penn-blue bg-rich-black px-3 py-2 text-sm"
+          />
+          <button type="submit" className="client-secondary">
+            Search
+          </button>
+          {q ? (
+            <Link
+              href={`/portal/tickets?view=${view}`}
+              className="self-center text-sm text-text-secondary"
+            >
+              Clear
+            </Link>
+          ) : null}
+        </form>
+      </div>
+      <section
+        className="client-panel overflow-hidden"
+        aria-label="Your support tickets"
+      >
+        {tickets?.length ? (
+          <div className="divide-y divide-penn-blue">
+            {tickets.map((ticket) => (
               <Link
                 key={ticket.id}
                 href={`/portal/tickets/${ticket.id}`}
-                className="block p-5 transition hover:bg-penn-blue/30"
+                className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 transition hover:bg-blue-ncs/5 sm:px-6"
               >
-                <p className="text-xs uppercase tracking-[0.16em] text-text-secondary">
-                  {ticket.type} · {formatDateTime(ticket.created_at)}
-                </p>
-                <h3 className="mt-2 line-clamp-2 font-semibold text-white">
-                  {ticket.title}
-                </h3>
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-text-secondary">
+                    {ticket.type === "issue" ? "Issue" : "Request"} ·{" "}
+                    {formatDateTime(ticket.last_activity_at)}
+                  </p>
+                  <h2 className="mt-2 text-base font-medium text-white">
+                    {ticket.title}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-4">
                   <StatusBadge status={ticket.status} />
-                  <PriorityBadge priority={ticket.priority || "normal"} />
+                  <span aria-hidden="true" className="text-text-secondary">
+                    →
+                  </span>
                 </div>
               </Link>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="px-6 py-12 text-center">
+            <h2 className="text-lg font-semibold text-white">
+              {q
+                ? "No matching tickets"
+                : view === "active"
+                  ? "You’re all caught up"
+                  : "Let’s start a conversation"}
+            </h2>
+            <p className="mt-2 text-sm text-text-secondary">
+              {q
+                ? "Try another search or clear your filters."
+                : "Need a change, found an issue, or have a question? Create a ticket and we’ll help."}
+            </p>
+            {!q ? (
+              <Link
+                href="/portal/tickets/new"
+                className="mt-5 inline-flex text-sm font-medium text-blue-ncs"
+              >
+                Create a ticket →
+              </Link>
+            ) : null}
+          </div>
+        )}
       </section>
     </main>
   );

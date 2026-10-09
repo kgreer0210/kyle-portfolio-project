@@ -9,6 +9,7 @@ import {
   ticketCategoryLabels,
 } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
+import { firstParam } from "@/lib/searchParams";
 import type { TicketCategory, TicketPriority, TicketStatus } from "@/types/crm";
 
 const pageSize = 20;
@@ -24,12 +25,12 @@ const allStatuses: TicketStatus[] = [
 
 interface AdminTicketsPageProps {
   searchParams?: Promise<{
-    view?: string;
-    q?: string;
-    status?: string;
-    priority?: string;
-    org?: string;
-    page?: string;
+    view?: string | string[];
+    q?: string | string[];
+    status?: string | string[];
+    priority?: string | string[];
+    org?: string | string[];
+    page?: string | string[];
   }>;
 }
 
@@ -42,20 +43,17 @@ export default async function AdminTicketsPage({
 }: AdminTicketsPageProps) {
   const { supabase } = await requireAdminUser();
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const view = resolvedSearchParams?.view === "all" ? "all" : "active";
-  const q = (resolvedSearchParams?.q || "").trim();
-  const statusFilter = allStatuses.includes(
-    resolvedSearchParams?.status as TicketStatus,
-  )
-    ? (resolvedSearchParams?.status as TicketStatus)
+  const view = firstParam(resolvedSearchParams?.view) === "all" ? "all" : "active";
+  const q = firstParam(resolvedSearchParams?.q).trim();
+  const statusParam = firstParam(resolvedSearchParams?.status);
+  const statusFilter = allStatuses.includes(statusParam as TicketStatus)
+    ? (statusParam as TicketStatus)
     : "";
+  const priorityParam = firstParam(resolvedSearchParams?.priority);
   const priorityFilter =
-    resolvedSearchParams?.priority &&
-    isTicketPriority(resolvedSearchParams.priority)
-      ? resolvedSearchParams.priority
-      : "";
-  const orgFilter = resolvedSearchParams?.org || "";
-  const page = Math.max(0, Number.parseInt(resolvedSearchParams?.page || "0", 10) || 0);
+    priorityParam && isTicketPriority(priorityParam) ? priorityParam : "";
+  const orgFilter = firstParam(resolvedSearchParams?.org);
+  const page = Math.max(0, Number.parseInt(firstParam(resolvedSearchParams?.page) || "0", 10) || 0);
 
   let query = supabase
     .from("tickets")
@@ -128,13 +126,12 @@ export default async function AdminTicketsPage({
     <main className="space-y-6">
       <div className="flex flex-col gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+          <p className="text-xs font-medium text-blue-ncs">
             Admin Ticket Queue
           </p>
           <h2 className="mt-2 text-3xl font-semibold text-white">Tickets</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">
-            Review client requests by most recent activity. Search, filter, and
-            jump directly into the ticket detail workflow.
+            Search and manage client conversations.
           </p>
         </div>
 
@@ -149,7 +146,7 @@ export default async function AdminTicketsPage({
       </div>
 
       {tickets.length === 0 ? (
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-8 text-sm text-text-secondary">
+        <div className="admin-panel p-8 text-sm text-text-secondary">
           {q || statusFilter || priorityFilter || orgFilter
             ? "No tickets match the current filters."
             : view === "active"
@@ -157,7 +154,7 @@ export default async function AdminTicketsPage({
               : "No tickets have been submitted yet."}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-[2rem] border border-penn-blue bg-oxford-blue/80">
+        <div className="overflow-hidden admin-panel">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-penn-blue text-left text-sm">
               <thead className="bg-rich-black/40 text-text-secondary">

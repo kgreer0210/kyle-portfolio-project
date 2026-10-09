@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import AttachmentChip from "@/components/crm/AttachmentChip";
 import PriorityBadge from "@/components/crm/PriorityBadge";
@@ -40,7 +41,9 @@ export default async function AdminTicketDetailPage({
       .maybeSingle(),
     supabase
       .from("ticket_messages")
-      .select("id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)")
+      .select(
+        "id, body, visibility, is_system, created_at, profiles:author_id(full_name, email)",
+      )
       .eq("ticket_id", ticketId)
       .order("created_at", { ascending: true }),
     supabase
@@ -91,136 +94,164 @@ export default async function AdminTicketDetailPage({
   const rootAttachments = signedAttachments.filter((item) => !item.message_id);
 
   return (
-    <main className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="space-y-6">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
-                {ticket.type}
-                {ticket.category
-                  ? ` · ${ticketCategoryLabels[ticket.category as keyof typeof ticketCategoryLabels] || ticket.category}`
-                  : ""}
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold text-white">
-                {ticket.title}
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-text-secondary">
-                {(ticket.organizations as { name?: string | null } | null)?.name ||
-                  "Unknown organization"}
-              </p>
-            </div>
-            <div className="flex flex-col items-start gap-2 md:items-end">
-              <StatusBadge status={ticket.status} />
-              <PriorityBadge priority={ticket.priority || "normal"} />
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-3xl border border-penn-blue bg-rich-black/40 p-5">
-            <p className="whitespace-pre-wrap text-sm leading-7 text-text-primary">
-              {ticket.description}
-            </p>
-            <p className="mt-4 text-xs uppercase tracking-[0.18em] text-text-secondary">
-              Opened {formatDateTime(ticket.created_at)}
-            </p>
-          </div>
-
-          {rootAttachments.length > 0 ? (
-            <div className="mt-5 flex flex-wrap gap-3">
-              {rootAttachments.map((attachment) => (
-                <AttachmentChip key={attachment.id} attachment={attachment} />
-              ))}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="space-y-4">
-          {(messages || []).map((message) => {
-            const author = (message as { profiles?: { full_name?: string | null; email?: string | null } | null }).profiles;
-            const inlineAttachments = signedAttachments.filter(
-              (attachment) => attachment.message_id === message.id,
-            );
-
-            return (
-              <div
-                key={message.id}
-                className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6"
-              >
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-semibold text-white">
-                      {author?.full_name ||
-                        author?.email ||
-                        (message.is_system ? "AI triage" : "Unknown author")}
-                    </p>
-                    <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
-                      {message.is_system ? "system" : message.visibility}
-                    </p>
-                  </div>
-                  <p className="text-sm text-text-secondary">
-                    {formatDateTime(message.created_at)}
-                  </p>
-                </div>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-text-primary">
-                  {message.body}
+    <main className="space-y-5">
+      <Link
+        href="/admin/tickets"
+        className="inline-flex text-sm text-text-secondary hover:text-white"
+      >
+        ← Ticket queue
+      </Link>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="min-w-0 space-y-5">
+          <div className="admin-panel p-6 md:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs font-medium text-blue-ncs">
+                  {ticket.type}
+                  {ticket.category
+                    ? ` · ${ticketCategoryLabels[ticket.category as keyof typeof ticketCategoryLabels] || ticket.category}`
+                    : ""}
                 </p>
-                {inlineAttachments.length > 0 ? (
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {inlineAttachments.map((attachment) => (
-                      <AttachmentChip
-                        key={attachment.id}
-                        attachment={attachment}
-                      />
-                    ))}
-                  </div>
-                ) : null}
+                <h2 className="mt-2 text-3xl font-semibold text-white">
+                  {ticket.title}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-text-secondary">
+                  {(ticket.organizations as { name?: string | null } | null)
+                    ?.name || "Unknown organization"}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </section>
+              <div className="flex flex-col items-start gap-2 md:items-end">
+                <StatusBadge status={ticket.status} />
+                <PriorityBadge priority={ticket.priority || "normal"} />
+              </div>
+            </div>
 
-      <aside className="space-y-6">
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Update status</h3>
-          <div className="mt-5">
-            <TicketStatusForm ticketId={ticket.id} currentStatus={ticket.status} />
-          </div>
-        </div>
+            <div className="mt-6 rounded-lg border border-penn-blue bg-rich-black/40 p-5">
+              <p className="whitespace-pre-wrap text-sm leading-7 text-text-primary">
+                {ticket.description}
+              </p>
+              <p className="mt-4 text-xs font-medium text-text-secondary">
+                Opened {formatDateTime(ticket.created_at)}
+              </p>
+            </div>
 
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">
-            Ticket details
-          </h3>
-          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-text-secondary">
-            {(ticket.organizations as { billing_type?: BillingType | null } | null)
-              ?.billing_type
-              ? `Billing: ${billingTypeLabels[(ticket.organizations as { billing_type: BillingType }).billing_type]}`
-              : "Billing: not set"}
-            {ticket.ai_triaged_at
-              ? ` · AI triaged ${formatDateTime(ticket.ai_triaged_at)}`
-              : ""}
-          </p>
-          <div className="mt-5">
-            <TicketMetaForm
-              ticketId={ticket.id}
-              currentPriority={ticket.priority || "normal"}
-              currentCategory={ticket.category || null}
-              currentCost={ticket.cost_amount ?? null}
-              currentOutOfScope={Boolean(ticket.out_of_scope)}
-              currentProjectId={ticket.project_id ?? null}
-              projects={(orgProjects || []) as Array<{ id: string; title: string }>}
-            />
+            {rootAttachments.length > 0 ? (
+              <div className="mt-5 flex flex-wrap gap-3">
+                {rootAttachments.map((attachment) => (
+                  <AttachmentChip key={attachment.id} attachment={attachment} />
+                ))}
+              </div>
+            ) : null}
           </div>
-        </div>
 
-        <div className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6">
-          <h3 className="text-xl font-semibold text-white">Reply or add note</h3>
-          <div className="mt-5">
-            <TicketReplyForm ticketId={ticket.id} allowInternalNote={true} allowAiDraft={true} />
+          <div className="space-y-4">
+            {(messages || []).map((message) => {
+              const author = (
+                message as {
+                  profiles?: {
+                    full_name?: string | null;
+                    email?: string | null;
+                  } | null;
+                }
+              ).profiles;
+              const inlineAttachments = signedAttachments.filter(
+                (attachment) => attachment.message_id === message.id,
+              );
+
+              return (
+                <div key={message.id} className="admin-panel p-6">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="font-semibold text-white">
+                        {author?.full_name ||
+                          author?.email ||
+                          (message.is_system ? "AI triage" : "Unknown author")}
+                      </p>
+                      <p className="text-xs font-medium text-text-secondary">
+                        {message.is_system ? "system" : message.visibility}
+                      </p>
+                    </div>
+                    <p className="text-sm text-text-secondary">
+                      {formatDateTime(message.created_at)}
+                    </p>
+                  </div>
+                  <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-text-primary">
+                    {message.body}
+                  </p>
+                  {inlineAttachments.length > 0 ? (
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {inlineAttachments.map((attachment) => (
+                        <AttachmentChip
+                          key={attachment.id}
+                          attachment={attachment}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
-        </div>
-      </aside>
+          <div className="admin-panel p-6">
+            <h3 className="text-xl font-semibold text-white">
+              Reply or add note
+            </h3>
+            <div className="mt-5">
+              <TicketReplyForm
+                ticketId={ticket.id}
+                allowInternalNote={true}
+                allowAiDraft={true}
+              />
+            </div>
+          </div>
+        </section>
+
+        <aside className="min-w-0 space-y-5">
+          <div className="admin-panel p-6">
+            <h3 className="text-xl font-semibold text-white">Update status</h3>
+            <div className="mt-5">
+              <TicketStatusForm
+                ticketId={ticket.id}
+                currentStatus={ticket.status}
+              />
+            </div>
+          </div>
+
+          <div className="admin-panel p-6">
+            <h3 className="text-xl font-semibold text-white">Ticket details</h3>
+            <p className="mt-2 text-xs font-medium text-text-secondary">
+              {(
+                ticket.organizations as {
+                  billing_type?: BillingType | null;
+                } | null
+              )?.billing_type
+                ? `Billing: ${billingTypeLabels[(ticket.organizations as { billing_type: BillingType }).billing_type]}`
+                : "Billing: not set"}
+              {ticket.ai_triaged_at
+                ? ` · AI triaged ${formatDateTime(ticket.ai_triaged_at)}`
+                : ""}
+            </p>
+            <details className="mt-5">
+              <summary className="cursor-pointer text-sm font-medium text-blue-ncs">
+                Edit ticket details
+              </summary>
+              <div className="mt-4">
+                <TicketMetaForm
+                  ticketId={ticket.id}
+                  currentPriority={ticket.priority || "normal"}
+                  currentCategory={ticket.category || null}
+                  currentCost={ticket.cost_amount ?? null}
+                  currentOutOfScope={Boolean(ticket.out_of_scope)}
+                  currentProjectId={ticket.project_id ?? null}
+                  projects={
+                    (orgProjects || []) as Array<{ id: string; title: string }>
+                  }
+                />
+              </div>
+            </details>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

@@ -1,9 +1,41 @@
 import { describe, expect, it } from "vitest";
-import { pickAutoProjectId, toProjectScope } from "@/lib/ticketProjects";
+import {
+  pickAutoProjectId,
+  resolveTicketProjectId,
+  toProjectScope,
+} from "@/lib/ticketProjects";
 import {
   buildReplyDraftPrompt,
   REPLY_DRAFT_SYSTEM_PROMPT,
 } from "@/lib/ticketReplyDraft";
+
+describe("resolveTicketProjectId", () => {
+  const orgProjects = [
+    { id: "active-1", status: "active" },
+    { id: "done-1", status: "done" },
+  ];
+
+  it("uses a requested project that belongs to the organization, even if done", () => {
+    expect(resolveTicketProjectId("done-1", orgProjects)).toBe("done-1");
+    expect(resolveTicketProjectId("active-1", orgProjects)).toBe("active-1");
+  });
+
+  it("ignores a requested project id that is not in the organization's projects", () => {
+    expect(resolveTicketProjectId("someone-elses-project", orgProjects)).toBe("active-1");
+    expect(
+      resolveTicketProjectId("someone-elses-project", [
+        { id: "a", status: "active" },
+        { id: "b", status: "active" },
+      ]),
+    ).toBeNull();
+  });
+
+  it("falls back to the automatic pick when no project is requested", () => {
+    expect(resolveTicketProjectId(null, orgProjects)).toBe("active-1");
+    expect(resolveTicketProjectId("", orgProjects)).toBe("active-1");
+    expect(resolveTicketProjectId(null, [])).toBeNull();
+  });
+});
 
 describe("pickAutoProjectId", () => {
   it("returns null with no projects", () => {

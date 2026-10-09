@@ -64,10 +64,10 @@ export default async function AdminArchivedOnboardingPage({
 
   return (
     <main className="space-y-8">
-      <section className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6 md:p-8">
+      <section className="admin-panel p-6 md:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+            <p className="text-xs font-medium text-blue-ncs">
               Onboarding answers (archived)
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-white">
@@ -82,8 +82,8 @@ export default async function AdminArchivedOnboardingPage({
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Primary contact
             </p>
             <p className="mt-2 text-lg font-semibold text-white">
@@ -93,24 +93,24 @@ export default async function AdminArchivedOnboardingPage({
               {organization.primary_contact_email || "No email"}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Submitted
             </p>
             <p className="mt-2 text-lg font-semibold text-white">
               {formatDateTime(onboardingRecord.submitted_at)}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Reviewed
             </p>
             <p className="mt-2 text-lg font-semibold text-white">
               {formatDateTime(onboardingRecord.reviewed_at)}
             </p>
           </div>
-          <div className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+          <div className="rounded-lg border border-penn-blue bg-rich-black/40 p-4">
+            <p className="text-xs font-medium text-text-secondary">
               Completed steps
             </p>
             <p className="mt-2 text-lg font-semibold text-white">
@@ -134,10 +134,10 @@ export default async function AdminArchivedOnboardingPage({
           {onboardingSteps.map((step, index) => (
             <article
               key={step.key}
-              className="rounded-[2rem] border border-penn-blue bg-oxford-blue/80 p-6"
+              className="admin-panel p-6"
             >
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-blue-ncs">
+                <p className="text-xs font-medium text-blue-ncs">
                   Step {index + 1}
                 </p>
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -167,9 +167,9 @@ export default async function AdminArchivedOnboardingPage({
                   return (
                     <div
                       key={field.key}
-                      className="rounded-3xl border border-penn-blue bg-rich-black/40 p-4"
+                      className="rounded-lg border border-penn-blue bg-rich-black/40 p-4"
                     >
-                      <p className="text-xs uppercase tracking-[0.18em] text-text-secondary">
+                      <p className="text-xs font-medium text-text-secondary">
                         {field.label}
                       </p>
                       <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white">

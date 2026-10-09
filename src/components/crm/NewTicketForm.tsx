@@ -14,7 +14,7 @@ import {
 
 const MAX_DESCRIPTION_LENGTH = 5000;
 
-export default function NewTicketForm() {
+export default function NewTicketForm({ projectId }: { projectId?: string }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [title, setTitle] = useState("");
@@ -87,6 +87,7 @@ export default function NewTicketForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      {projectId ? <input type="hidden" name="projectId" value={projectId} /> : null}
       <TicketAssistPanel
         draftTitle={title}
         draftDescription={description}
