@@ -9,6 +9,7 @@ import {
   ticketCategoryLabels,
 } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
+import { firstParam } from "@/lib/searchParams";
 import type { TicketCategory, TicketPriority, TicketStatus } from "@/types/crm";
 
 const pageSize = 20;
@@ -24,12 +25,12 @@ const allStatuses: TicketStatus[] = [
 
 interface AdminTicketsPageProps {
   searchParams?: Promise<{
-    view?: string;
-    q?: string;
-    status?: string;
-    priority?: string;
-    org?: string;
-    page?: string;
+    view?: string | string[];
+    q?: string | string[];
+    status?: string | string[];
+    priority?: string | string[];
+    org?: string | string[];
+    page?: string | string[];
   }>;
 }
 
@@ -42,20 +43,17 @@ export default async function AdminTicketsPage({
 }: AdminTicketsPageProps) {
   const { supabase } = await requireAdminUser();
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const view = resolvedSearchParams?.view === "all" ? "all" : "active";
-  const q = (resolvedSearchParams?.q || "").trim();
-  const statusFilter = allStatuses.includes(
-    resolvedSearchParams?.status as TicketStatus,
-  )
-    ? (resolvedSearchParams?.status as TicketStatus)
+  const view = firstParam(resolvedSearchParams?.view) === "all" ? "all" : "active";
+  const q = firstParam(resolvedSearchParams?.q).trim();
+  const statusParam = firstParam(resolvedSearchParams?.status);
+  const statusFilter = allStatuses.includes(statusParam as TicketStatus)
+    ? (statusParam as TicketStatus)
     : "";
+  const priorityParam = firstParam(resolvedSearchParams?.priority);
   const priorityFilter =
-    resolvedSearchParams?.priority &&
-    isTicketPriority(resolvedSearchParams.priority)
-      ? resolvedSearchParams.priority
-      : "";
-  const orgFilter = resolvedSearchParams?.org || "";
-  const page = Math.max(0, Number.parseInt(resolvedSearchParams?.page || "0", 10) || 0);
+    priorityParam && isTicketPriority(priorityParam) ? priorityParam : "";
+  const orgFilter = firstParam(resolvedSearchParams?.org);
+  const page = Math.max(0, Number.parseInt(firstParam(resolvedSearchParams?.page) || "0", 10) || 0);
 
   let query = supabase
     .from("tickets")

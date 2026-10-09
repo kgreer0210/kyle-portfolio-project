@@ -4,8 +4,13 @@ import {
   requireClientUser,
   getPrimaryOrganizationMembership,
 } from "@/lib/auth";
+import { firstParam } from "@/lib/searchParams";
 
-export default async function NewSupportTicketPage() {
+export default async function NewSupportTicketPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ projectId?: string | string[] }>;
+}) {
   const { supabase, user } = await requireClientUser();
   const membership = await getPrimaryOrganizationMembership(user.id, supabase);
   if (!membership?.organizations)
@@ -15,6 +20,17 @@ export default async function NewSupportTicketPage() {
         help.
       </main>
     );
+
+  // Only show or attach a project the client can see in their own organization.
+  const requestedProjectId = firstParam((await searchParams).projectId);
+  const { data: project } = requestedProjectId
+    ? await supabase
+        .from("projects")
+        .select("id, title")
+        .eq("id", requestedProjectId)
+        .eq("organization_id", membership.organization_id)
+        .maybeSingle<{ id: string; title: string }>()
+    : { data: null };
 
   return (
     <main className="mx-auto max-w-3xl space-y-6">
@@ -32,7 +48,12 @@ export default async function NewSupportTicketPage() {
         </p>
       </div>
       <section className="client-panel p-5 sm:p-7">
-        <NewTicketForm />
+        {project ? (
+          <p className="mb-5 text-sm text-text-secondary">
+            For project <span className="font-medium text-white">{project.title}</span>
+          </p>
+        ) : null}
+        <NewTicketForm projectId={project?.id} />
       </section>
     </main>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdminUser } from "@/lib/auth";
 import { projectStatusLabels, projectStatuses } from "@/lib/projects";
+import { firstParam } from "@/lib/searchParams";
 import type { ProjectStatus } from "@/types/crm";
 
 interface ProjectRow {
@@ -15,12 +16,13 @@ interface ProjectRow {
 export default async function AdminProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string | string[]; status?: string | string[] }>;
 }) {
   const { supabase } = await requireAdminUser();
   const params = await searchParams;
-  const q = (params.q || "").trim();
-  const status = projectStatuses.find((value) => value === params.status) || "";
+  const q = firstParam(params.q).trim();
+  const statusParam = firstParam(params.status);
+  const status = projectStatuses.find((value) => value === statusParam) || "";
   const { data, error } = await supabase
     .from("projects")
     .select(

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import StatusBadge from "@/components/crm/StatusBadge";
 import { activeTicketStatuses, formatDateTime } from "@/lib/crm";
+import { firstParam } from "@/lib/searchParams";
 import {
   requireClientUser,
   getPrimaryOrganizationMembership,
@@ -18,7 +19,7 @@ interface SupportTicket {
 export default async function PortalTicketsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; q?: string }>;
+  searchParams: Promise<{ view?: string | string[]; q?: string | string[] }>;
 }) {
   const { supabase, user } = await requireClientUser();
   const membership = await getPrimaryOrganizationMembership(user.id, supabase);
@@ -30,8 +31,8 @@ export default async function PortalTicketsPage({
       </main>
     );
   const params = await searchParams;
-  const view = params.view === "all" ? "all" : "active";
-  const q = (params.q || "").trim();
+  const view = firstParam(params.view) === "all" ? "all" : "active";
+  const q = firstParam(params.q).trim();
   let query = supabase
     .from("tickets")
     .select("id, title, type, status, last_activity_at")

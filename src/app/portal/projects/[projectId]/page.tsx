@@ -212,7 +212,7 @@ export default async function ClientProjectPage({
                     will follow up in your support thread.
                   </p>
                   <Link
-                    href="/portal/tickets/new"
+                    href={`/portal/tickets/new?projectId=${encodeURIComponent(project.id)}`}
                     className="client-primary mt-4 inline-flex"
                   >
                     Start a request
@@ -280,7 +280,10 @@ export default async function ClientProjectPage({
                   <h2 className="text-lg font-semibold text-white">
                     Project support
                   </h2>
-                  <Link href="/portal/tickets/new" className="client-secondary">
+                  <Link
+                    href={`/portal/tickets/new?projectId=${encodeURIComponent(project.id)}`}
+                    className="client-secondary"
+                  >
                     New ticket
                   </Link>
                 </div>

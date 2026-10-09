@@ -12,6 +12,25 @@ export function pickAutoProjectId(
   return active.length === 1 ? active[0].id : null;
 }
 
+/**
+ * Honor a project the client picked from their project page, but only when it
+ * is one of their own organization's projects. The requested id is a hint and
+ * is never trusted for authorization; anything else falls back to
+ * pickAutoProjectId.
+ */
+export function resolveTicketProjectId(
+  requestedProjectId: string | null,
+  orgProjects: Array<{ id: string; status: string }>,
+): string | null {
+  if (
+    requestedProjectId &&
+    orgProjects.some((project) => project.id === requestedProjectId)
+  ) {
+    return requestedProjectId;
+  }
+  return pickAutoProjectId(orgProjects);
+}
+
 export function toProjectScope(args: {
   project: { title: string; summary: string | null };
   milestones: Array<{ title: string }>;

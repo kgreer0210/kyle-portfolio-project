@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { formatDateTime } from "@/lib/crm";
 import { requireAdminUser } from "@/lib/auth";
+import { firstParam } from "@/lib/searchParams";
 
 export default async function AdminClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
 }) {
   const { q: rawQuery } = await searchParams;
-  const q = (rawQuery || "").trim();
+  const q = firstParam(rawQuery).trim();
   const { supabase } = await requireAdminUser();
   const { data, error } = await supabase
     .from("organizations")
