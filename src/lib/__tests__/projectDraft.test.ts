@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildProjectRows,
   draftClientSchema,
+  firstIssueMessage,
   projectDraftSchema,
 } from "@/lib/projectDraft";
 import { onlyProvided, patchItemSchema, toItemUpdate } from "@/lib/projectItems";
@@ -46,6 +47,21 @@ describe("projectDraftSchema", () => {
         .success,
     ).toBe(false);
     expect(projectDraftSchema.safeParse({ project: { title: " " } }).success).toBe(false);
+  });
+
+  it("reports the list size limit when a capped list is also internally invalid", () => {
+    const result = projectDraftSchema.safeParse({
+      project: { title: "Site" },
+      milestones: Array.from({ length: 31 }, () => ({ title: "" })),
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(result.error.issues.map((issue) => issue.code)).toEqual(["too_big"]);
+    expect(firstIssueMessage(result.error)).toBe(
+      "Too big: expected array to have <=30 items",
+    );
   });
 
   it("validates and lowercases client email", () => {
