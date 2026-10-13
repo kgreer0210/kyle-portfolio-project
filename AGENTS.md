@@ -154,3 +154,19 @@ Verify the relevant public, client, or admin flow at mobile and desktop widths
 for UI work. Pay particular attention to project request actions, authorization,
 and client visibility when those areas change. Report any check that could not
 be run because it needs external credentials or deployed infrastructure.
+
+## Agent skills
+
+Vendored Matt Pocock skills for Cursor and Grok cloud agents live in
+`.agents/skills/` (see `.agents/skills/README.md`). Claude Code and Codex load
+the same skills through the plugin.
+
+### Issue tracker
+
+GitHub Issues on `kgreer0210/kyle-portfolio-project`. See
+`docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` at the repo root and ADRs in `docs/adr/`. See
+`docs/agents/domain.md`.
