@@ -216,6 +216,10 @@ html {
 .client-primary:hover { background: var(--lapis-lazuli); }
 .client-secondary { border: 1px solid var(--penn-blue); color: var(--text-primary); }
 .client-secondary:hover { border-color: var(--blue-ncs); }
+/* The site-wide footer color would paint a narrow bar on the page background. */
+.client-workspace > footer {
+  background-color: transparent;
+}
 .client-workspace :is(button, a, input, select, textarea, summary, [role="tabpanel"]):focus-visible { outline: 2px solid var(--blue-ncs); outline-offset: 3px; }
 .client-workspace :is(input, select, textarea, button) { border-radius: 0.5rem; max-width: 100%; }
 .client-workspace :is(h1, h2, h3, p, a) { overflow-wrap: anywhere; }

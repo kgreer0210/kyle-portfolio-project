@@ -49,8 +49,10 @@ export default async function PortalLayout({
       >
         {children}
       </div>
-      <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-text-secondary sm:px-6 lg:px-8">
-        KYGR Solutions · Your projects and support, in one place.
+      <footer className="bg-transparent!">
+        <div className="mx-auto max-w-6xl px-4 pb-8 text-xs text-text-secondary sm:px-6 lg:px-8">
+          KYGR Solutions · Your projects and support, in one place.
+        </div>
       </footer>
     </div>
   );
