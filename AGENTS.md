@@ -170,3 +170,67 @@ GitHub Issues on `kgreer0210/kyle-portfolio-project`. See
 
 Single-context: one `GLOSSARY.md` at the repo root and ADRs in `docs/adr/`. See
 `docs/agents/domain.md`.
+
+## Cursor Cloud specific instructions
+
+Cloud agents install dependencies with `npm ci` (`.cursor/environment.json`).
+The repo does not pin Node in `package.json` `engines` or `.nvmrc`. CI uses
+Node 22, which matches the default Cloud Agent image, so install does not
+switch Node versions. The root `Dockerfile` is the production image (`node:20`)
+and is not the agent base image. `package.json` pins `packageManager` to
+`npm@12.0.1`; CI applies that pin with `corepack enable npm` before `npm ci`.
+
+Agents use a Supabase **dev** project. Never use the production service-role
+key. `.env.example` lists variable names with empty values. Put secret values
+in the Cloud Agent secret store, not in the repo.
+
+Public / non-secret:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+  (either one is the client key)
+- `CONTACT_EMAIL`
+- `CRM_ADMIN_EMAILS`
+- `WEBAUTHN_ORIGIN`
+- `WEBAUTHN_RP_ID`
+- `WEBAUTHN_RP_NAME`
+
+Secret:
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_SECRET_KEY`
+- `RESEND_API_KEY`
+- `RESEND_WEBHOOK_SECRET`
+- `OPENROUTER_API_KEY`
+- `RETELL_API_KEY`
+- `DISCORD_WEBHOOK_URL`
+- `CRON_SECRET`
+- `WEBAUTHN_CHALLENGE_SECRET`
+
+Names checked against `process.env` reads:
+
+- The client key also accepts `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`,
+  after the anon key and publishable key (`middleware.ts`,
+  `src/lib/supabase/env.ts`). Set one of the three.
+- The service credential accepts either `SUPABASE_SERVICE_ROLE_KEY` or
+  `SUPABASE_SECRET_KEY` (`src/lib/supabase/env.ts`). Use the dev project's key.
+- Inbound ticket replies also read `INBOUND_REPLY_DOMAIN` (non-secret) and
+  `INBOUND_REPLY_SECRET` (secret) in `src/lib/inboundEmail.ts`. Both are
+  optional; replies stay link-only until they are set.
+- `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME`, and `WEBAUTHN_ORIGIN` fall back to the
+  production host when unset (`src/lib/webauthn/config.ts`). Set them for the
+  dev origin.
+- `NEXT_PUBLIC_SITE_URL` falls back to the production site URL when unset
+  (`src/lib/crm.ts`).
+- Sentry is not configured through environment variables.
+
+There is no `typecheck` script. CI and cloud agents typecheck with
+`npx tsc --noEmit`.
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm test
+npm run build
+```
