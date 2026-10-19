@@ -3,7 +3,11 @@
 import { motion } from "motion/react";
 import { Breadcrumb, Contact } from "../../components";
 
-export default function ContactClient() {
+interface ContactClientProps {
+  initialSubject?: string;
+}
+
+export default function ContactClient({ initialSubject }: ContactClientProps) {
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -161,7 +165,7 @@ export default function ContactClient() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <Contact />
+              <Contact initialSubject={initialSubject} />
             </motion.div>
           </div>
         </div>

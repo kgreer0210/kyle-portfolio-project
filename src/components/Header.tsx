@@ -33,7 +33,7 @@ export default function Header() {
       transition={{ duration: 0.6 }}
     >
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex shrink-0 items-center">
           <motion.div
             className="cursor-pointer"
             whileHover={{ scale: 1.05 }}
@@ -51,7 +51,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex gap-8 items-center">
+        <div className="hidden shrink-0 items-center gap-3 md:flex lg:gap-6 xl:gap-8">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} prefetch={true}>
               <motion.span
@@ -67,7 +67,7 @@ export default function Header() {
           ))}
           <Link href="/login">
             <motion.span
-              className="inline-block px-5 py-2 rounded-full border border-blue-ncs text-blue-ncs text-sm font-semibold hover:bg-blue-ncs hover:text-white transition-colors cursor-pointer"
+              className="inline-block whitespace-nowrap rounded-full border border-blue-ncs px-4 py-2 text-sm font-semibold text-blue-ncs transition-colors hover:bg-blue-ncs hover:text-white cursor-pointer xl:px-5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -76,7 +76,7 @@ export default function Header() {
           </Link>
           <Link href="/contact">
             <motion.button
-              className="px-5 py-2 rounded-full bg-blue-ncs text-white text-sm font-semibold hover:bg-lapis-lazuli transition-colors"
+              className="whitespace-nowrap rounded-full bg-blue-ncs px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-lapis-lazuli xl:px-5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
