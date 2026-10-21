@@ -157,10 +157,6 @@ be run because it needs external credentials or deployed infrastructure.
 
 ## Agent skills
 
-Vendored Matt Pocock skills for Cursor and Grok cloud agents live in
-`.agents/skills/` (see `.agents/skills/README.md`). Claude Code and Codex load
-the same skills through the plugin.
-
 ### Issue tracker
 
 GitHub Issues on `kgreer0210/kyle-portfolio-project`. See
