@@ -2,7 +2,12 @@
 
 import { motion } from "motion/react";
 import { useState, FormEvent } from "react";
+import { IDX_SUBJECT } from "../data/idx";
 import { services } from "../data/services";
+import {
+  GENERAL_INQUIRY_SUBJECT,
+  resolveContactSubject,
+} from "../lib/idxContact";
 
 interface FormData {
   name: string;
@@ -19,11 +24,17 @@ interface FormErrors {
   message?: string;
 }
 
-export default function Contact() {
+interface ContactProps {
+  initialSubject?: string;
+}
+
+export default function Contact({ initialSubject }: ContactProps) {
+  const serviceTitles = services.map((service) => service.title);
+  const resolvedSubject = resolveContactSubject(initialSubject, serviceTitles);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
-    subject: "",
+    subject: resolvedSubject,
     message: "",
     website: "", // Honeypot field - should remain empty
   });
@@ -295,7 +306,10 @@ export default function Contact() {
                   {s.title}
                 </option>
               ))}
-              <option value="General Inquiry">General Inquiry</option>
+              <option value={IDX_SUBJECT}>{IDX_SUBJECT}</option>
+              <option value={GENERAL_INQUIRY_SUBJECT}>
+                {GENERAL_INQUIRY_SUBJECT}
+              </option>
             </select>
             {errors.subject && (
               <p className="mt-1 text-sm text-red-400">{errors.subject}</p>

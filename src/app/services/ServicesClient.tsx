@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Breadcrumb, ServiceIllustration } from "../../components";
+import { IDX_PATH, idxOffering } from "../../data/idx";
 import { services } from "../../data/services";
 
 export default function ServicesClient() {
@@ -68,6 +69,36 @@ export default function ServicesClient() {
             </motion.section>
           ))}
         </div>
+
+        <motion.section
+          className="mb-20 p-8 md:p-12 rounded-3xl bg-oxford-blue/40 border border-blue-ncs/30"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
+            IDX for Real Estate
+          </span>
+          <h2 className="text-3xl font-bold text-text-headings mb-4">
+            {idxOffering.headline}
+          </h2>
+          <p className="text-lg text-text-primary font-medium mb-4">
+            {idxOffering.subhead}
+          </p>
+          <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-3xl">
+            {idxOffering.body}
+          </p>
+          <Link href={IDX_PATH}>
+            <motion.button
+              className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              See the IDX offering
+            </motion.button>
+          </Link>
+        </motion.section>
 
         <motion.div
           className="text-center py-16"
