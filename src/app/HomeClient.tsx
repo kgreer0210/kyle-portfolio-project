@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Hero, HowItWorks, Testimonials } from "../components";
+import { IDX_PATH, idxOffering } from "../data/idx";
 import { projects } from "../data/projects";
 import { services } from "../data/services";
 
@@ -184,6 +185,80 @@ export default function HomeClient() {
                   </motion.li>
                 ))}
               </ul>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="py-20" aria-labelledby="idx-home-heading">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
+                IDX for Real Estate
+              </span>
+              <h2
+                id="idx-home-heading"
+                className="text-3xl md:text-4xl font-bold text-text-headings mb-5"
+              >
+                {idxOffering.headline}
+              </h2>
+              <p className="text-lg text-text-primary font-medium mb-4">
+                {idxOffering.subhead}
+              </p>
+              <p className="text-lg text-text-secondary mb-8 leading-relaxed">
+                {idxOffering.body}
+              </p>
+              <Link href={IDX_PATH}>
+                <motion.button
+                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  See the IDX offering
+                </motion.button>
+              </Link>
+            </motion.div>
+
+            <motion.div
+              className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-xl font-bold text-blue-ncs mb-6">
+                Built into your site
+              </h3>
+              <ul className="space-y-4">
+                {idxOffering.features.slice(0, 4).map((point) => (
+                  <li key={point} className="flex gap-3 text-text-primary">
+                    <span className="mt-1 w-5 h-5 rounded-full bg-blue-ncs/10 border border-blue-ncs/40 flex items-center justify-center shrink-0">
+                      <svg
+                        className="w-3 h-3 text-blue-ncs"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm font-semibold text-blue-ncs">
+                {idxOffering.pricing}
+              </p>
             </motion.div>
           </div>
         </section>
