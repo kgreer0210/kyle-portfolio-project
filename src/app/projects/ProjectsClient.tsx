@@ -8,21 +8,6 @@ import { projects } from "../../data/projects";
 import { Project } from "../../types";
 
 export default function ProjectsClient() {
-  // Group projects by category
-  const projectsByCategory = projects.reduce((acc, project) => {
-    if (!acc[project.category]) {
-      acc[project.category] = [];
-    }
-    acc[project.category].push(project);
-    return acc;
-  }, {} as Record<string, Project[]>);
-
-  const categories: Array<"Web Application" | "Website" | "Automation"> = [
-    "Web Application",
-    "Website",
-    "Automation",
-  ];
-
   const renderProjectCard = (project: Project, index: number) => (
     <motion.div
       key={project.id}
@@ -91,33 +76,13 @@ export default function ProjectsClient() {
             My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
-            A look at the websites, web applications, and automations I&apos;ve built—from personal passion projects to business tools that streamline operations.
+            A look at what I&apos;ve built for local businesses, ministries, and my own household, from custom websites to the tools that keep a business running.
           </p>
         </motion.div>
 
-        {categories.map((category) => {
-          const categoryProjects = projectsByCategory[category];
-          if (!categoryProjects || categoryProjects.length === 0) return null;
-
-          return (
-            <div key={category} className="mb-20">
-              <motion.h2
-                className="text-3xl font-bold text-text-headings mb-8"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                {category === "Web Application" && "Web Applications"}
-                {category === "Website" && "Websites"}
-                {category === "Automation" && "Automations"}
-              </motion.h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
-                {categoryProjects.map((project, index) => renderProjectCard(project, index))}
-              </div>
-            </div>
-          );
-        })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {projects.map((project, index) => renderProjectCard(project, index))}
+        </div>
       </div>
     </main>
   );
