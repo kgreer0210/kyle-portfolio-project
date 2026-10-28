@@ -12,7 +12,6 @@ export interface Project {
   description: string;
   image: string;
   technologies: string[];
-  category: "Web Application" | "Website" | "Automation";
   liveUrl?: string;
   status?: "completed" | "in-progress" | "planned";
   role?: string;
@@ -20,6 +19,8 @@ export interface Project {
   outcome?: string;
   backendShowcase?: {
     available: boolean;
+    title?: string;
+    subtitle?: string;
     description: string;
     screenshots: Screenshot[];
   };

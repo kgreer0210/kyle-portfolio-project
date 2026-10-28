@@ -2,6 +2,66 @@ import { Project } from "../types";
 
 export const projects: Project[] = [
   {
+    id: "dexter-gordy-realtor",
+    title: "Dexter Gordy Realtor",
+    description:
+      "A custom website for Middle Georgia Realtor Dexter Gordy, with IDX home search across Central Georgia MLS and Georgia MLS, his featured and recently sold listings, and quick ways for buyers to reach him.",
+    image: "/projects/dexter-gordy-realtor/hero.png",
+    technologies: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vercel",
+      "KYGR IDX API",
+      "Google Maps",
+      "Resend",
+    ],
+    liveUrl: "https://dextergordyrealtor.net",
+    status: "completed",
+    role: "Design, full-stack development, and IDX integration",
+    challenge:
+      "Dexter needed more than a brochure site. Buyers want to search homes, so the site pulls IDX listing data from two sources, Central Georgia MLS and Georgia MLS, into one map-based search that starts in Middle Georgia and opens up with a single \"Search all of Georgia\" option. A home listed on both MLSs shows up once, and every listing carries the attribution and disclaimers its MLS requires.",
+    outcome:
+      "Buyers can search homes on a map, browse Dexter's featured listings and recent sales, and call, text, or send a Dream Home request from any listing, all on a site that's built to keep MLS attribution right.",
+    backendShowcase: {
+      available: true,
+      title: "Inside the Site",
+      subtitle:
+        "A closer look at the IDX home search, with listing data provided by Central Georgia MLS and Georgia MLS, and the page of homes Dexter has recently sold.",
+      description:
+        "A look at the IDX home search and the sold properties page built for Dexter Gordy Realtor.",
+      screenshots: [
+        {
+          id: "home-search",
+          title: "Home search",
+          description:
+            "Map-based home search over listing data provided by Central Georgia MLS and Georgia MLS. It defaults to Middle Georgia, with a one-click option to search all of Georgia.",
+          image: "/projects/dexter-gordy-realtor/listings.png",
+          features: [
+            "Map-based search that starts in Middle Georgia",
+            "\"Search all of Georgia\" option",
+            "One merged feed with duplicate listings shown once",
+            "Each listing attributed to its source MLS",
+            "Listing detail pages with a photo gallery and call/text buttons",
+          ],
+        },
+        {
+          id: "sold-properties",
+          title: "Sold properties",
+          description:
+            "A page of homes Dexter has sold recently, alongside his featured listings on the homepage.",
+          image: "/projects/dexter-gordy-realtor/sold.png",
+          features: [
+            "Dexter's recently sold homes",
+            "Featured listings on the homepage",
+            "Dream Home and contact lead forms",
+            "MLS-compliant attribution on every listing",
+          ],
+        },
+      ],
+    },
+  },
+  {
     id: "mise-ai",
     title: "Mise AI",
     description:
@@ -16,7 +76,6 @@ export const projects: Project[] = [
       "Zustand",
       "Motion",
     ],
-    category: "Web Application",
     liveUrl: "https://mise-ai.app/",
     status: "completed",
     role: "Product design, UX, and full-stack development",
@@ -44,7 +103,6 @@ export const projects: Project[] = [
       "TypeScript",
       "Convex",
     ],
-    category: "Web Application",
     liveUrl: "https://lexis-fresh-slate-cleaning.vercel.app/",
     status: "completed",
     role: "Product discovery, UX/UI, and full-stack development",
@@ -233,7 +291,6 @@ export const projects: Project[] = [
       "A regional website for F3 Warner Robins, a free peer-led outdoor workout group focused on fitness, fellowship, and faith. Features event management, workout schedules, and community engagement tools.",
     image: "/f3-warner-robins-screenshot.png",
     technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-    category: "Website",
     liveUrl: "https://f3-warner-robins.vercel.app/",
     status: "completed",
     role: "Product design, UX/UI, and full-stack development",
@@ -262,7 +319,6 @@ export const projects: Project[] = [
       "shadcn/ui",
       "Resend",
     ],
-    category: "Website",
     liveUrl: "https://midstatebaptistassociation.org/",
     status: "completed",
     role: "Product design, UX/UI, and full-stack development",
