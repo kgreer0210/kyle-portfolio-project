@@ -345,6 +345,20 @@ export const projects: Project[] = [
           ],
         },
         {
+          id: "admin-churches",
+          title: "Churches Management",
+          description:
+            "Staff keep the public church finder up to date, managing each church's listing, county, and contact details in one place.",
+          image:
+            "/projects/mid-state-baptist-association/backend-screenshots/admin-churches.png",
+          features: [
+            "Add, edit, and remove church listings",
+            "Search by name or address",
+            "Filter by county",
+            "Feeds the public church finder",
+          ],
+        },
+        {
           id: "admin-events",
           title: "Events Management",
           description:
