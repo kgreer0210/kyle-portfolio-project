@@ -327,9 +327,66 @@ export const projects: Project[] = [
     outcome:
       "Delivered a clean, accessible website that makes it easy for the community to find churches, browse events, and download resources, with a protected admin system for staff to manage all content.",
     backendShowcase: {
-      available: false,
-      description: "",
-      screenshots: [],
+      available: true,
+      description:
+        "Admin tools for the Mid-State Baptist Association, letting staff keep events, resources, and site content current without a developer.",
+      screenshots: [
+        {
+          id: "admin-dashboard",
+          title: "Admin Dashboard",
+          description:
+            "A simple starting point for staff, with a card for each area of the site they manage.",
+          image:
+            "/projects/mid-state-baptist-association/backend-screenshots/admin-dashboard.png",
+          features: [
+            "Section cards for contacts, churches, events, resources, trailer requests, and settings",
+            "One-click access to each management area",
+            "Admin access and permissions in one place",
+          ],
+        },
+        {
+          id: "admin-churches",
+          title: "Churches Management",
+          description:
+            "Staff keep the public church finder up to date, managing each church's listing, county, and contact details in one place.",
+          image:
+            "/projects/mid-state-baptist-association/backend-screenshots/admin-churches.png",
+          features: [
+            "Add, edit, and remove church listings",
+            "Search by name or address",
+            "Filter by county",
+            "Feeds the public church finder",
+          ],
+        },
+        {
+          id: "admin-events",
+          title: "Events Management",
+          description:
+            "Staff post and update association events themselves, so the public calendar stays current without waiting on a developer.",
+          image:
+            "/projects/mid-state-baptist-association/backend-screenshots/admin-events.png",
+          features: [
+            "Create, edit, and delete events",
+            "Search by title or location and filter by status",
+            "Categories and featured events",
+            "Track how many people plan to attend",
+          ],
+        },
+        {
+          id: "admin-resources",
+          title: "Resources Management",
+          description:
+            "A managed library of downloadable PDFs that churches can browse on the public site.",
+          image:
+            "/projects/mid-state-baptist-association/backend-screenshots/admin-resources.png",
+          features: [
+            "Upload and organize PDF resources",
+            "Search by title, file name, or tags",
+            "Filter by category",
+            "See download counts for each resource",
+          ],
+        },
+      ],
     },
   },
 ];
