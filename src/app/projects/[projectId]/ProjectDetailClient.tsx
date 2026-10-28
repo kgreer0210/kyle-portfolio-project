@@ -131,9 +131,12 @@ export default function ProjectDetailClient() {
             className="mb-20"
           >
             <div className="mb-12 text-center">
-              <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-4">System Deep-Dive</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-4">
+                {project.backendShowcase.title ?? "System Deep-Dive"}
+              </h2>
               <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-                Exploring the backend architecture and administrative tools built for this solution.
+                {project.backendShowcase.subtitle ??
+                  "Exploring the backend architecture and administrative tools built for this solution."}
               </p>
             </div>
             <BackendShowcase 

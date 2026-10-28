@@ -19,6 +19,8 @@ export interface Project {
   outcome?: string;
   backendShowcase?: {
     available: boolean;
+    title?: string;
+    subtitle?: string;
     description: string;
     screenshots: Screenshot[];
   };

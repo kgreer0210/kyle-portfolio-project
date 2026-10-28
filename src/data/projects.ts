@@ -25,6 +25,9 @@ export const projects: Project[] = [
       "Buyers can search homes on a map, browse Dexter's featured listings and recent sales, and call, text, or send a Dream Home request from any listing, all on a site that's built to keep MLS attribution right.",
     backendShowcase: {
       available: true,
+      title: "Inside the Site",
+      subtitle:
+        "A closer look at the IDX home search, with listing data provided by Central Georgia MLS and Georgia MLS, and the page of homes Dexter has recently sold.",
       description:
         "A look at the IDX home search and the sold properties page built for Dexter Gordy Realtor.",
       screenshots: [
