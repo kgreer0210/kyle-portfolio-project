@@ -66,7 +66,7 @@ export const projects: Project[] = [
     title: "Mise AI",
     description:
       'A modern SaaS application built to solve the eternal "What\'s for dinner?" problem for my household. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
-    image: "/mise-ai-screenshot.png",
+    image: "/projects/mise-ai/landing.png",
     technologies: [
       "Next.js 16",
       "TypeScript",
@@ -84,9 +84,64 @@ export const projects: Project[] = [
     outcome:
       "Reduces meal-planning friction with AI recipes, weekly planners, and smart grocery lists households actually use.",
     backendShowcase: {
-      available: false,
-      description: "",
-      screenshots: [],
+      available: true,
+      title: "Inside the App",
+      subtitle:
+        "A closer look at recipe generation, saved recipes, and Chef's Week, the weekly dinner planner.",
+      description:
+        "A look at the recipe generator, a generated recipe, Chef's Week planning, and the pricing tiers in Mise AI.",
+      screenshots: [
+        {
+          id: "recipe-generator",
+          title: "Recipe generator",
+          description:
+            "Pick a cuisine, or switch to Pantry mode to cook from what's on hand, and Mise AI generates a recipe to match.",
+          image: "/projects/mise-ai/recipe-generator.png",
+          features: [
+            "Classic and Pantry modes",
+            "Cuisine picker to start from a craving",
+            "Weekly recipe allowance meter",
+          ],
+        },
+        {
+          id: "recipe-result",
+          title: "Generated recipe",
+          description:
+            "Every recipe comes with adjustable servings, step-by-step instructions, and one-tap actions to cook it, schedule it, or add it to the grocery list.",
+          image: "/projects/mise-ai/recipe-result.png",
+          features: [
+            "Adjustable servings that rescale ingredients",
+            "Step-by-step instructions",
+            "Add to Grocery List and scheduling",
+            "Cuisine, meal, and protein tags",
+          ],
+        },
+        {
+          id: "chefs-week",
+          title: "Chef's Week",
+          description:
+            "Chef's Week fills open nights on the weekly meal plan with new dinners, guided by cuisine, meal style, and protein.",
+          image: "/projects/mise-ai/chefs-week.png",
+          features: [
+            "Weekly meal plan grid",
+            "Cuisine, meal style, and protein preferences",
+            "Warns before replacing a planned dinner",
+            "Build a grocery list from the week",
+          ],
+        },
+        {
+          id: "pricing",
+          title: "Plans and pricing",
+          description:
+            "Free, Plus, and Pro tiers, with Chef's Week planning on Plus and Pro.",
+          image: "/projects/mise-ai/pricing.png",
+          features: [
+            "Free, Plus, and Pro plans",
+            "Monthly or yearly billing",
+            "Chef's Week on paid plans",
+          ],
+        },
+      ],
     },
   },
   {
