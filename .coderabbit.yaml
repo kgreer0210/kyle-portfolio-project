@@ -1,0 +1,241 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# CodeRabbit review configuration. Project guidance lives in AGENTS.md; the
+# path instructions below point reviewers at the rules that matter most here.
+language: en-US
+
+chat:
+  # Reviews only: do not reply to PR comments unless CodeRabbit is mentioned.
+  auto_reply: false
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - AGENTS.md
+      - CLAUDE.md
+      - docs/**/*.md
+
+reviews:
+  profile: assertive
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - master
+
+  path_filters:
+    - "!package-lock.json"
+    - "!bun.lock"
+    - "!public/**/*.png"
+    - "!public/**/*.jpg"
+    - "!public/**/*.jpeg"
+    - "!public/**/*.gif"
+    - "!public/**/*.webp"
+    - "!public/**/*.avif"
+    - "!public/**/*.ico"
+    - "!.next/**"
+    - "!out/**"
+    - "!build/**"
+    - "!coverage/**"
+    - "!node_modules/**"
+    - "!*.tsbuildinfo"
+
+  path_instructions:
+    # 1. Safari / WebKit compatibility
+    - path: "**/*.{ts,tsx}"
+      instructions: |
+        Safari/WebKit compatibility (macOS Safari and iOS Safari). Flag JS/DOM
+        APIs that Safari lacks or handles differently, and suggest a code-level
+        fallback or a unit test. Do not ask for manual Safari testing.
+        - `requestIdleCallback`/`cancelIdleCallback` are unsupported: require a
+          `setTimeout` fallback.
+        - Newer Array/Object/Intl/String/Promise features (e.g. `Array.prototype.at`
+          on old iOS, `Object.groupBy`, `Array.fromAsync`, `Promise.withResolvers`,
+          `Intl.Segmenter`) and RegExp lookbehind or `v`-flag usage in code that
+          runs in the browser: verify support or add a fallback.
+        - `structuredClone` edge cases (functions, class instances, DOM nodes).
+        - `new Date(string)` / `Date.parse` with non-ISO strings (e.g.
+          "2026-10-30 14:00", "Oct 30 2026 2pm") returns Invalid Date in Safari:
+          require ISO 8601 with a `T` and timezone, or explicit parsing.
+        - WebAuthn/passkeys (`@simplewebauthn/browser`): conditional UI and
+          cross-device/hybrid behavior differ; call WebAuthn only from a user
+          gesture, handle `NotAllowedError` and feature detection gracefully.
+        - Autoplay/video: require `muted`, `playsInline`, and a handled
+          `play()` promise rejection; iOS blocks unmuted autoplay and may use
+          low-power mode.
+        - Prefer feature detection over user-agent sniffing.
+    - path: "**/*.css"
+      instructions: |
+        Safari/WebKit compatibility (macOS Safari and iOS Safari). Flag CSS
+        that Safari lacks or renders differently, and suggest a fallback. Do
+        not ask for manual Safari testing.
+        - `100vh` on iOS includes the dynamic toolbar: prefer `dvh`/`svh`/`lvh`
+          with a `vh` fallback declared first.
+        - `backdrop-filter` needs the `-webkit-backdrop-filter` prefix alongside
+          the standard property.
+        - `:has()`, container queries, `@property`, `color-mix()`, `subgrid`,
+          `scrollbar-gutter`, `scrollbar-width`, `text-wrap: balance`, and
+          `field-sizing` need a supported-version check and a graceful
+          fallback (wrap in `@supports` where the layout would break without it).
+        - Form inputs under 16px font size trigger zoom-on-focus on iOS; keep
+          `input`, `select`, and `textarea` at `font-size: 16px` or larger on
+          small viewports.
+        - Watch for `position: sticky`/`fixed` inside `overflow` ancestors,
+          safe-area insets (`env(safe-area-inset-*)`), and `-webkit-` prefixed
+          `line-clamp`/`mask` usage.
+
+    # 2. Secrets
+    - path: "**"
+      instructions: |
+        Secrets and credentials (applies to all code, `.env*`, and config files).
+        - No hardcoded keys, tokens, passwords, webhook URLs, or connection
+          strings. `.env.example` lists names only, with empty values.
+        - Flag anything that looks like `sb_secret_` (Supabase Secret Key) or a
+          Supabase service-role JWT (`eyJ...` with `service_role`).
+        - Server-only env vars must never be read in client components
+          (`"use client"`) or exposed via `NEXT_PUBLIC_*`: `SUPABASE_SERVICE_ROLE_KEY`,
+          `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`,
+          `OPENROUTER_API_KEY`, `RETELL_API_KEY`, `DISCORD_WEBHOOK_URL`,
+          `CRON_SECRET`, `WEBAUTHN_CHALLENGE_SECRET`, `INBOUND_REPLY_SECRET`.
+        - Flag any `NEXT_PUBLIC_` variable whose name contains SECRET,
+          SERVICE_ROLE, or KEY, other than the allowed Supabase client keys
+          (`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+          `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`).
+        - Service-role / Secret Key Supabase clients belong only in server code
+          (`src/lib/supabase`, route handlers, server actions). They must not be
+          imported into client components, passed as props, returned in
+          responses, or logged (including via Sentry breadcrumbs or `console`).
+
+    # 3. Production data safety
+    - path: "**/*.{ts,tsx,js,mjs,cjs,sh,sql}"
+      instructions: |
+        Production data safety. Flag any code path that writes to, backfills, or
+        migrates production data outside the normal `supabase/migrations/`
+        flow: one-off scripts, ad hoc admin endpoints, or cron/route handlers
+        that mass-update rows, and any script that targets a production Supabase
+        project or uses a production service-role key. Agents and local
+        development use a Supabase dev project only. Data fixes belong in a
+        reviewed migration or an explicit, authorization-checked admin action.
+    - path: "supabase/migrations/**"
+      instructions: |
+        Database migrations get extra scrutiny.
+        - Schema changes must be a new timestamped file. Never edit, rename, or
+          reorder an applied migration.
+        - Preserve or add RLS and grants for every new or altered table, view,
+          function, and storage bucket. Check policies cover both admin access
+          and organization-member (client) access; clients are SELECT-only on
+          project tables and must not see `project_sow` or tasks with
+          `client_visible = false`.
+        - Flag destructive DDL/DML: `DROP` (table, column, policy, function),
+          `TRUNCATE`, `DELETE`/`UPDATE` without a `WHERE`, and column type
+          changes that can lose or truncate data. Require a safe path
+          (expand/backfill/contract, backup, or explicit justification).
+        - New `SECURITY DEFINER` functions need `search_path` set and
+          restricted `EXECUTE` grants.
+        - New constraints or `NOT NULL` on existing tables need a safe backfill.
+        - Do not hardcode production IDs, emails, or secrets.
+
+    # 4. Stack conventions
+    - path: "src/app/**"
+      instructions: |
+        Next.js 16 App Router. Check `node_modules/next/dist/docs/` before
+        relying on remembered APIs.
+        - Prefer Server Components; add `"use client"` only for browser APIs,
+          state, or event handlers, and keep client boundaries small.
+        - `params` and `searchParams` are async in Next 16: they must be
+          awaited (or unwrapped with `use`).
+        - Route handlers and server helpers must enforce authentication and
+          resource-level authorization themselves; `middleware.ts` is not a
+          substitute. Use the existing helpers in `src/lib/api-auth.ts` and
+          `src/lib/api-response.ts` rather than new parallel patterns.
+        - Client-facing pages must never render `project_sow`, hidden tasks
+          (`client_visible = false`), admin notes, or internal ticket-triage
+          notes.
+        - Keep portal styling scoped under `.client-workspace`/`.client-panel`
+          and admin styling under `.admin-workspace`/`.admin-panel`.
+    - path: "src/app/api/**"
+      instructions: |
+        API route handlers.
+        - Validate all input (body, query, params, headers) with zod before use.
+        - Authenticate, then authorize against the specific resource (admin
+          role, or organization membership for clients). Do not trust IDs from
+          the request.
+        - Clients are SELECT-only through RLS; client writes go only through
+          `/api/crm/projects/requests/[id]`, which checks membership and uses
+          the service role.
+        - Responses to clients must not include internal ticket notes,
+          triage output, `project_sow`, or hidden tasks.
+        - Webhooks and cron routes verify their secret (`RESEND_WEBHOOK_SECRET`,
+          `RETELL_API_KEY`, `CRON_SECRET`, `INBOUND_REPLY_SECRET`) with a
+          constant-time comparison before doing work.
+        - Passkey routes under `src/app/api/auth/passkey`: never log secrets,
+          challenges, magic links, or full authentication assertions.
+        - Return errors via the shared response helpers without leaking stack
+          traces or provider error bodies.
+    - path: "src/lib/supabase/**"
+      instructions: |
+        Supabase clients (`@supabase/ssr`).
+        - Server code must use `supabase.auth.getUser()`, which revalidates the
+          token, not `getSession()`, for authorization decisions.
+        - Cookie handling must use the `getAll`/`setAll` pattern and keep the
+          session cookies in sync on the response.
+        - The browser client uses only the public client key. The admin
+          (service-role / Secret Key) client stays server-only and is never
+          imported by client components.
+    - path: "middleware.ts"
+      instructions: |
+        Middleware routes unauthenticated users to `/login`, admins to `/admin`,
+        and clients to `/portal`. Use `@supabase/ssr` cookie handling and
+        `getUser()`; refreshed session cookies must be copied onto every
+        response, including redirects. Middleware is a convenience, not an
+        authorization boundary: do not rely on it for resource-level checks.
+    - path: "src/lib/**"
+      instructions: |
+        Library code. For AI features (Vercel AI SDK `ai`, `@openrouter/ai-sdk-provider`):
+        - The visitor assistant answers first, asks at most one follow-up, and
+          never quotes prices. Preserve the voice and scoping rules in
+          `src/data/knowledge/` and `src/lib/chatKnowledge.ts`.
+        - AI calls are best-effort: handle timeouts, provider errors, and empty
+          or malformed output, and degrade gracefully. Ticket triage failure
+          must never block ticket creation; triage notes are internal-only.
+        - Validate structured model output with zod; treat model output and
+          user content as untrusted (no secrets or internal notes in prompts
+          that can be echoed to visitors).
+        - Do not log prompts containing personal data, secrets, or tokens.
+        - Keep pure logic (e.g. `projects.ts`, `projectDraft.ts`) free of I/O
+          so it stays testable, and add focused tests for new logic.
+    - path: "{sentry.*.config.ts,src/instrumentation*.ts,next.config.ts}"
+      instructions: |
+        Sentry (`@sentry/nextjs`) and Next config. Keep the `/monitoring`
+        tunnel route intact. Do not send PII, auth headers, cookies, tokens,
+        passkey data, or request bodies to Sentry; keep sampling rates and
+        `sendDefaultPii` deliberate. DSNs are public, but auth tokens
+        (`SENTRY_AUTH_TOKEN`) must never be committed. Config changes must not
+        weaken security headers or CSP.
+    - path: "src/data/**"
+      instructions: |
+        Data-driven copy. Public copy lives here rather than in components.
+        - No prices or price ranges (the assistant and site do not quote prices).
+        - No "real-time" claims unless it is literally true.
+        - MLS/IDX wording must not imply endorsement, partnership, or data
+          ownership by the MLS, brokerage, or KYGR Solutions.
+        - Files in `src/data/knowledge/` are loaded at runtime by
+          `src/lib/chatKnowledge.ts`. Do not rename or remove them (notably
+          `diagnostic-questions.md`) without updating the loader, and keep the
+          assistant's answer-first voice and scoping rules.
+    - path: "src/components/**"
+      instructions: |
+        UI components.
+        - Reuse Tailwind CSS 4 tokens and component classes from
+          `src/app/globals.css` (rich black, Oxford blue, Penn blue, Lapis
+          Lazuli, Blue NCS, text colors) instead of hardcoded colors or new
+          visual primitives.
+        - Server Components by default; `"use client"` only when needed.
+        - Accessibility: semantic elements, labels for every form control,
+          visible focus states, keyboard support (tabs, disclosures, dialogs),
+          meaningful `alt` text, sufficient contrast, and `prefers-reduced-motion`
+          handling for Motion/animated effects.
+        - Never render hidden tasks, `project_sow`, or internal notes in client
+          components.
