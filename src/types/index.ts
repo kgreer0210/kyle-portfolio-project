@@ -13,7 +13,8 @@ export interface Project {
   image: string;
   technologies: string[];
   liveUrl?: string;
-  status?: "completed" | "in-progress" | "planned";
+  // "coming-soon" renders a non-linked placeholder card and has no detail page.
+  status?: "completed" | "in-progress" | "planned" | "coming-soon";
   role?: string;
   challenge?: string;
   outcome?: string;
