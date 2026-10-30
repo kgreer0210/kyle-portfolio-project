@@ -132,17 +132,14 @@ export default function ProjectDetailClient() {
           >
             <div className="mb-12 text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-4">
-                {project.backendShowcase.title ?? "System Deep-Dive"}
+                {project.backendShowcase.title ?? "Inside the Project"}
               </h2>
               <p className="text-xl text-text-secondary max-w-2xl mx-auto">
                 {project.backendShowcase.subtitle ??
-                  "Exploring the backend architecture and administrative tools built for this solution."}
+                  "A closer look at the screens and tools built for this project."}
               </p>
             </div>
-            <BackendShowcase 
-              projectTitle={project.title} 
-              screenshots={project.backendShowcase.screenshots} 
-            />
+            <BackendShowcase screenshots={project.backendShowcase.screenshots} />
           </motion.div>
         )}
       </div>

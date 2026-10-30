@@ -13,14 +13,10 @@ interface Screenshot {
 }
 
 interface BackendShowcaseProps {
-  projectTitle: string;
   screenshots: Screenshot[];
 }
 
-export default function BackendShowcase({
-  projectTitle,
-  screenshots,
-}: BackendShowcaseProps) {
+export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
   const [selectedScreenshot, setSelectedScreenshot] =
     useState<Screenshot | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -44,26 +40,6 @@ export default function BackendShowcase({
       transition={{ duration: 0.8 }}
     >
       <div className="max-w-6xl mx-auto px-6">
-        <motion.h1
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-headings mb-6 md:mb-8 text-center px-4"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {projectTitle} - Backend Architecture
-        </motion.h1>
-
-        <motion.p
-          className="text-base sm:text-lg text-text-secondary mb-8 md:mb-12 text-center max-w-3xl mx-auto px-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          Explore the backend systems and administrative interfaces that power
-          this application. These are the tools and dashboards that enable
-          efficient business operations.
-        </motion.p>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {screenshots.map((screenshot, index) => (
             <motion.div
