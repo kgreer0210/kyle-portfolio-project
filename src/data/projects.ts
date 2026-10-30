@@ -1,5 +1,19 @@
 import { Project } from "../types";
 
+/**
+ * Coming-soon projects show a placeholder card on /projects. They have no
+ * detail page, are skipped by the homepage featured work, and are not listed
+ * in the sitemap.
+ */
+export function isComingSoonProject(project: Project): boolean {
+  return project.status === "coming-soon";
+}
+
+/** Projects that can be linked to and featured. */
+export function getPublishedProjects(list: Project[] = projects): Project[] {
+  return list.filter((project) => !isComingSoonProject(project));
+}
+
 export const projects: Project[] = [
   {
     id: "dexter-gordy-realtor",
@@ -142,6 +156,33 @@ export const projects: Project[] = [
           ],
         },
       ],
+    },
+  },
+  {
+    // PLACEHOLDER: Lisa Dunn's site is not built yet. To publish this entry:
+    //   1. Drop hero.png, listings.png, and sold.png (PNG, 1440x900) into
+    //      public/projects/lisa-dunn/ (see the README.md there), then delete
+    //      that README.md.
+    //   2. Change `status` below from "coming-soon" to "completed".
+    //   3. Fill in the TODOs: description, technologies, liveUrl, role,
+    //      challenge, outcome, and backendShowcase (set `available: true`
+    //      and add a screenshots entry per file, as in Dexter Gordy Realtor).
+    // Keep any MLS/IDX copy within the KYGR IDX rules (no "real-time", no
+    // prices, no claim of owning the data).
+    id: "lisa-dunn-real-estate",
+    title: "Lisa Dunn Real Estate",
+    // TODO: replace with real copy once the site is built.
+    description: "A real estate agent website by KYGR Solutions.",
+    // Not rendered while coming soon; this is the hero screenshot to add.
+    image: "/projects/lisa-dunn/hero.png",
+    // TODO: list the real technologies once the site is built.
+    technologies: [],
+    // TODO: add liveUrl at launch.
+    status: "coming-soon",
+    backendShowcase: {
+      available: false,
+      description: "",
+      screenshots: [],
     },
   },
   {

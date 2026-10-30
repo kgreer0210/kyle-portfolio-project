@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Hero, HowItWorks, Testimonials } from "../components";
 import { IDX_PATH, idxOffering } from "../data/idx";
-import { projects } from "../data/projects";
+import { getPublishedProjects } from "../data/projects";
 import { services } from "../data/services";
 
 export default function HomeClient() {
@@ -29,7 +29,7 @@ export default function HomeClient() {
     }
   }, []);
 
-  const featuredProjects = projects.slice(0, 2);
+  const featuredProjects = getPublishedProjects().slice(0, 2);
 
   return (
     <motion.div

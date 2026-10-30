@@ -1,6 +1,7 @@
 import ProjectDetailClient from "./ProjectDetailClient";
-import { projects } from "../../../data/projects";
+import { isComingSoonProject, projects } from "../../../data/projects";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ projectId: string }>;
@@ -10,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { projectId } = await params;
   const project = projects.find((p) => p.id === projectId);
 
-  if (!project) {
+  if (!project || isComingSoonProject(project)) {
     return {
       title: "Project Not Found",
     };
@@ -34,6 +35,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProjectDetailPage() {
+export default async function ProjectDetailPage({ params }: Props) {
+  const { projectId } = await params;
+  const project = projects.find((p) => p.id === projectId);
+
+  // Coming-soon placeholders have no detail page.
+  if (project && isComingSoonProject(project)) {
+    notFound();
+  }
+
   return <ProjectDetailClient />;
 }
