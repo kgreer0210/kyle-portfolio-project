@@ -180,7 +180,7 @@ export default function Contact({ initialSubject }: ContactProps) {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Ready to take your business to the next level? You can{" "}
+          Have an idea you keep coming back to? You can{" "}
           <a
             href={consultLink}
             target="_blank"
@@ -189,16 +189,15 @@ export default function Contact({ initialSubject }: ContactProps) {
           >
             book a quick call
           </a>
-          , call us at{" "}
+          , call me at{" "}
           <a
             href="tel:+14787775799"
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
             (478) 777-5799
           </a>
-          , or send details through this form—whatever is easiest. I focus on
-          custom websites, web/mobile apps, and automations for businesses ready
-          to grow — wherever you&apos;re located.
+          , or send details through this form, whatever&apos;s easiest. Hard
+          problems welcome, wherever you&apos;re located.
         </motion.p>
 
         <motion.div

@@ -3,7 +3,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: "Explore our portfolio of custom software solutions, web applications, and business automations built for real-world impact.",
+  description: "Websites, apps, and automations I've built for local businesses, ministries, and my own household.",
 };
 
 export default function ProjectsPage() {

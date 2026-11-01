@@ -58,10 +58,10 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.45 }}
           >
-            We help businesses convert more visitors, streamline operations, and
-            reclaim time with custom websites, modern web/mobile apps, and
-            practical automations — whether you&apos;re down the street or
-            across the country.
+            Have an idea you&apos;ve been carrying around? I&apos;ll turn it
+            into a website, app, or automation that does exactly what you
+            pictured, and then some, so you get your time back. Down the street
+            or across the country.
           </motion.p>
 
           <motion.div
@@ -87,7 +87,7 @@ export default function Hero() {
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              Send us an email
+              Send me an email
             </MotionLink>
           </motion.div>
 
@@ -130,7 +130,7 @@ export default function Hero() {
             <div className="relative mx-3 h-56 overflow-hidden rounded-lg sm:h-72 xl:h-[340px]">
               <Image
                 src={lexisProject.image}
-                alt="Screenshot of the Lexis Fresh Slate Cleanings website homepage"
+                alt="Screenshot of the Lexi's Fresh Slate Cleanings website homepage"
                 fill
                 preload
                 sizes="(min-width: 1280px) 516px, (min-width: 640px) 620px, 100vw"
@@ -142,7 +142,7 @@ export default function Hero() {
                 {lexisProject.title}
               </span>
               <span className="text-[13px] text-text-secondary">
-                Client & staff portals
+                Portals + one-button text reminders
               </span>
             </figcaption>
           </motion.figure>

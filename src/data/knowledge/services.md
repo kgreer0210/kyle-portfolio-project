@@ -3,7 +3,7 @@
 KYGR Solutions is a one-person side practice. The work I take on falls into six buckets, and most projects are some combination of these:
 
 ## 1. Custom web apps & portals
-Full-stack builds where a business needs more than a website — they need a working tool. Admin dashboards, client portals, employee portals, custom workflows. Example: the full front-end + admin/client/employee portal I built for Lexis Fresh Slate Cleanings.
+Full-stack builds where a business needs more than a website — they need a working tool. Admin dashboards, client portals, employee portals, custom workflows. Example: the full front-end + admin/client/employee portal I built for Lexi's Fresh Slate Cleanings.
 
 ## 2. Marketing & business websites
 Modern, fast, easy-to-update sites for small businesses, ministries, and local organizations. Example: the revitalized site for Mid-State Baptist Association.

@@ -34,21 +34,21 @@ export default function AboutClient() {
               </h2>
               <div className="space-y-6 text-lg text-text-primary leading-relaxed">
                 <p>
-                  My name is Kyle Greer, and I&apos;m the founder of KYGR
-                  Solutions. I&apos;m a software developer, husband, and father
-                  of three young children. I started this business with a clear
-                  goal in mind: to build something meaningful that serves others
-                  well and to build a business that honors God, supports my
-                  family, and allows me to be a faithful steward of the skills
-                  I&apos;ve been given.
+                  I&apos;m Kyle Greer, a husband, a father of three, a man of
+                  faith, and the founder of KYGR Solutions. My peace comes from
+                  the Lord, so hard problems don&apos;t scare me. They&apos;re
+                  how I grow. I started this business to serve people well,
+                  honor God, and be a faithful steward of the skills I&apos;ve
+                  been given.
                 </p>
                 <p>
-                  KYGR Solutions was born out of a desire to use technology
-                  responsibly and purposefully — not just to build software, but
-                  to solve real problems for real people. I work closely with
-                  businesses and organizations to understand what they actually
-                  need, then design solutions that are simple, reliable, and
-                  easy to use.
+                  I love taking the idea you&apos;ve been carrying around and
+                  guiding it all the way to finished software that does exactly
+                  what you pictured, and then some. I don&apos;t settle for
+                  &quot;good enough.&quot; I sweat the small details nobody else
+                  would notice, because the work should be right. My favorite
+                  part is the moment a client sees it working and realizes their
+                  life just got easier.
                 </p>
               </div>
             </motion.div>
@@ -73,6 +73,53 @@ export default function AboutClient() {
           </div>
         </section>
 
+        {/* Section: Why I Build */}
+        <section className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold text-text-headings mb-6">
+              Why I build
+            </h2>
+            <p className="text-xl text-text-primary leading-relaxed max-w-3xl mb-10">
+              Because my peace comes from the Lord, hard things don&apos;t scare
+              me. I turn the ideas people carry around into something real, and
+              serving people that way brings me joy.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                {
+                  title: "$138,000 in 18 months",
+                  desc: "In 2024, my wife and I paid off $138,000 of debt in 18 months. Every month we asked what else we could do, and we even sold a van we’d bought a year earlier. That season taught me one question: “If I had to, what would it take?” Hard things aren’t blockers. They’re there to be overcome, and they help me grow. I bring that same question to every project.",
+                },
+                {
+                  title: "The page nobody complained about",
+                  desc: "While showing a new client a site I’d built for Lexi’s Fresh Slate Cleanings, I noticed the admin calendar page loading slowly. A loading animation covered it, so nobody else would have noticed, but it wasn’t up to my standard. I fixed the slow queries without anyone asking. I could do better, so I did.",
+                },
+              ].map((story, idx) => (
+                <motion.div
+                  key={story.title}
+                  className="p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <h3 className="text-xl font-bold text-blue-ncs mb-3">
+                    {story.title}
+                  </h3>
+                  <p className="text-text-primary text-lg leading-relaxed">
+                    {story.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
         {/* Section 2: Mission */}
         <section className="mb-20">
           <motion.div
@@ -87,6 +134,24 @@ export default function AboutClient() {
               To help businesses and organizations use technology as a tool —
               not a burden — by delivering honest, high-quality software
               solutions that improve efficiency, clarity, and trust.
+            </p>
+          </motion.div>
+          <motion.div
+            className="mt-8 bg-blue-ncs/5 p-8 md:p-12 rounded-3xl border border-blue-ncs/10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold text-blue-ncs mb-6">
+              Where we&apos;re headed
+            </h2>
+            <p className="text-2xl text-text-primary leading-relaxed font-medium">
+              In five years, I want KYGR Solutions known for lasting
+              relationships built by serving people well, with websites and apps
+              that make their lives easier. A business that never settles for
+              mediocre, keeps pushing the envelope, holds firm to its values,
+              and honors the Lord in everything it does.
             </p>
           </motion.div>
         </section>
@@ -106,7 +171,7 @@ export default function AboutClient() {
               {[
                 {
                   title: "Built with Purpose",
-                  desc: "My work is guided by faith, integrity, and stewardship. I believe technology should do what it claims to do and be built with care and intention.",
+                  desc: "My work is guided by faith, integrity, and stewardship. I want to honor the Lord in how I build, how I price, and how I treat people. Technology should do what it claims to do.",
                 },
                 {
                   title: "People Over Platforms",
@@ -114,11 +179,11 @@ export default function AboutClient() {
                 },
                 {
                   title: "Clarity & Craftsmanship",
-                  desc: "Clean code, thoughtful design, and a strong user experience matter. Good software should feel intuitive, not frustrating.",
+                  desc: "Clean code, thoughtful design, and a strong user experience matter. I don’t settle for “good enough.” If something can be better, even if no one would notice, I make it better.",
                 },
                 {
                   title: "Trust Through Partnership",
-                  desc: "I aim to be more than just a developer. I want to be a trusted partner who understands your goals and helps you move forward with confidence.",
+                  desc: "I want more than a project. I want a lasting relationship, built by serving you well long after launch.",
                 },
               ].map((value, idx) => (
                 <motion.div
@@ -149,11 +214,11 @@ export default function AboutClient() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-bold text-text-headings mb-6">
-            Ready to streamline your business?
+            Got an idea you&apos;ve been carrying around?
           </h2>
           <p className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
-            Let&apos;s discuss how we can build the digital tools your business
-            needs to grow and thrive.
+            Let&apos;s talk about it. I&apos;ll help you figure out what it
+            would take to make it real.
           </p>
           <Link href="/contact">
             <motion.button

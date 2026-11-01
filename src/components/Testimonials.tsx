@@ -88,9 +88,8 @@ export default function Testimonials() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Don&apos;t just take my word for it. Here&apos;s what my clients say — from
-          local shops to growing businesses everywhere. More stories available
-          on a call if you want details.
+          Don&apos;t just take my word for it. Here&apos;s what my first official
+          client has to say. I&apos;m happy to share more on a call.
         </motion.p>
       </motion.div>
 
