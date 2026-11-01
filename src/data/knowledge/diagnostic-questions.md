@@ -26,8 +26,8 @@ Answer the visitor's question first. If you need more context to be truly helpfu
 - Keep it direct — this visitor is ready, don't slow them down.
 
 ## Intent: IDX / property search on a real estate site
-- Answer first with the IDX facts in services.md: approved IDX vendor for Central Georgia MLS, branded search on the agent's own domain, listings updated every 15 minutes, contact for pricing.
-- One natural follow-up: "Is your office a Central Georgia MLS participant?"
+- Answer first with the IDX facts in services.md: approved IDX vendor with access to Georgia MLS and Central Georgia MLS, branded search on the agent's own domain, listings updated every 15 minutes, contact for pricing.
+- One natural follow-up: "Is your office in Georgia MLS, Central Georgia MLS, or both?"
 - Offer the contact form or Calendly link when they want to talk about their site.
 - Apply the IDX language rule in scoping-guidelines.md. Do not add claims that are not in services.md.
 

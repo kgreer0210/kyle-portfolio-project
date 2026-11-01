@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     "tech stack review",
     "technology consulting",
     "IDX",
+    "Georgia MLS",
     "Central Georgia MLS",
     "property search",
     "business software",

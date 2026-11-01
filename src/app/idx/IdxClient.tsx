@@ -22,7 +22,7 @@ export default function IdxClient() {
           </span>
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6">
             Custom IDX for{" "}
-            <span className="text-blue-ncs">Central Georgia agents</span>
+            <span className="text-blue-ncs">Georgia agents</span>
           </h1>
           <p className="text-xl md:text-2xl text-text-primary font-medium mb-6">
             {idxOffering.subhead}

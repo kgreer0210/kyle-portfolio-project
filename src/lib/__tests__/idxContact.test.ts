@@ -6,12 +6,10 @@ const publicCopy = idxPublicCopy.join("\n");
 
 describe("IDX public copy", () => {
   it("keeps the approved offering language", () => {
-    expect(publicCopy).toContain("Custom IDX for Central Georgia agents");
-    expect(publicCopy).toContain(
-      "An approved IDX vendor for Central Georgia MLS.",
-    );
+    expect(publicCopy).toContain("Custom IDX for Georgia agents");
+    expect(publicCopy).toContain("Georgia MLS and Central Georgia MLS");
     expect(publicCopy).toContain("Contact for pricing");
-    expect(publicCopy).toContain("Talk to us about IDX for your site");
+    expect(publicCopy).toContain("Talk to me about IDX for your site");
     expect(publicCopy).toContain("every 15 minutes");
     expect(publicCopy).toContain(
       "Your participating broker opts in in writing.",
@@ -20,8 +18,6 @@ describe("IDX public copy", () => {
 
   it("does not make prohibited MLS claims", () => {
     const forbidden = [
-      /\bGAMLS\b/i,
-      /(?<!Central )Georgia MLS/i,
       /real-?time/i,
       /sold data/i,
       /home valuation/i,
