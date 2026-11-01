@@ -445,3 +445,16 @@ export const projects: Project[] = [
     },
   },
 ];
+
+// The home page Featured Work section shows these projects, in this order.
+export const FEATURED_PROJECT_IDS = [
+  "dexter-gordy-realtor",
+  "lexisFreshSlateCleanings",
+] as const;
+
+export function getFeaturedProjects(): Project[] {
+  return FEATURED_PROJECT_IDS.flatMap((id) => {
+    const project = projects.find((p) => p.id === id);
+    return project ? [project] : [];
+  });
+}
