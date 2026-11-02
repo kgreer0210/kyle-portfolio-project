@@ -81,8 +81,8 @@ export default function ProjectDetailClient() {
             {project.outcome && (
               <section className="p-8 rounded-3xl bg-blue-ncs/10 border border-blue-ncs/20">
                 <h2 className="text-2xl font-bold text-blue-ncs mb-4">The Outcome</h2>
-                <p className="text-xl text-text-primary italic leading-relaxed">
-                  &ldquo;{project.outcome}&rdquo;
+                <p className="text-xl text-text-primary leading-relaxed">
+                  {project.outcome}
                 </p>
               </section>
             )}

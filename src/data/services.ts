@@ -17,13 +17,13 @@ export const services: Service[] = [
     points: [
       "Customer and staff portals that streamline service delivery",
       "Mobile-friendly experiences for teams and clients on the go",
-      "Real-time data synchronization and offline support",
+      "Data that stays in sync across devices, with offline support",
       "Secure user authentication and data management",
     ],
   },
   {
     title: "Automation & Integrations",
-    description: "Intelligent workflows that remove manual busywork and reduce operational errors.",
+    description: "Workflows that take repetitive work off your plate, like sending a whole week of appointment reminders with one button.",
     points: [
       "Remove manual busywork with workflows and integrations",
       "Fewer errors, faster handoffs, and better visibility",

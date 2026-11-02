@@ -22,8 +22,8 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-            Ready to reclaim your time and scale your operations? Reach out
-            today for a free consultation.
+            Tell me about the idea you&apos;ve been carrying around. The first
+            call is free, and we&apos;ll figure out what it would take.
           </p>
         </motion.div>
 
@@ -144,7 +144,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                     2
                   </span>
                   <p className="text-sm text-text-secondary">
-                    We&apos;ll schedule a brief 30-minute intro call.
+                    I&apos;ll schedule a brief 30-minute intro call.
                   </p>
                 </li>
                 <li className="flex gap-3">

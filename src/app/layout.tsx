@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     "tech stack review",
     "technology consulting",
     "IDX",
+    "Georgia MLS",
     "Central Georgia MLS",
     "property search",
     "business software",
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "KYGR Solutions",
     title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Helping businesses grow through custom websites, apps, and automation — based in Georgia, working everywhere. Reclaim your time and win more leads.",
+      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I turn the idea you've been carrying around into software that gives you your time back.",
     images: [
       {
         url: "/logo.png", // Ensure this path is correct or use a specific OG image
@@ -69,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Helping businesses grow through custom websites, apps, and automation — based in Georgia, working everywhere. Reclaim your time and win more leads.",
+      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I turn the idea you've been carrying around into software that gives you your time back.",
     images: ["/logo.png"],
     creator: "@kygrsolutions", // Replace with your actual handle if applicable
   },

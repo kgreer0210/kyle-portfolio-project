@@ -146,9 +146,9 @@ export const projects: Project[] = [
   },
   {
     id: "lexisFreshSlateCleanings",
-    title: "Lexis Fresh Slate Cleanings",
+    title: "Lexi's Fresh Slate Cleanings",
     description:
-      "A comprehensive web application for a local cleaning company featuring customer and employee portals, an admin dashboard with service management, booking system, staff scheduling, client management, estimate requests, and automated SMS reminders.",
+      "A web app for my first official client, a local cleaning company. One-button text reminders tied to her calendar replaced hours of weekend copy-and-paste, alongside customer and employee portals, booking, staff scheduling, and estimate requests.",
     image: "/lexisFreshSlateCleaningsScreenshot.png",
     technologies: [
       "Next.js",
@@ -162,13 +162,13 @@ export const projects: Project[] = [
     status: "completed",
     role: "Product discovery, UX/UI, and full-stack development",
     challenge:
-      "As the primary developer on this project, I was responsible for transforming the client's vision into a high-performance digital solution. The main challenge was to create a system that was both powerful for the business owner and intuitive for the end-users.",
+      "Lexi's Fresh Slate Cleanings was my first official client. Every weekend, Lexi spent hours copying and pasting reminder texts to customers. I needed to build a system powerful enough to run her business and simple enough for her customers and staff to use without thinking. Getting business texting approved meant working through carrier registration paperwork. It was the least fun part, but it's what the job took.",
     outcome:
-      "Streamlined scheduling, client communication, and staff coordination for a growing cleaning company; less back-office busywork.",
+      "A whole week of reminders now goes out with one button, pulled from her calendar. Lexi says it gave her weekends back.",
     backendShowcase: {
       available: true,
       description:
-        "Backend architecture for Lexis Fresh Slate Cleanings, showcasing service management, booking system, staff management, and customer portal.",
+        "Backend architecture for Lexi's Fresh Slate Cleanings, showcasing service management, booking system, staff management, and customer portal.",
       screenshots: [
         {
           id: "admin-portal-dashboard",
@@ -180,7 +180,7 @@ export const projects: Project[] = [
           features: [
             "Business performance metrics",
             "Quick access navigation",
-            "Real-time notifications",
+            "Instant notifications",
             "Client Invite Management",
             "Revenue analytics",
           ],
@@ -218,7 +218,7 @@ export const projects: Project[] = [
           id: "admin-calendar",
           title: "Admin Calendar Management",
           description:
-            "Advanced scheduling interface for managing appointments, staff assignments, and resource allocation across all locations.",
+            "Advanced scheduling interface for managing appointments, staff assignments, and resource allocation across all locations. While showing this site to a new client, I noticed this page loading slowly behind its loading animation. Nobody had complained, but it wasn't up to my standard, so I fixed the slow queries.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Calendar.png",
           features: [
@@ -277,11 +277,11 @@ export const projects: Project[] = [
           id: "admin-estimate-request-management",
           title: "Admin Estimate Request Management",
           description:
-            "Streamlined interface for managing customer estimate requests with real-time notifications. Features a notification icon that alerts Lexi when new estimate requests are available, ensuring prompt response to potential customers.",
+            "Streamlined interface for managing customer estimate requests with instant notifications. Features a notification icon that alerts Lexi when new estimate requests are available, ensuring prompt response to potential customers.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Estimate Request Management.png",
           features: [
-            "Real-time estimate request notifications",
+            "Instant estimate request alerts",
             "Notification icon indicator",
             "Request status management",
             "Customer communication tracking",
@@ -292,7 +292,7 @@ export const projects: Project[] = [
           id: "admin-sms-reminder",
           title: "Admin SMS Reminder System",
           description:
-            "Integrated Twilio SMS system for automated communications. Enables sending weekly SMS reminders for upcoming appointments, new employee invites, and customer invitations to keep everyone informed and engaged.",
+            "Sends the whole week's appointment reminders with one button, pulled from the calendar. That replaced hours of copy-and-paste every weekend. It also handles employee and customer invites.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin SMS Reminder.png",
           features: [
@@ -445,3 +445,16 @@ export const projects: Project[] = [
     },
   },
 ];
+
+// The home page Featured Work section shows these projects, in this order.
+export const FEATURED_PROJECT_IDS = [
+  "dexter-gordy-realtor",
+  "lexisFreshSlateCleanings",
+] as const;
+
+export function getFeaturedProjects(): Project[] {
+  return FEATURED_PROJECT_IDS.flatMap((id) => {
+    const project = projects.find((p) => p.id === id);
+    return project ? [project] : [];
+  });
+}
