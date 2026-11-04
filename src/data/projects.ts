@@ -1,5 +1,19 @@
 import { Project } from "../types";
 
+/**
+ * Coming-soon projects show a placeholder card on /projects. They have no
+ * detail page, are skipped by the homepage featured work, and are not listed
+ * in the sitemap.
+ */
+export function isComingSoonProject(project: Project): boolean {
+  return project.status === "coming-soon";
+}
+
+/** Projects that can be linked to and featured. */
+export function getPublishedProjects(list: Project[] = projects): Project[] {
+  return list.filter((project) => !isComingSoonProject(project));
+}
+
 export const projects: Project[] = [
   {
     id: "dexter-gordy-realtor",
@@ -139,6 +153,88 @@ export const projects: Project[] = [
             "Free, Plus, and Pro plans",
             "Monthly or yearly billing",
             "Chef's Week on paid plans",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "lisa-dunn-real-estate",
+    title: "Lisa Dunn Real Estate",
+    description:
+      "A bilingual English and Spanish website for Central Georgia Realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with IDX home search on a map, a page that highlights her own listings, and contact and lead forms.",
+    image: "/projects/lisa-dunn/hero.png",
+    technologies: [
+      "Next.js 16",
+      "TypeScript",
+      "next-intl",
+      "Resend",
+      "Vercel",
+      "Google Maps",
+      "IDX API",
+    ],
+    liveUrl: "https://lisardunnrealtor.com",
+    status: "completed",
+    role: "Design, full-stack development, IDX integration, hosting, and domain cutover",
+    challenge:
+      "Lisa's old WordPress site needed to become a modern website in both English and Spanish. I rebuilt it from scratch, brought her listings in through the Central Georgia MLS IDX approval process, and followed her brokerage's licensing and disclaimer rules, so her license and the office license show up correctly.",
+    outcome:
+      "Central Georgia MLS approved the site for IDX, and it launched on Lisa's own domain on November 4, 2026. Visitors can browse active listings across Central Georgia, with Lisa's own listings highlighted, in English or Spanish.",
+    backendShowcase: {
+      available: true,
+      title: "Inside the Site",
+      subtitle:
+        "A closer look at Lisa's listings, the IDX home search, and the Spanish version of the site, with listing data provided by Central Georgia MLS.",
+      description:
+        "A look at the listings page, home search, listing map, and Spanish home page built for Lisa Dunn Real Estate.",
+      screenshots: [
+        {
+          id: "portfolio",
+          title: "Lisa's listings",
+          description:
+            "A portfolio page that highlights Lisa's own listings, with listing data provided by Central Georgia MLS.",
+          image: "/projects/lisa-dunn/listings.png",
+          features: [
+            "Lisa's own listings highlighted",
+            "Photo, status, and key details on each listing",
+            "Listing firm and license shown with each listing",
+            "Source credit to Central Georgia MLS",
+          ],
+        },
+        {
+          id: "home-search",
+          title: "Home search",
+          description:
+            "Map-based home search over listing data provided by Central Georgia MLS, with filters to narrow the results.",
+          image: "/projects/lisa-dunn/search.png",
+          features: [
+            "Search by city, beds, baths, and property type",
+            "Map of matching homes across Central Georgia",
+            "Sort options",
+          ],
+        },
+        {
+          id: "listing-map",
+          title: "Listing map",
+          description:
+            "Listing detail pages include a map of the home's location, with an option to ask Lisa about the home.",
+          image: "/projects/lisa-dunn/detail.png",
+          features: [
+            "Google Map on each listing",
+            "Ask Lisa about this home",
+            "Lisa's license shown in the site header",
+          ],
+        },
+        {
+          id: "spanish",
+          title: "Spanish version",
+          description:
+            "The site is bilingual, with a language switch in the header, so visitors can read it in English or Spanish.",
+          image: "/projects/lisa-dunn/spanish.png",
+          features: [
+            "English and Spanish versions of the site",
+            "One-click EN / ES language switch",
+            "License and brokerage shown in the header",
           ],
         },
       ],
