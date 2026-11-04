@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   getPublishedProjects,
@@ -25,13 +27,28 @@ describe("projects data", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("lists Lisa Dunn Real Estate as a coming-soon placeholder after the first project", () => {
+  it("lists Lisa Dunn Real Estate as a completed project after the first one", () => {
     const index = projects.findIndex(
       (project) => project.id === "lisa-dunn-real-estate",
     );
     expect(index).toBeGreaterThan(0);
-    expect(isComingSoonProject(projects[index])).toBe(true);
-    expect(projects[index].liveUrl).toBeUndefined();
+    expect(projects[index].status).toBe("completed");
+    expect(isComingSoonProject(projects[index])).toBe(false);
+    expect(projects[index].liveUrl).toBe("https://lisardunnrealtor.com");
+  });
+
+  it("points every Lisa Dunn screenshot at an existing file", () => {
+    const lisa = projects.find(
+      (project) => project.id === "lisa-dunn-real-estate",
+    );
+    const images = [
+      lisa?.image,
+      ...(lisa?.backendShowcase?.screenshots.map((shot) => shot.image) ?? []),
+    ];
+    expect(images).toHaveLength(5);
+    for (const image of images) {
+      expect(existsSync(join(process.cwd(), "public", image ?? ""))).toBe(true);
+    }
   });
 });
 
@@ -51,9 +68,9 @@ describe("coming-soon projects", () => {
     expect(getPublishedProjects([comingSoon, live])).toEqual([live]);
   });
 
-  it("are excluded from the default published list", () => {
-    const ids = getPublishedProjects().map((project) => project.id);
-    expect(ids).not.toContain("lisa-dunn-real-estate");
-    expect(ids[0]).toBe("dexter-gordy-realtor");
+  it("leave every current project in the default published list", () => {
+    expect(getPublishedProjects().map((project) => project.id)).toEqual(
+      projects.map((project) => project.id),
+    );
   });
 });

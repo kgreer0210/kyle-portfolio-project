@@ -159,30 +159,85 @@ export const projects: Project[] = [
     },
   },
   {
-    // PLACEHOLDER: Lisa Dunn's site is not built yet. To publish this entry:
-    //   1. Drop hero.png, listings.png, and sold.png (PNG, 1440x900) into
-    //      public/projects/lisa-dunn/ (see the README.md there), then delete
-    //      that README.md.
-    //   2. Change `status` below from "coming-soon" to "completed".
-    //   3. Fill in the TODOs: description, technologies, liveUrl, role,
-    //      challenge, outcome, and backendShowcase (set `available: true`
-    //      and add a screenshots entry per file, as in Dexter Gordy Realtor).
-    // Keep any MLS/IDX copy within the KYGR IDX rules (no "real-time", no
-    // prices, no claim of owning the data).
     id: "lisa-dunn-real-estate",
     title: "Lisa Dunn Real Estate",
-    // TODO: replace with real copy once the site is built.
-    description: "A real estate agent website by KYGR Solutions.",
-    // Not rendered while coming soon; this is the hero screenshot to add.
+    description:
+      "A bilingual English and Spanish website for Central Georgia Realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with IDX home search on a map, a page that highlights her own listings, and contact and lead forms.",
     image: "/projects/lisa-dunn/hero.png",
-    // TODO: list the real technologies once the site is built.
-    technologies: [],
-    // TODO: add liveUrl at launch.
-    status: "coming-soon",
+    technologies: [
+      "Next.js 16",
+      "TypeScript",
+      "next-intl",
+      "Resend",
+      "Vercel",
+      "Google Maps",
+      "IDX API",
+    ],
+    liveUrl: "https://lisardunnrealtor.com",
+    status: "completed",
+    role: "Design, full-stack development, IDX integration, hosting, and domain cutover",
+    challenge:
+      "Lisa's old WordPress site needed to become a modern website in both English and Spanish. I rebuilt it from scratch, brought her listings in through the Central Georgia MLS IDX approval process, and followed her brokerage's licensing and disclaimer rules, so her license and the office license show up correctly.",
+    outcome:
+      "Central Georgia MLS approved the site for IDX, and it launched on Lisa's own domain on November 4, 2026. Visitors can browse active listings across Central Georgia, with Lisa's own listings highlighted, in English or Spanish.",
     backendShowcase: {
-      available: false,
-      description: "",
-      screenshots: [],
+      available: true,
+      title: "Inside the Site",
+      subtitle:
+        "A closer look at Lisa's listings, the IDX home search, and the Spanish version of the site, with listing data provided by Central Georgia MLS.",
+      description:
+        "A look at the listings page, home search, listing map, and Spanish home page built for Lisa Dunn Real Estate.",
+      screenshots: [
+        {
+          id: "portfolio",
+          title: "Lisa's listings",
+          description:
+            "A portfolio page that highlights Lisa's own listings, with listing data provided by Central Georgia MLS.",
+          image: "/projects/lisa-dunn/listings.png",
+          features: [
+            "Lisa's own listings highlighted",
+            "Photo, status, and key details on each listing",
+            "Listing firm and license shown with each listing",
+            "Source credit to Central Georgia MLS",
+          ],
+        },
+        {
+          id: "home-search",
+          title: "Home search",
+          description:
+            "Map-based home search over listing data provided by Central Georgia MLS, with filters to narrow the results.",
+          image: "/projects/lisa-dunn/search.png",
+          features: [
+            "Search by city, beds, baths, and property type",
+            "Map of matching homes across Central Georgia",
+            "Sort options",
+          ],
+        },
+        {
+          id: "listing-map",
+          title: "Listing map",
+          description:
+            "Listing detail pages include a map of the home's location, with an option to ask Lisa about the home.",
+          image: "/projects/lisa-dunn/detail.png",
+          features: [
+            "Google Map on each listing",
+            "Ask Lisa about this home",
+            "Lisa's license shown in the site header",
+          ],
+        },
+        {
+          id: "spanish",
+          title: "Spanish version",
+          description:
+            "The site is bilingual, with a language switch in the header, so visitors can read it in English or Spanish.",
+          image: "/projects/lisa-dunn/spanish.png",
+          features: [
+            "English and Spanish versions of the site",
+            "One-click EN / ES language switch",
+            "License and brokerage shown in the header",
+          ],
+        },
+      ],
     },
   },
   {
