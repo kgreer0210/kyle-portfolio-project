@@ -4,7 +4,7 @@ import { firstParam } from "@/lib/searchParams";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Ready to reclaim your time and scale your operations? Reach out today for a free consultation about your software needs.",
+  description: "Tell me about the idea you've been carrying around. The first call is free, and we'll figure out what it would take.",
 };
 
 interface ContactPageProps {

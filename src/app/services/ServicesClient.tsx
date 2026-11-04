@@ -21,8 +21,9 @@ export default function ServicesClient() {
             Strategic <span className="text-blue-ncs">Services</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-            I offer comprehensive software solutions tailored to the unique
-            needs of your business.
+            A site that brings in leads, a portal your team actually uses, or
+            an automation that takes the busywork off your plate. Whatever
+            you&apos;ve been picturing, here&apos;s how I can help.
           </p>
         </motion.div>
 
@@ -126,7 +127,7 @@ export default function ServicesClient() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                See Our Work
+                See My Work
               </motion.button>
             </Link>
           </div>

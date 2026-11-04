@@ -3,7 +3,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Learn more about KYGR Solutions, our mission, and our founder, Kyle Greer. We build purposeful software for businesses of all kinds.",
+  description: "Meet Kyle Greer, founder of KYGR Solutions. He's a husband, father, and man of faith who turns the ideas people carry around into software that makes their lives easier.",
 };
 
 export default function AboutPage() {

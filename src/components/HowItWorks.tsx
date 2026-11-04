@@ -6,7 +6,7 @@ const steps = [
   {
     number: "01",
     title: "Free consult",
-    body: "Book a 30-minute call. Tell me how your business runs today and where it's getting stuck.",
+    body: "Book a 30-minute call. Tell me how your business runs today, where it's getting stuck, and the idea you've been carrying around.",
   },
   {
     number: "02",
@@ -16,12 +16,12 @@ const steps = [
   {
     number: "03",
     title: "Build with care",
-    body: "Clean code, thoughtful design, and regular check-ins so you always know where things stand.",
+    body: "Clean code, thoughtful design, and regular check-ins. I sweat the details nobody else would notice, like a slow page hidden behind a loading animation. If it can be better, I make it better.",
   },
   {
     number: "04",
     title: "Launch & partner",
-    body: "Go live with confidence, then keep improving with a partner who understands your goals.",
+    body: "Go live with confidence, then keep improving with a partner who's in it for the long haul.",
   },
 ] as const;
 

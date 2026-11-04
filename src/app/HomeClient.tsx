@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Hero, HowItWorks, Testimonials } from "../components";
 import { IDX_PATH, idxOffering } from "../data/idx";
-import { getPublishedProjects } from "../data/projects";
+import { getFeaturedProjects } from "../data/projects";
 import { services } from "../data/services";
 
 export default function HomeClient() {
@@ -29,7 +29,7 @@ export default function HomeClient() {
     }
   }, []);
 
-  const featuredProjects = getPublishedProjects().slice(0, 2);
+  const featuredProjects = getFeaturedProjects();
 
   return (
     <motion.div
@@ -57,9 +57,10 @@ export default function HomeClient() {
               <span className="text-blue-ncs">Work for You</span>
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-              I build conversion-focused websites, web & mobile apps, and
-              automations for businesses ready to grow—helping you win more
-              leads, streamline operations, and reclaim your time.
+              I build websites, web & mobile apps, and automations that win
+              you more leads and take work off your plate. And I don&apos;t
+              settle for &quot;good enough.&quot; I sweat the details nobody
+              else would notice, because the work should be right.
             </p>
           </motion.div>
         </section>
@@ -262,6 +263,43 @@ export default function HomeClient() {
             </motion.div>
           </div>
         </section>
+
+        {/* Story: first client */}
+        <section className="py-20" aria-labelledby="weekends-story-heading">
+          <motion.div
+            className="rounded-3xl border border-blue-ncs/10 bg-blue-ncs/5 p-8 md:p-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
+              A story from my first client
+            </span>
+            <h2
+              id="weekends-story-heading"
+              className="text-3xl md:text-4xl font-bold text-text-headings mb-5"
+            >
+              Her weekends back
+            </h2>
+            <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-3xl">
+              Lexi runs Lexi&apos;s Fresh Slate Cleanings. She was spending
+              hours every weekend copying and pasting reminder texts to her
+              customers. I built a system tied to her calendar that sends them
+              all with one button. The carrier registration paperwork for
+              texting was the least fun part of the build, but I pushed
+              through. She&apos;s told me it gave her weekends back. That&apos;s
+              the kind of work I love.
+            </p>
+            <Link
+              href="/projects/lexisFreshSlateCleanings"
+              className="text-blue-ncs font-bold inline-flex items-center gap-2"
+            >
+              See the project
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </motion.div>
+        </section>
         </div>
 
         <HowItWorks />
@@ -275,7 +313,8 @@ export default function HomeClient() {
                 Featured Work
               </h2>
               <p className="text-lg text-text-secondary">
-                See how I&apos;ve helped businesses like yours succeed.
+                Real projects for real people, from a Realtor&apos;s home
+                search to a cleaning business owner who got her weekends back.
               </p>
             </div>
             <Link href="/projects">
@@ -361,8 +400,8 @@ export default function HomeClient() {
               <span className="text-blue-ncs">business?</span>
             </h2>
             <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
-              Stop fighting with manual tasks and messy workflows. Let&apos;s
-              build the digital systems that give you your time back.
+              Let&apos;s build the thing you&apos;ve been picturing, and give
+              you your time back. Hard problems welcome.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
               <Link href="/contact">
@@ -380,7 +419,7 @@ export default function HomeClient() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Meet the Developer
+                  Meet Kyle
                 </motion.button>
               </Link>
             </div>
