@@ -68,9 +68,11 @@ describe("coming-soon projects", () => {
     expect(getPublishedProjects([comingSoon, live])).toEqual([live]);
   });
 
-  it("leave every current project in the default published list", () => {
+  it("are the only entries left out of the default published list", () => {
     expect(getPublishedProjects().map((project) => project.id)).toEqual(
-      projects.map((project) => project.id),
+      projects
+        .filter((project) => !isComingSoonProject(project))
+        .map((project) => project.id),
     );
   });
 });
