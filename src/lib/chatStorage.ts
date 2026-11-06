@@ -76,9 +76,7 @@ export async function getConversationState(
   return {
     exists: Boolean(data),
     turnstileState:
-      data?.turnstile_state === "verified" || data?.turnstile_state === "degraded"
-        ? data.turnstile_state
-        : null,
+      data?.turnstile_state === "verified" ? "verified" : null,
     contact: {
       email: data?.visitor_email ?? null,
       phone: data?.visitor_phone ?? null,

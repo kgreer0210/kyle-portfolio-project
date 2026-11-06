@@ -75,12 +75,14 @@ Abuse protection and contact capture (see README "Chat abuse protection"):
   (`src/lib/turnstile.ts`, action `chat`, exact hostname allowlist). The pass is
   stored in `chat_conversations.turnstile_state`; never trust a client flag.
   Missing site key, secret, or hostnames bypasses Turnstile with a diagnostic
-  log and keeps rate limits.
+  log and keeps rate limits. With keys present it fails closed: no token, a
+  blocked script, or a Cloudflare outage gives a retry state in the widget with
+  the phone line and contact form still visible, never an unverified message.
 - `src/lib/chatContact.ts` parses email and US phone, merges without overwriting
   captured values, and decides when the assistant may ask for contact (once).
   Contact values stay out of prompts, logs, and client responses.
 - Rejections are non-streaming JSON with a `code` (`turnstile_required`,
-  `turnstile_failed`, `rate_limited`, `invalid_request`) that the widget uses to
+  `turnstile_failed`, `turnstile_unavailable`, `rate_limited`, `invalid_request`) that the widget uses to
   restore the message for a retry.
 
 `diagnostic-questions.md` keeps its historical filename but now contains the

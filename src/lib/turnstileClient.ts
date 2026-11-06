@@ -1,6 +1,6 @@
 /**
  * Browser-side Turnstile helpers. The script is loaded on demand with
- * explicit rendering, so a blocked or failing script degrades the chat
+ * explicit rendering, so a blocked or failing script shows a retry state in the chat
  * widget instead of throwing. Nothing here needs third-party cookies or
  * storage.
  */
@@ -8,7 +8,7 @@
 export const TURNSTILE_SCRIPT_URL =
   "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 export const TURNSTILE_SCRIPT_TIMEOUT_MS = 8000;
-// How long a send waits for a token before falling back to degraded mode.
+// How long a send waits for a token before showing the retry state.
 export const TURNSTILE_TOKEN_TIMEOUT_MS = 10000;
 
 export interface TurnstileRenderOptions {

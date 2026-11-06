@@ -114,17 +114,23 @@ beyond Cloudflare's free Turnstile widget.
   the server logs a `[chat-abuse][DIAGNOSTIC][NOT PRODUCTION SAFE]` warning
   (once per instance). Visitors never see an error, and rate limits still apply.
   This is the state of any environment where the variables are not set.
-- Keys set, but the script is blocked or slow, or Cloudflare is unreachable or
-  rejects our secret: the first message is allowed through a deliberately small
-  budget (3 per IP per hour, flagged `degraded` on the conversation) rather than
-  locking the visitor out. Omitting the token is therefore not a free bypass.
-  Rejected tokens (replayed, expired, wrong action or hostname) are refused.
+- Keys set, but the script is blocked, errors, or times out in the browser:
+  the widget sends nothing, keeps the visitor's message, and shows a clear
+  "Try the security check again" button next to the normal ways to reach me
+  (the direct phone line and the contact form). The server never accepts a
+  first message without a verified token, so blocking the script is not a
+  bypass. If Cloudflare itself is unreachable or rejects our secret, the server
+  answers 503 `turnstile_unavailable` with the same retry-plus-contact state
+  (a rejected secret also logs an error naming `TURNSTILE_SECRET_KEY`). This
+  fails closed on purpose; contact options stay available throughout.
+  Rejected tokens (replayed, expired, wrong action or hostname) are refused with
+  a friendly "send it again" message and the widget requests a fresh token.
 - `NEXT_PUBLIC_*` values are inlined at build time. After adding or changing the
   site key, redeploy so the browser bundle picks it up.
 
 **Vercel setup (names only; nothing is configured by the repo)**
 
-Add all four variables in Vercel for **Production**. Create the Turnstile widget
+Add all four variables in Vercel for **Production** (none exist there today). Create the Turnstile widget
 in Cloudflare in Managed mode with hostnames for every production frontend, at
 minimum `kygrsolutions.com`, plus `www.kygrsolutions.com` if `www` serves the
 site rather than redirecting. Set `TURNSTILE_ALLOWED_HOSTNAMES` to the same
@@ -145,9 +151,11 @@ different value from Production.
 | Per IP | 15 per minute, 100 per hour |
 | Per conversation (validated UUID, lower-cased) | 6 per minute, 40 per hour |
 | New conversations per IP | 10 per hour |
-| Degraded first messages per IP | 3 per hour |
 
-Counters are keyed by an HMAC of the server-derived IP (Vercel's
+The limit store reuses the existing server-side Supabase Secret Key through the
+normal client in `src/lib/supabase/env.ts` (`SUPABASE_SERVICE_ROLE_KEY`, then
+`SUPABASE_SECRET_KEY`); no new Supabase variable is needed. `RATE_LIMIT_SECRET`
+is a separate HMAC secret, not a Supabase key. Counters are keyed by an HMAC of the server-derived IP (Vercel's
 `x-vercel-forwarded-for`, with IPv6 collapsed to its /64) and of the
 conversation id; raw IPs are never stored. Limits run before the model is
 called and before any message is stored. If the database limiter errors (or the

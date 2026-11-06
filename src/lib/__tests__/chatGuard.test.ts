@@ -128,34 +128,39 @@ describe("missing configuration", () => {
   });
 });
 
-describe("degraded mode", () => {
-  it("lets the first message through when the browser could not run the script", async () => {
+describe("when verification cannot complete (fail closed)", () => {
+  it("refuses a first message that arrives without a token, whatever the client claims", async () => {
     const { deps, verifyToken } = setup();
 
     const decision = await guardChatRequest(
-      { conversationId: ID, ip: IP, turnstileUnavailable: true },
+      // A bot blocking the script cannot talk its way past the gate.
+      { conversationId: ID, ip: IP, turnstileUnavailable: true } as never,
       deps,
     );
 
-    expect(decision).toMatchObject({ ok: true, turnstileState: "degraded" });
+    expect(decision).toMatchObject({ ok: false, status: 403, code: "turnstile_required" });
     expect(verifyToken).not.toHaveBeenCalled();
   });
 
-  it("lets it through when Cloudflare cannot be reached", async () => {
-    const { deps, log } = setup({
-      verifyToken: async (): Promise<TurnstileOutcome> => ({ status: "unavailable", reason: "network" }),
-    });
+  it.each(["network", "timeout", "bad-response"] as const)(
+    "refuses with a retryable 503 when Cloudflare is unreachable (%s)",
+    async (reason) => {
+      const { deps, log } = setup({
+        verifyToken: async (): Promise<TurnstileOutcome> => ({ status: "unavailable", reason }),
+      });
 
-    const decision = await guardChatRequest(
-      { conversationId: ID, ip: IP, turnstileToken: "tok" },
-      deps,
-    );
+      const decision = await guardChatRequest(
+        { conversationId: ID, ip: IP, turnstileToken: "tok" },
+        deps,
+      );
 
-    expect(decision).toMatchObject({ ok: true, turnstileState: "degraded" });
-    expect(log).toHaveBeenCalledWith("warn", expect.stringContaining("network"));
-  });
+      expect(decision).toMatchObject({ ok: false, status: 503, code: "turnstile_unavailable" });
+      if (!decision.ok) expect(decision.message).toMatch(/reach me directly/i);
+      expect(log).toHaveBeenCalledWith("warn", expect.stringContaining(reason));
+    },
+  );
 
-  it("logs loudly when Cloudflare rejects our secret, but still serves the visitor", async () => {
+  it("refuses, and logs an error, when Cloudflare rejects our secret", async () => {
     const { deps, log } = setup({
       verifyToken: async (): Promise<TurnstileOutcome> => ({ status: "unavailable", reason: "misconfigured" }),
     });
@@ -165,23 +170,19 @@ describe("degraded mode", () => {
       deps,
     );
 
-    expect(decision).toMatchObject({ ok: true, turnstileState: "degraded" });
+    expect(decision).toMatchObject({ ok: false, code: "turnstile_unavailable" });
     expect(log).toHaveBeenCalledWith("error", expect.stringContaining("TURNSTILE_SECRET_KEY"));
   });
 
-  it("is a small budget per IP, so omitting the token is not a free bypass", async () => {
-    const { deps } = setup();
-    const outcomes = [];
-    for (let i = 0; i < 4; i++) {
-      outcomes.push(
-        await guardChatRequest(
-          { conversationId: `3f2b8c1e-9d4a-4c7b-8e21-5a6f7b8c9d0${i}`, ip: IP, turnstileUnavailable: true },
-          deps,
-        ),
-      );
-    }
-    expect(outcomes.map((o) => o.ok)).toEqual([true, true, true, false]);
-    expect(outcomes[3]).toMatchObject({ status: 429, code: "rate_limited" });
+  it("never records a pass for a refused message", async () => {
+    const { deps } = setup({
+      verifyToken: async (): Promise<TurnstileOutcome> => ({ status: "unavailable", reason: "network" }),
+    });
+    const decision = await guardChatRequest(
+      { conversationId: ID, ip: IP, turnstileToken: "tok" },
+      deps,
+    );
+    expect(decision.ok).toBe(false);
   });
 });
 

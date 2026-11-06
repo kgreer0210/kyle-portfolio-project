@@ -42,7 +42,6 @@ const chatRequestSchema = z.object({
   visitorEmail: z.string().nullish(),
   messages: z.array(z.unknown()).min(1),
   turnstileToken: z.string().max(TURNSTILE_MAX_TOKEN_LENGTH).nullish(),
-  turnstileUnavailable: z.boolean().nullish(),
 });
 
 const chatMessageSchema = z.object({
@@ -174,7 +173,6 @@ export async function POST(req: NextRequest) {
       conversationId,
       ip,
       turnstileToken: body.turnstileToken,
-      turnstileUnavailable: body.turnstileUnavailable === true,
     },
     buildGuardDeps(ip),
   );

@@ -71,7 +71,6 @@ describe("ChatWidget without a Turnstile site key", () => {
 
     await screen.findByText("Happy to help");
     expect(requestBody(fetchMock)).not.toHaveProperty("turnstileToken");
-    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileUnavailable");
     expect(document.head.querySelector("script[src*=turnstile]")).toBeNull();
   });
 
@@ -127,7 +126,6 @@ describe("ChatWidget with a Turnstile site key", () => {
 
     await screen.findByText("Happy to help");
     expect(requestBody(fetchMock)).toMatchObject({ turnstileToken: "token-1" });
-    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileUnavailable");
   });
 
   it("does not send a token again after the first message is accepted", async () => {
@@ -147,13 +145,10 @@ describe("ChatWidget with a Turnstile site key", () => {
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(requestBody(fetchMock, 1)).not.toHaveProperty("turnstileToken");
-    expect(requestBody(fetchMock, 1)).not.toHaveProperty(
-      "turnstileUnavailable",
-    );
     await waitFor(() => expect(api.remove).toHaveBeenCalledWith("widget-1"));
   });
 
-  it("falls back to degraded mode, without crashing, when the script is blocked", async () => {
+  it("sends nothing, keeps the message, and offers retry plus contact options when the script is blocked", async () => {
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
     await renderWidget("site-key");
@@ -166,14 +161,59 @@ describe("ChatWidget with a Turnstile site key", () => {
     });
     tag?.onerror?.(new Event("error"));
 
-    submitFirstMessage();
+    submitFirstMessage("I need a website for my bakery");
 
-    await screen.findByText("Happy to help");
-    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
-    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileToken");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /security check didn't load/i,
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByPlaceholderText(/short note/i)).toHaveValue(
+      "I need a website for my bakery",
+    );
+    expect(
+      screen.getByRole("button", { name: /try the security check again/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "(478) 777-1266" })).toHaveAttribute(
+      "href",
+      "tel:+14787771266",
+    );
+    expect(screen.getByRole("link", { name: /contact form/i })).toHaveAttribute(
+      "href",
+      "/contact",
+    );
   });
 
-  it("falls back to degraded mode if the widget errors out", async () => {
+  it("retries the script and sends once a token arrives", async () => {
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+    const tag = await waitFor(() => {
+      const found = document.head.querySelector<HTMLScriptElement>(
+        "script[src*=turnstile]",
+      );
+      expect(found).not.toBeNull();
+      return found;
+    });
+    tag?.onerror?.(new Event("error"));
+    submitFirstMessage();
+    const retry = await screen.findByRole("button", {
+      name: /try the security check again/i,
+    });
+
+    // The script becomes reachable before the visitor retries.
+    const { api, state } = installTurnstile();
+    fireEvent.click(retry);
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    state.options?.callback("token-2");
+    fireEvent.click(
+      screen.getByRole("button", { name: /start the conversation/i }),
+    );
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).toMatchObject({ turnstileToken: "token-2" });
+  });
+
+  it("does not send, and shows the fallback, if the widget errors out", async () => {
     const { api, state } = installTurnstile();
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
@@ -183,11 +223,13 @@ describe("ChatWidget with a Turnstile site key", () => {
 
     submitFirstMessage();
 
-    await screen.findByText("Happy to help");
-    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
+    expect(
+      await screen.findByRole("button", { name: /try the security check again/i }),
+    ).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("does not crash when turnstile.render throws", async () => {
+  it("does not crash, and does not send, when turnstile.render throws", async () => {
     const { api } = installTurnstile();
     vi.mocked(api.render).mockImplementation(() => {
       throw new Error("bad sitekey");
@@ -198,8 +240,34 @@ describe("ChatWidget with a Turnstile site key", () => {
 
     submitFirstMessage();
 
-    await screen.findByText("Happy to help");
-    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("shows the retry and contact options when the server cannot verify", async () => {
+    const { api, state } = installTurnstile();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        jsonError(503, {
+          code: "turnstile_unavailable",
+          error: "I couldn't finish the security check just now.",
+        }),
+      ),
+    );
+    await renderWidget("site-key");
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    state.options?.callback("tok");
+
+    submitFirstMessage("I need a website for my bakery");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/couldn't finish/i);
+    expect(
+      screen.getByRole("button", { name: /try the security check again/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/short note/i)).toHaveValue(
+      "I need a website for my bakery",
+    );
   });
 
   it("restores the message and resets the widget when verification fails", async () => {

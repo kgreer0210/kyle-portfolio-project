@@ -30,9 +30,6 @@ export const CHAT_RATE_LIMITS = {
   conversationPerMinute: { limit: 6, windowSeconds: 60 },
   conversationPerHour: { limit: 40, windowSeconds: 3600 },
   newConversationPerIpHour: { limit: 10, windowSeconds: 3600 },
-  // First messages that skipped Turnstile because the script or Cloudflare
-  // was unavailable. Deliberately small.
-  degradedPerIpHour: { limit: 3, windowSeconds: 3600 },
 } as const;
 
 /* ------------------------------------------------------------------ */

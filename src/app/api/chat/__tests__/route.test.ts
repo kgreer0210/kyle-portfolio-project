@@ -166,30 +166,29 @@ describe("POST /api/chat with Turnstile configured", () => {
     );
   });
 
-  it("lets the first message through at a small budget when Cloudflare is down", async () => {
+  it("refuses with 503 JSON, and stores nothing, when Cloudflare is down", async () => {
     enableTurnstile();
     stubSiteverify(new TypeError("fetch failed"));
-    vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const response = await POST(chatRequest(firstMessage("Hello there", { turnstileToken: "tok" })));
 
-    expect(response.status).toBe(200);
-    expect(storage.upsertConversation).toHaveBeenCalledWith(
-      expect.objectContaining({ turnstileState: "degraded" }),
-    );
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ code: "turnstile_unavailable" });
+    expect(storage.upsertConversation).not.toHaveBeenCalled();
+    expect(storage.appendMessage).not.toHaveBeenCalled();
+    expect(streamText).not.toHaveBeenCalled();
   });
 
-  it("lets the first message through in degraded mode when the script never loaded", async () => {
+  it("does not let a client skip verification by claiming the script is unavailable", async () => {
     enableTurnstile();
 
     const response = await POST(
       chatRequest(firstMessage("Hello there", { turnstileUnavailable: true })),
     );
 
-    expect(response.status).toBe(200);
-    expect(storage.upsertConversation).toHaveBeenCalledWith(
-      expect.objectContaining({ turnstileState: "degraded" }),
-    );
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({ code: "turnstile_required" });
+    expect(storage.appendMessage).not.toHaveBeenCalled();
   });
 });
 

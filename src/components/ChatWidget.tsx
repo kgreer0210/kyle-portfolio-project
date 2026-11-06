@@ -1,11 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   extractEmails,
   extractPhones,
   isValidEmail,
+  formatUsPhone,
   KYLE_PHONE_E164,
 } from "@/lib/chatContact";
 import { useTurnstile } from "./useTurnstile";
@@ -136,10 +138,14 @@ export default function ChatWidget() {
     persisted.messages.length > 0,
   );
   const gateAcceptedRef = useRef(gateAccepted);
+  // The security check could not run or complete. Shows a retry button and
+  // the normal ways to reach Kyle instead of letting the message through.
+  const [verificationBlocked, setVerificationBlocked] = useState(false);
   const {
     containerRef: turnstileContainerRef,
     getToken: getTurnstileToken,
     reset: resetTurnstile,
+    retry: retryTurnstile,
     interactive: turnstileInteractive,
   } = useTurnstile(TURNSTILE_SITE_KEY, isOpen && !gateAccepted);
 
@@ -280,20 +286,23 @@ export default function ChatWidget() {
       setStreaming(true);
       setStreamingText("");
       setError(null);
+      setVerificationBlocked(false);
       let usedToken = false;
       try {
-        // First message only: attach a Turnstile token, or say the check
-        // could not run so the server can apply its smaller degraded budget.
-        let turnstileFields: {
-          turnstileToken?: string;
-          turnstileUnavailable?: boolean;
-        } = {};
+        // First message only. No token means no request: a blocked or failed
+        // script must never become a way around verification.
+        let turnstileFields: { turnstileToken?: string } = {};
         if (TURNSTILE_SITE_KEY && !gateAcceptedRef.current) {
           const result = await getTurnstileToken();
-          usedToken = result.token !== null;
-          turnstileFields = result.token
-            ? { turnstileToken: result.token }
-            : { turnstileUnavailable: true };
+          if (!result.token) {
+            setVerificationBlocked(true);
+            setError(
+              "The security check didn't load. A content blocker or browser setting may be stopping it.",
+            );
+            return "rejected";
+          }
+          usedToken = true;
+          turnstileFields = { turnstileToken: result.token };
         }
 
         const response = await fetch("/api/chat", {
@@ -317,11 +326,13 @@ export default function ChatWidget() {
           const rejected =
             code === "turnstile_required" ||
             code === "turnstile_failed" ||
+            code === "turnstile_unavailable" ||
             code === "rate_limited";
-          if (code === "turnstile_required" || code === "turnstile_failed") {
+          if (code.startsWith("turnstile_")) {
             gateAcceptedRef.current = false;
             setGateAccepted(false);
           }
+          if (code === "turnstile_unavailable") setVerificationBlocked(true);
           if (usedToken) resetTurnstile();
           setError(errBody.error || `Chat request failed (${response.status})`);
           return rejected ? "rejected" : "failed";
@@ -483,6 +494,7 @@ export default function ChatWidget() {
       setStreamingText("");
       setError(null);
       setEmailDismissed(false);
+      setVerificationBlocked(false);
       setConfirmingEnd(false);
       gateAcceptedRef.current = false;
       setGateAccepted(false);
@@ -507,6 +519,12 @@ export default function ChatWidget() {
       return;
     }
     setConfirmingEnd(true);
+  };
+
+  const retryVerification = () => {
+    setVerificationBlocked(false);
+    setError(null);
+    retryTurnstile();
   };
 
   const handleCancelEnd = () => setConfirmingEnd(false);
@@ -709,6 +727,9 @@ export default function ChatWidget() {
                       {error}
                     </div>
                   )}
+                  {verificationBlocked && (
+                    <VerificationFallback onRetry={retryVerification} />
+                  )}
                 </form>
               ) : (
                 <>
@@ -734,6 +755,9 @@ export default function ChatWidget() {
                     <div className="text-xs text-red-300 bg-red-900/30 border border-red-900/40 px-3 py-2 rounded-md">
                       {error}
                     </div>
+                  )}
+                  {verificationBlocked && (
+                    <VerificationFallback onRetry={retryVerification} />
                   )}
                 </>
               )}
@@ -865,6 +889,34 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function VerificationFallback({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="text-xs text-(--color-text-secondary) bg-(--color-rich-black) border border-(--color-penn-blue) px-3 py-3 rounded-md space-y-2">
+      <button
+        type="button"
+        onClick={onRetry}
+        className="font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
+      >
+        Try the security check again
+      </button>
+      <p>
+        Or reach me directly: call{" "}
+        <a
+          href={`tel:${KYLE_PHONE_E164}`}
+          className="text-(--color-text-primary) underline"
+        >
+          {formatUsPhone(KYLE_PHONE_E164)}
+        </a>{" "}
+        or use the{" "}
+        <Link href="/contact" className="text-(--color-text-primary) underline">
+          contact form
+        </Link>
+        .
+      </p>
+    </div>
   );
 }
 

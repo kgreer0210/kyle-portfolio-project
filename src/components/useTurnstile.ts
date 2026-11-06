@@ -28,6 +28,8 @@ export function useTurnstile(siteKey: string | undefined, active: boolean) {
   const unavailableRef = useRef(false);
   const waitersRef = useRef<Waiter[]>([]);
   const [interactive, setInteractive] = useState(false);
+  // Bumped by `retry` to tear down and reload a widget that failed.
+  const [attempt, setAttempt] = useState(0);
 
   const flush = useCallback((result: TurnstileTokenResult) => {
     const waiters = waitersRef.current;
@@ -105,7 +107,7 @@ export function useTurnstile(siteKey: string | undefined, active: boolean) {
       setInteractive(false);
       flush({ token: null, unavailable: true });
     };
-  }, [siteKey, active, flush]);
+  }, [siteKey, active, flush, attempt]);
 
   const getToken = useCallback((): Promise<TurnstileTokenResult> => {
     if (!siteKey) return Promise.resolve({ token: null, unavailable: false });
@@ -142,5 +144,8 @@ export function useTurnstile(siteKey: string | undefined, active: boolean) {
     }
   }, []);
 
-  return { containerRef, getToken, reset, interactive };
+  /** Reload the script and widget after a failure. */
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+
+  return { containerRef, getToken, reset, retry, interactive };
 }

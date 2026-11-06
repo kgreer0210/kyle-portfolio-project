@@ -8,7 +8,7 @@ import {
 } from "@/lib/rateLimit";
 import type { TurnstileConfig, TurnstileOutcome } from "@/lib/turnstile";
 
-export type TurnstileState = "verified" | "degraded";
+export type TurnstileState = "verified";
 
 export interface ConversationState {
   exists: boolean;
@@ -20,6 +20,7 @@ export interface ConversationState {
 export type ChatRejectionCode =
   | "turnstile_required"
   | "turnstile_failed"
+  | "turnstile_unavailable"
   | "rate_limited";
 
 export type GuardDecision =
@@ -31,7 +32,7 @@ export type GuardDecision =
     }
   | {
       ok: false;
-      status: 403 | 429;
+      status: 403 | 429 | 503;
       code: ChatRejectionCode;
       message: string;
       retryAfterSeconds?: number;
@@ -54,8 +55,6 @@ export interface GuardInput {
   /** Normalized client IP, or null when the platform did not provide one. */
   ip: string | null;
   turnstileToken?: string | null;
-  /** The browser could not load or run the Turnstile script. */
-  turnstileUnavailable?: boolean;
 }
 
 function waitPhrase(seconds: number): string {
@@ -79,6 +78,14 @@ const TURNSTILE_REQUIRED: GuardDecision = {
   code: "turnstile_required",
   message:
     "I need a quick security check before we start. Give it a second, then send your message again.",
+};
+
+const TURNSTILE_UNAVAILABLE: GuardDecision = {
+  ok: false,
+  status: 503,
+  code: "turnstile_unavailable",
+  message:
+    "I couldn't finish the security check just now. Please try again in a moment, or reach me directly.",
 };
 
 const TURNSTILE_FAILED: GuardDecision = {
@@ -114,11 +121,11 @@ function logBypassOnce(deps: GuardDeps, reason: string) {
  * 2. Turnstile is required once per conversation, on the first message. The
  *    pass is remembered in the database, never taken from the client.
  *
- * Degraded mode: when keys are configured but the browser cannot run the
- * script, or Cloudflare cannot be reached, the first message is allowed
- * through a much smaller per-IP budget. An attacker can claim "unavailable"
- * too, but then gets only a few conversations per hour per IP instead of
- * unlimited ones.
+ * Fail closed: when keys are configured, a first message without a verified
+ * token is never accepted. A blocked script, a Cloudflare outage, or a
+ * rejected secret all end in a retryable refusal (the widget keeps the normal
+ * contact options visible) so a bot cannot skip verification by blocking the
+ * script.
  */
 export async function guardChatRequest(
   input: GuardInput,
@@ -161,23 +168,8 @@ export async function guardChatRequest(
     return pass(null);
   }
 
-  const degrade = async (reason: string): Promise<GuardDecision> => {
-    deps.log("warn", `[chat-abuse] Turnstile unavailable (${reason}); using degraded first-message budget.`);
-    const [result] = await deps.limiter.hit([
-      {
-        key: `ip-degraded:${ipHash}`,
-        ...CHAT_RATE_LIMITS.degradedPerIpHour,
-      },
-    ]);
-    return result.allowed ? pass("degraded") : rateLimited(result.retryAfterSeconds);
-  };
-
   const token = input.turnstileToken?.trim();
-  if (!token) {
-    return input.turnstileUnavailable
-      ? degrade("client-script-unavailable")
-      : TURNSTILE_REQUIRED;
-  }
+  if (!token) return TURNSTILE_REQUIRED;
 
   const outcome = await deps.verifyToken(token, input.ip);
   switch (outcome.status) {
@@ -186,9 +178,12 @@ export async function guardChatRequest(
     case "rejected":
       return TURNSTILE_FAILED;
     case "unavailable":
-      if (outcome.reason === "misconfigured") {
-        deps.log("error", "[chat-abuse] Turnstile secret was rejected by Cloudflare. Check TURNSTILE_SECRET_KEY.");
-      }
-      return degrade(outcome.reason);
+      deps.log(
+        outcome.reason === "misconfigured" ? "error" : "warn",
+        outcome.reason === "misconfigured"
+          ? "[chat-abuse] Turnstile secret was rejected by Cloudflare. Check TURNSTILE_SECRET_KEY; first messages are blocked until fixed."
+          : `[chat-abuse] Turnstile verification unavailable (${outcome.reason}); first message refused.`,
+      );
+      return TURNSTILE_UNAVAILABLE;
   }
 }
