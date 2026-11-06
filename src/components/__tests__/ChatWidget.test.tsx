@@ -1,0 +1,229 @@
+// @vitest-environment jsdom
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { TurnstileApi, TurnstileRenderOptions } from "@/lib/turnstileClient";
+
+// NEXT_PUBLIC_* values are inlined when the module loads, so each test sets
+// the environment first and imports the widget afterwards.
+async function renderWidget(siteKey: string | null) {
+  vi.resetModules();
+  vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", siteKey ?? "");
+  const { default: ChatWidget } = await import("@/components/ChatWidget");
+  render(<ChatWidget />);
+  fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
+}
+
+function installTurnstile() {
+  const state: { options: TurnstileRenderOptions | null } = { options: null };
+  const api: TurnstileApi = {
+    render: vi.fn((_container, options) => {
+      state.options = options;
+      return "widget-1";
+    }),
+    reset: vi.fn(),
+    remove: vi.fn(),
+  };
+  window.turnstile = api;
+  return { api, state };
+}
+
+function submitFirstMessage(text = "I need a website for my bakery") {
+  fireEvent.change(screen.getByPlaceholderText(/short note/i), {
+    target: { value: text },
+  });
+  fireEvent.click(
+    screen.getByRole("button", { name: /start the conversation/i }),
+  );
+}
+
+function requestBody(fetchMock: ReturnType<typeof vi.fn>, call = 0) {
+  return JSON.parse(fetchMock.mock.calls[call][1].body as string);
+}
+
+function textResponse(text: string) {
+  return new Response(text, { status: 200 });
+}
+
+function jsonError(status: number, body: Record<string, unknown>) {
+  return Response.json(body, { status });
+}
+
+beforeEach(() => {
+  window.sessionStorage.clear();
+  delete window.turnstile;
+  document.head.innerHTML = "";
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
+
+describe("ChatWidget without a Turnstile site key", () => {
+  it("sends no Turnstile fields and never loads the script", async () => {
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget(null);
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileToken");
+    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileUnavailable");
+    expect(document.head.querySelector("script[src*=turnstile]")).toBeNull();
+  });
+
+  it("keeps the composer for visitors who skip the optional name", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => textResponse("Happy to help")));
+    await renderWidget(null);
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(screen.getByPlaceholderText(/type a message/i)).toBeInTheDocument();
+  });
+
+  it("restores the message and shows the wait when rate limited", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        jsonError(429, {
+          code: "rate_limited",
+          error:
+            "You're sending messages faster than I can keep up. Please wait about 30 seconds and try again.",
+        }),
+      ),
+    );
+    await renderWidget(null);
+
+    submitFirstMessage("I need a website for my bakery");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /about 30 seconds/i,
+    );
+    expect(screen.getByPlaceholderText(/short note/i)).toHaveValue(
+      "I need a website for my bakery",
+    );
+  });
+});
+
+describe("ChatWidget with a Turnstile site key", () => {
+  it("renders an interaction-only widget for the chat action and sends its token", async () => {
+    const { api, state } = installTurnstile();
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    expect(state.options).toMatchObject({
+      sitekey: "site-key",
+      action: "chat",
+      appearance: "interaction-only",
+    });
+    state.options?.callback("token-1");
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).toMatchObject({ turnstileToken: "token-1" });
+    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileUnavailable");
+  });
+
+  it("does not send a token again after the first message is accepted", async () => {
+    const { api, state } = installTurnstile();
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    state.options?.callback("token-1");
+    submitFirstMessage();
+    await screen.findByText("Happy to help");
+
+    fireEvent.change(screen.getByPlaceholderText(/type a message/i), {
+      target: { value: "And how long does it take?" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /send message/i }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(requestBody(fetchMock, 1)).not.toHaveProperty("turnstileToken");
+    expect(requestBody(fetchMock, 1)).not.toHaveProperty(
+      "turnstileUnavailable",
+    );
+    await waitFor(() => expect(api.remove).toHaveBeenCalledWith("widget-1"));
+  });
+
+  it("falls back to degraded mode, without crashing, when the script is blocked", async () => {
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+    const tag = await waitFor(() => {
+      const found = document.head.querySelector<HTMLScriptElement>(
+        "script[src*=turnstile]",
+      );
+      expect(found).not.toBeNull();
+      return found;
+    });
+    tag?.onerror?.(new Event("error"));
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
+    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileToken");
+  });
+
+  it("falls back to degraded mode if the widget errors out", async () => {
+    const { api, state } = installTurnstile();
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    state.options?.["error-callback"]?.("300030");
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
+  });
+
+  it("does not crash when turnstile.render throws", async () => {
+    const { api } = installTurnstile();
+    vi.mocked(api.render).mockImplementation(() => {
+      throw new Error("bad sitekey");
+    });
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(requestBody(fetchMock)).toMatchObject({ turnstileUnavailable: true });
+  });
+
+  it("restores the message and resets the widget when verification fails", async () => {
+    const { api, state } = installTurnstile();
+    const fetchMock = vi.fn(async () =>
+      jsonError(403, {
+        code: "turnstile_failed",
+        error:
+          "The security check didn't go through. Please send your message again and it should clear.",
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await renderWidget("site-key");
+    await waitFor(() => expect(api.render).toHaveBeenCalled());
+    state.options?.callback("spent-token");
+
+    submitFirstMessage("I need a website for my bakery");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /security check didn't go through/i,
+    );
+    expect(screen.getByPlaceholderText(/short note/i)).toHaveValue(
+      "I need a website for my bakery",
+    );
+    await waitFor(() => expect(api.reset).toHaveBeenCalledWith("widget-1"));
+  });
+});

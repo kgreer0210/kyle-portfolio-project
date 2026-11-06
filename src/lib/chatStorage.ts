@@ -1,3 +1,4 @@
+import type { ConversationState, TurnstileState } from "@/lib/chatGuard";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
 export type ChatRole = "user" | "assistant" | "system";
@@ -13,6 +14,7 @@ export interface ChatConversationRecord {
   id: string;
   visitorName: string | null;
   visitorEmail: string | null;
+  visitorPhone: string | null;
   startedAt: string;
   endedAt: string | null;
   status: "active" | "completed" | "abandoned";
@@ -27,6 +29,61 @@ interface UpsertConversationInput {
   conversationId: string;
   visitorName?: string | null;
   visitorEmail?: string | null;
+  /** E.164, e.g. +14787771266. */
+  visitorPhone?: string | null;
+  turnstileState?: TurnstileState | null;
+}
+
+/**
+ * The columns this helper may write for a conversation, with null/undefined
+ * left out so a stale caller can never erase captured lead data.
+ */
+export function buildConversationWrites(
+  input: Omit<UpsertConversationInput, "conversationId">,
+): Record<string, string> {
+  const writes: Record<string, string> = {};
+  if (input.visitorName) writes.visitor_name = input.visitorName;
+  if (input.visitorEmail) writes.visitor_email = input.visitorEmail;
+  if (input.visitorPhone) writes.visitor_phone = input.visitorPhone;
+  if (input.turnstileState) writes.turnstile_state = input.turnstileState;
+  return writes;
+}
+
+/**
+ * Reads what the guard and contact capture need to know about a conversation.
+ * A read failure is logged and reported as "unknown" (exists, no gate pass, no
+ * contact) so a database hiccup cannot make every message look like a brand
+ * new conversation.
+ */
+export async function getConversationState(
+  conversationId: string,
+): Promise<ConversationState> {
+  const supabase = createAdminSupabaseClient();
+  const { data, error } = await supabase
+    .from("chat_conversations")
+    .select("*")
+    .eq("id", conversationId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to read chat conversation state:", error.message);
+    return {
+      exists: true,
+      turnstileState: null,
+      contact: { email: null, phone: null },
+    };
+  }
+  return {
+    exists: Boolean(data),
+    turnstileState:
+      data?.turnstile_state === "verified" || data?.turnstile_state === "degraded"
+        ? data.turnstile_state
+        : null,
+    contact: {
+      email: data?.visitor_email ?? null,
+      phone: data?.visitor_phone ?? null,
+    },
+  };
 }
 
 /**
@@ -47,11 +104,11 @@ export async function upsertConversation(
   // Step 1: ensure the row exists with the supplied values (insert-only on
   // conflict). This populates name/email if they're given on the very first
   // turn but takes no action if the row already exists.
+  const writes = buildConversationWrites(input);
   const insertPayload: Record<string, unknown> = {
     id: input.conversationId,
+    ...writes,
   };
-  if (input.visitorName) insertPayload.visitor_name = input.visitorName;
-  if (input.visitorEmail) insertPayload.visitor_email = input.visitorEmail;
 
   const { error: insertErr } = await supabase
     .from("chat_conversations")
@@ -63,16 +120,13 @@ export async function upsertConversation(
     console.error("Failed to insert chat conversation:", insertErr);
   }
 
-  // Step 2: if the caller supplied non-null name/email, update those columns.
+  // Step 2: if the caller supplied non-null metadata, update those columns.
   // Skip the update entirely when there's nothing new — that's the path that
   // used to clobber existing values with null.
-  const updates: Record<string, unknown> = {};
-  if (input.visitorName) updates.visitor_name = input.visitorName;
-  if (input.visitorEmail) updates.visitor_email = input.visitorEmail;
-  if (Object.keys(updates).length > 0) {
+  if (Object.keys(writes).length > 0) {
     const { error: updateErr } = await supabase
       .from("chat_conversations")
-      .update(updates)
+      .update(writes)
       .eq("id", input.conversationId);
     if (updateErr) {
       console.error("Failed to update chat conversation metadata:", updateErr);
@@ -150,6 +204,7 @@ export async function writeConversationAnalytics(
     scoreTier?: "high" | "medium" | "low" | null;
     visitorName?: string | null;
     visitorEmail?: string | null;
+    visitorPhone?: string | null;
   },
 ): Promise<void> {
   const supabase = createAdminSupabaseClient();
@@ -161,8 +216,14 @@ export async function writeConversationAnalytics(
   if (fields.scoreTier !== undefined) updates.score_tier = fields.scoreTier;
   // Only persist visitor metadata when non-null — same rule as the upsert
   // helper, so we never overwrite captured leads with null.
-  if (fields.visitorName) updates.visitor_name = fields.visitorName;
-  if (fields.visitorEmail) updates.visitor_email = fields.visitorEmail;
+  Object.assign(
+    updates,
+    buildConversationWrites({
+      visitorName: fields.visitorName,
+      visitorEmail: fields.visitorEmail,
+      visitorPhone: fields.visitorPhone,
+    }),
+  );
 
   if (Object.keys(updates).length === 0) return;
 
@@ -213,6 +274,7 @@ export async function getConversationTranscript(
         id: convoRow.id,
         visitorName: convoRow.visitor_name,
         visitorEmail: convoRow.visitor_email,
+        visitorPhone: convoRow.visitor_phone ?? null,
         startedAt: convoRow.started_at,
         endedAt: convoRow.ended_at,
         status: convoRow.status,

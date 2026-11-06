@@ -98,11 +98,13 @@ reviews:
           (`"use client"`) or exposed via `NEXT_PUBLIC_*`: `SUPABASE_SERVICE_ROLE_KEY`,
           `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`,
           `OPENROUTER_API_KEY`, `RETELL_API_KEY`, `DISCORD_WEBHOOK_URL`,
-          `CRON_SECRET`, `WEBAUTHN_CHALLENGE_SECRET`, `INBOUND_REPLY_SECRET`.
+          `CRON_SECRET`, `WEBAUTHN_CHALLENGE_SECRET`, `INBOUND_REPLY_SECRET`,
+          `TURNSTILE_SECRET_KEY`, `RATE_LIMIT_SECRET`.
         - Flag any `NEXT_PUBLIC_` variable whose name contains SECRET,
           SERVICE_ROLE, or KEY, other than the allowed Supabase client keys
           (`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
-          `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`).
+          `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`) and the public Cloudflare
+          Turnstile site key (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`).
         - Service-role / Secret Key Supabase clients belong only in server code
           (`src/lib/supabase`, route handlers, server actions). They must not be
           imported into client components, passed as props, returned in

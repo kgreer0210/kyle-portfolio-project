@@ -2,10 +2,16 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { extractEmails, extractPhones } from "@/lib/chatContact";
+import { useTurnstile } from "./useTurnstile";
 
 const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
 const STORAGE_KEY = "kygr_chat_state_v1";
 const EMAIL_PROMPT_AFTER_TURNS = 3;
+// Public by design. When unset, the widget skips Turnstile entirely.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || undefined;
+
+type SendOutcome = "ok" | "rejected" | "failed";
 
 type ChatRole = "user" | "assistant";
 
@@ -123,10 +129,32 @@ export default function ChatWidget() {
   // know that before it happens.
   const [confirmingEnd, setConfirmingEnd] = useState(false);
 
+  // Turnstile only gates the first message of a conversation. The server
+  // remembers the pass, so a restored conversation never needs a new token.
+  const [gateAccepted, setGateAccepted] = useState(
+    persisted.messages.length > 0,
+  );
+  const gateAcceptedRef = useRef(gateAccepted);
+  const {
+    containerRef: turnstileContainerRef,
+    getToken: getTurnstileToken,
+    reset: resetTurnstile,
+    interactive: turnstileInteractive,
+  } = useTurnstile(TURNSTILE_SITE_KEY, isOpen && !gateAccepted);
+
+  // The visitor already gave contact details in chat, so skip the form.
+  const sharedContactInChat = messages.some(
+    (m) =>
+      m.role === "user" &&
+      (extractEmails(m.content).length > 0 ||
+        extractPhones(m.content).length > 0),
+  );
+
   // Email prompt becomes visible after enough turns, unless visitor dismissed
-  // it or already provided an email. Fully derived from other state.
+  // it or already provided contact details. Fully derived from other state.
   const showEmailPrompt =
     !email &&
+    !sharedContactInChat &&
     !emailDismissed &&
     messages.filter((m) => m.role === "user").length >=
       EMAIL_PROMPT_AFTER_TURNS;
@@ -165,6 +193,9 @@ export default function ChatWidget() {
   useEffect(() => {
     emailRef.current = email;
   }, [email]);
+  useEffect(() => {
+    gateAcceptedRef.current = gateAccepted;
+  }, [gateAccepted]);
 
   // Auto-scroll to bottom on new messages or while streaming.
   useEffect(() => {
@@ -230,7 +261,7 @@ export default function ChatWidget() {
         visitorName: string | null;
         visitorEmail: string | null;
       },
-    ) => {
+    ): Promise<SendOutcome> => {
       // Cancel any prior in-flight stream before starting a new one. Also
       // creates the AbortController for THIS request and stashes it in a
       // ref so performEnd() can abort it from outside this closure.
@@ -248,7 +279,22 @@ export default function ChatWidget() {
       setStreaming(true);
       setStreamingText("");
       setError(null);
+      let usedToken = false;
       try {
+        // First message only: attach a Turnstile token, or say the check
+        // could not run so the server can apply its smaller degraded budget.
+        let turnstileFields: {
+          turnstileToken?: string;
+          turnstileUnavailable?: boolean;
+        } = {};
+        if (TURNSTILE_SITE_KEY && !gateAcceptedRef.current) {
+          const result = await getTurnstileToken();
+          usedToken = result.token !== null;
+          turnstileFields = result.token
+            ? { turnstileToken: result.token }
+            : { turnstileUnavailable: true };
+        }
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -258,15 +304,29 @@ export default function ChatWidget() {
             visitorName: ctx.visitorName,
             visitorEmail: ctx.visitorEmail,
             messages: nextMessages,
+            ...turnstileFields,
           }),
         });
 
         if (!response.ok || !response.body) {
           const errBody = await response.json().catch(() => ({}));
-          throw new Error(
-            errBody.error || `Chat request failed (${response.status})`,
-          );
+          // The server refuses before storing anything, so the visitor can
+          // simply send the same message again.
+          const code = typeof errBody.code === "string" ? errBody.code : "";
+          const rejected =
+            code === "turnstile_required" ||
+            code === "turnstile_failed" ||
+            code === "rate_limited";
+          if (code === "turnstile_required" || code === "turnstile_failed") {
+            gateAcceptedRef.current = false;
+            setGateAccepted(false);
+          }
+          if (usedToken) resetTurnstile();
+          setError(errBody.error || `Chat request failed (${response.status})`);
+          return rejected ? "rejected" : "failed";
         }
+        gateAcceptedRef.current = true;
+        setGateAccepted(true);
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -285,7 +345,7 @@ export default function ChatWidget() {
             } catch {
               /* noop */
             }
-            return;
+            return "ok";
           }
           const chunk = decoder.decode(value, { stream: true });
           accumulated += chunk;
@@ -304,6 +364,7 @@ export default function ChatWidget() {
             { role: "assistant", content: accumulated },
           ]);
         }
+        return "ok";
       } catch (err) {
         // Aborts fire as DOMException(name='AbortError') — they're
         // expected when the user ends the conversation mid-stream and
@@ -312,13 +373,15 @@ export default function ChatWidget() {
           (err instanceof DOMException && err.name === "AbortError") ||
           (err instanceof Error && err.name === "AbortError")
         ) {
-          return;
+          return "ok";
         }
         const message =
           err instanceof Error
             ? err.message
             : "Something went wrong. Please try again.";
         setError(message);
+        if (usedToken) resetTurnstile();
+        return "failed";
       } finally {
         if (streamAbortRef.current === controller) {
           streamAbortRef.current = null;
@@ -327,7 +390,7 @@ export default function ChatWidget() {
         setStreamingText("");
       }
     },
-    [],
+    [getTurnstileToken, resetTurnstile],
   );
 
   const handleStart = async (e: React.FormEvent) => {
@@ -351,11 +414,17 @@ export default function ChatWidget() {
     setInitialName("");
     setInitialMessage("");
 
-    await sendMessage(next, {
+    const outcome = await sendMessage(next, {
       conversationId: id,
       visitorName: trimmedName,
       visitorEmail: email,
     });
+    if (outcome === "rejected") {
+      // Nothing was stored: put the message back in the form to resend.
+      setMessages((prev) => prev.slice(0, -1));
+      setInitialName(trimmedName);
+      setInitialMessage(trimmedMessage);
+    }
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -369,11 +438,15 @@ export default function ChatWidget() {
     ];
     setMessages(next);
     setDraft("");
-    await sendMessage(next, {
+    const outcome = await sendMessage(next, {
       conversationId,
       visitorName: name,
       visitorEmail: email,
     });
+    if (outcome === "rejected") {
+      setMessages((prev) => prev.slice(0, -1));
+      setDraft(trimmed);
+    }
   };
 
   const handleSaveEmail = async (e: React.FormEvent) => {
@@ -410,6 +483,8 @@ export default function ChatWidget() {
       setError(null);
       setEmailDismissed(false);
       setConfirmingEnd(false);
+      gateAcceptedRef.current = false;
+      setGateAccepted(false);
       if (closePanel) setIsOpen(false);
     },
     [finalizeOnClose],
@@ -436,7 +511,9 @@ export default function ChatWidget() {
   const handleCancelEnd = () => setConfirmingEnd(false);
   const handleConfirmEnd = () => performEnd(true);
 
-  const showInitialForm = !name || messages.length === 0;
+  // Keyed on messages only: visitors who skip the optional name still need
+  // the composer.
+  const showInitialForm = messages.length === 0;
 
   return (
     <>
@@ -561,7 +638,7 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {showInitialForm && messages.length === 0 ? (
+              {showInitialForm ? (
                 <form onSubmit={handleStart} className="space-y-3 pt-2">
                   <div>
                     <p className="text-sm text-(--color-text-primary) mb-3">
@@ -623,6 +700,14 @@ export default function ChatWidget() {
                   >
                     {streaming ? "Starting…" : "Start the conversation"}
                   </button>
+                  {error && (
+                    <div
+                      role="alert"
+                      className="text-xs text-red-300 bg-red-900/30 border border-red-900/40 px-3 py-2 rounded-md"
+                    >
+                      {error}
+                    </div>
+                  )}
                 </form>
               ) : (
                 <>
@@ -650,6 +735,16 @@ export default function ChatWidget() {
                     </div>
                   )}
                 </>
+              )}
+              {TURNSTILE_SITE_KEY && !gateAccepted && (
+                <div>
+                  {turnstileInteractive && (
+                    <p className="text-xs text-(--color-text-secondary) mb-1">
+                      Quick security check
+                    </p>
+                  )}
+                  <div ref={turnstileContainerRef} />
+                </div>
               )}
               <div ref={messagesEndRef} />
             </div>

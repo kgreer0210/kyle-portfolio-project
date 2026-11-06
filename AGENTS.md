@@ -60,6 +60,29 @@ documentation clutter. The assistant answers first, asks at most one follow-up,
 does not quote prices, and offers scheduling naturally. Chat turns are stored
 in Supabase and finalized with lead scoring and an email digest.
 
+Project facts are not duplicated in Markdown. `src/lib/chatProjectKnowledge.ts`
+derives them at request time from `src/data/projects.ts` (`getPublishedProjects()`,
+completed projects only, no screenshot captions or challenge text), so adding or
+removing a project there updates the assistant. Keep project names out of the
+knowledge Markdown.
+
+Abuse protection and contact capture (see README "Chat abuse protection"):
+
+- `src/lib/chatGuard.ts` runs before anything is stored or the model is called:
+  per-IP and per-conversation rate limits (`src/lib/rateLimit.ts`, Supabase RPC
+  `chat_rate_limit_hit`, HMAC-keyed with `RATE_LIMIT_SECRET`, in-memory
+  fallback), then Cloudflare Turnstile on the first message
+  (`src/lib/turnstile.ts`, action `chat`, exact hostname allowlist). The pass is
+  stored in `chat_conversations.turnstile_state`; never trust a client flag.
+  Missing site key, secret, or hostnames bypasses Turnstile with a diagnostic
+  log and keeps rate limits.
+- `src/lib/chatContact.ts` parses email and US phone, merges without overwriting
+  captured values, and decides when the assistant may ask for contact (once).
+  Contact values stay out of prompts, logs, and client responses.
+- Rejections are non-streaming JSON with a `code` (`turnstile_required`,
+  `turnstile_failed`, `rate_limited`, `invalid_request`) that the widget uses to
+  restore the message for a retry.
+
 `diagnostic-questions.md` keeps its historical filename but now contains the
 visitor-intent response guide. Do not rename it without updating the loader.
 
@@ -191,6 +214,13 @@ Public / non-secret:
 - `WEBAUTHN_ORIGIN`
 - `WEBAUTHN_RP_ID`
 - `WEBAUTHN_RP_NAME`
+
+Chat abuse protection (add values in the secret store; absent values bypass
+Turnstile with a diagnostic log):
+
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public) and `TURNSTILE_ALLOWED_HOSTNAMES`
+  (exact hostnames, comma-separated, no wildcards)
+- Secret: `TURNSTILE_SECRET_KEY`, `RATE_LIMIT_SECRET`
 
 Secret:
 

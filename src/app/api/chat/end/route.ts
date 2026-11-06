@@ -4,6 +4,7 @@ import {
   getConversationTranscript,
   writeConversationAnalytics,
 } from "@/lib/chatStorage";
+import { extractEmails } from "@/lib/chatContact";
 import { scoreChatTranscript } from "@/lib/chatLeadScoring";
 import { sendChatDigestEmail } from "@/lib/notifications";
 
@@ -60,10 +61,13 @@ export async function POST(req: NextRequest) {
 
   const visitorName =
     body.visitorName?.trim().slice(0, 100) || conversation.visitorName || null;
+  // The email captured during the chat wins; the widget's form value only
+  // fills a gap, and must at least look like an email.
   const visitorEmail =
-    body.visitorEmail?.trim().slice(0, 255) ||
     conversation.visitorEmail ||
+    extractEmails(body.visitorEmail ?? "")[0] ||
     null;
+  const visitorPhone = conversation.visitorPhone || null;
 
   const userMessageCount = messages.filter((m) => m.role === "user").length;
   const terminalStatus: "completed" | "abandoned" =
@@ -88,6 +92,7 @@ export async function POST(req: NextRequest) {
   await writeConversationAnalytics(body.conversationId, {
     visitorName,
     visitorEmail,
+    visitorPhone,
   });
 
   // Empty conversations are now finalized as "abandoned" by the claim
@@ -112,6 +117,7 @@ export async function POST(req: NextRequest) {
     conversationId: body.conversationId,
     visitorName,
     visitorEmail,
+    visitorPhone,
     startedAt: conversation.startedAt,
     endedAt: new Date().toISOString(),
     transcript: messages.map((m) => ({ role: m.role, content: m.content })),

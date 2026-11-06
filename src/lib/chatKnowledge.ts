@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { buildProjectKnowledge } from "@/lib/chatProjectKnowledge";
+import type { Project } from "@/types";
 
 // All knowledge files live under src/data/knowledge. They're read fresh on
 // every request — the files are small (~5 KB total) and the I/O is
@@ -38,8 +40,14 @@ function loadKnowledge(): KnowledgeBundle {
 
 export interface ChatPromptContext {
   visitorName?: string | null;
-  visitorEmail?: string | null;
+  /** Whether we already hold an email or phone. The values never enter the prompt. */
+  hasEmail?: boolean;
+  hasPhone?: boolean;
+  /** Deterministic permission to ask for contact details this turn. */
+  askForContact?: boolean;
   messageCount: number;
+  /** Override the portfolio, for tests. Defaults to src/data/projects.ts. */
+  projects?: Project[];
 }
 
 /**
@@ -52,13 +60,24 @@ export interface ChatPromptContext {
 export function buildSystemPrompt(context: ChatPromptContext): string {
   const k = loadKnowledge();
 
+  const hasContact = Boolean(context.hasEmail || context.hasPhone);
+  const contactLine = hasContact
+    ? `Contact details on file: ${[context.hasEmail && "email", context.hasPhone && "phone"].filter(Boolean).join(" and ")}. Do NOT ask for an email or phone number.`
+    : context.askForContact
+      ? "Contact details on file: none. ASK NOW: after answering, ask once, in one short sentence, for the best email or phone number to reach them. That is your one question this message; do not ask anything else and do not ask for their name. If they decline, drop it."
+      : "Contact details on file: none. Do NOT ask for an email or phone number yet; keep helping.";
+
+  const nameLine = context.askForContact && !hasContact
+    ? "Name gathering: not in this message (you are asking for contact details instead). Never gate your answer on not having a name."
+    : "Name gathering: do NOT ask for the visitor's name before answering their question. Answer first. If you don't know their name yet and you've had at least one substantive exchange, weave in asking naturally — something like 'By the way, who am I talking to?' If they share their name anywhere in the conversation, pick it up and use it. Never gate your answer on not having a name.";
+
   const visitorBlock = [
     "# Current Visitor State",
     `Visitor name: ${context.visitorName || "(not yet provided)"}`,
-    `Visitor email: ${context.visitorEmail || "(not yet provided)"}`,
+    contactLine,
     `Message count this conversation: ${context.messageCount}`,
     "",
-    "Name gathering: do NOT ask for the visitor's name before answering their question. Answer first. If you don't know their name yet and you've had at least one substantive exchange, weave in asking naturally — something like 'By the way, who am I talking to?' If they share their name anywhere in the conversation, pick it up and use it. Never gate your answer on not having a name.",
+    nameLine,
   ].join("\n");
 
   return [
@@ -78,6 +97,12 @@ export function buildSystemPrompt(context: ChatPromptContext): string {
     "----",
     "# Voice and Background",
     k.bio,
+    "",
+    "----",
+    "# Projects I've Built (from my portfolio)",
+    "This list is generated from the portfolio and is the only source for what I've built. Talk about it in the first person, as Kyle would (\"I built...\"). Use the exact titles. Never add details that are not listed.",
+    "",
+    buildProjectKnowledge(context.projects),
     "",
     "----",
     "# Services",
