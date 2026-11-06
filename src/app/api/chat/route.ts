@@ -88,7 +88,7 @@ function storageUnavailable(error: unknown) {
   );
 }
 
-function buildGuardDeps(ip: string | null): GuardDeps {
+function buildGuardDeps(): GuardDeps {
   const rateLimitSecret = process.env.RATE_LIMIT_SECRET;
   if (!rateLimitSecret && !warnedMissingRateLimitSecret) {
     warnedMissingRateLimitSecret = true;
@@ -124,7 +124,7 @@ function buildGuardDeps(ip: string | null): GuardDeps {
             token,
             secret: config.secret,
             allowedHostnames: config.allowedHostnames,
-            remoteIp: remoteIp ?? ip,
+            remoteIp,
           })
         : Promise.resolve({ status: "unavailable", reason: "misconfigured" }),
     log: (level, message) => console[level](message),
@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
         ip,
         turnstileToken: body.turnstileToken,
       },
-      buildGuardDeps(ip),
+      buildGuardDeps(),
     );
   } catch (error) {
     // The conversation state could not be read. Carrying on would treat any

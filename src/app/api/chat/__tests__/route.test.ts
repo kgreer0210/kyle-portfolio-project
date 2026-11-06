@@ -3,7 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ConversationState } from "@/lib/chatGuard";
 
 const streamText = vi.hoisted(() =>
-  vi.fn<(options: { system: string }) => { toTextStreamResponse: () => Response }>(
+  vi.fn<
+    (options: {
+      system: string;
+      messages: Array<{ role: string; content: string }>;
+    }) => { toTextStreamResponse: () => Response }
+  >(
     () => ({
       toTextStreamResponse: () => new Response("Hello from the assistant"),
     }),
@@ -144,6 +149,24 @@ describe("POST /api/chat with Turnstile configured", () => {
     expect(storage.appendMessage).toHaveBeenCalledWith(expect.any(String), "user", "Hello there");
   });
 
+  it("sends Cloudflare the exact IPv6 client address, not the rate-limit /64", async () => {
+    enableTurnstile();
+    const siteverify = stubSiteverify(
+      Response.json({ success: true, action: "chat", hostname: "kygrsolutions.com" }),
+    );
+
+    await POST(
+      chatRequest(
+        firstMessage("Hello there", { turnstileToken: "good" }),
+        "2001:DB8:abcd:12::1",
+      ),
+    );
+
+    const sent = (siteverify.mock.calls[0] as unknown as [string, { body: URLSearchParams }])[1].body;
+    expect(sent.get("remoteip")).toBe("2001:db8:abcd:12:0:0:0:1");
+    expect(sent.get("remoteip")).not.toContain("/");
+  });
+
   it("rejects a token Cloudflare says was already used", async () => {
     enableTurnstile();
     stubSiteverify(Response.json({ success: false, "error-codes": ["timeout-or-duplicate"] }));
@@ -246,6 +269,30 @@ describe("POST /api/chat contact capture", () => {
     expect(storage.upsertConversation).toHaveBeenCalledWith(
       expect.objectContaining({ visitorPhone: "+14045550199", visitorEmail: null }),
     );
+  });
+
+  it("keeps stored contact values out of the generated system prompt", async () => {
+    storage.getConversationState.mockResolvedValue({
+      exists: true,
+      turnstileState: "verified",
+      contact: { email: "jane@example.com", phone: "+14787771266" },
+    });
+
+    await POST(chatRequest(firstMessage("What does the process look like?")));
+
+    const prompt = promptOfLastCall();
+    expect(prompt).not.toMatch(/jane@example\.com|14787771266|\(478\) 555/);
+    expect(prompt).toMatch(/Contact details on file: email and phone\./);
+  });
+
+  it("still passes the visitor's own words to the model unredacted, as before", async () => {
+    await POST(chatRequest(firstMessage("It's jane@example.com, thanks")));
+
+    const sent = streamText.mock.calls[streamText.mock.calls.length - 1][0].messages;
+    expect(sent[sent.length - 1]).toEqual({
+      role: "user",
+      content: "It's jane@example.com, thanks",
+    });
   });
 
   it("stores an email from the message and keeps it out of the prompt", async () => {

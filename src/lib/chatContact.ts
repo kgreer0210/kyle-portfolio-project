@@ -159,20 +159,33 @@ interface TranscriptMessage {
   content: string;
 }
 
-// An assistant turn that asked for the visitor's contact details.
-const CONTACT_ASK_SUBJECT = /\b(?:e-?mail|phone|cell|number)\b/i;
-const CONTACT_ASK_VERB = /\b(?:reach|contact|get (?:back )?(?:to|in touch)|follow up|send)\b/i;
+// Ways an assistant question asks for the VISITOR's contact details. Each one
+// has to point at the visitor ("your", "for you", "reach you"), so a question
+// that only offers Kyle's number ("Want my number?") or an answer that shares
+// it does not count.
+const CONTACT_ASK_PATTERNS: RegExp[] = [
+  // "What's your best email?" / "your phone number" / "your number"
+  /\b(?:your|ur)\s+(?:(?:best|preferred|direct|personal|main|work|good)\s+)*(?:e-?mail|phone|cell|mobile|number|contact)/i,
+  // "What is the best email or phone number for you?"
+  /\b(?:e-?mail|phone|cell|mobile|number)\b[^?]*\bfor you\b/i,
+  // "How should Kyle reach you?" / "best way to contact you" / "get in touch with you"
+  /\b(?:reach|contact|get in touch with|follow up with)\s+you\b/i,
+  // "What's the best number to call you on?" / "best email to send it to?"
+  /\b(?:best|good|easiest|preferred)\s+(?:e-?mail|phone|cell|mobile|number|way)\b[^?]*\b(?:call|text|e-?mail|send)\b/i,
+];
 
+/** True if any assistant turn already asked the visitor for an email or phone. */
 export function assistantAskedForContact(
   messages: TranscriptMessage[],
 ): boolean {
-  return messages.some(
-    (m) =>
-      m.role === "assistant" &&
-      m.content.includes("?") &&
-      CONTACT_ASK_SUBJECT.test(m.content) &&
-      CONTACT_ASK_VERB.test(m.content),
-  );
+  return messages.some((m) => {
+    if (m.role !== "assistant") return false;
+    // Only question sentences count: sharing a number is not asking for one.
+    const questions = m.content.match(/[^.!?]*\?/g) ?? [];
+    return questions.some((question) =>
+      CONTACT_ASK_PATTERNS.some((pattern) => pattern.test(question)),
+    );
+  });
 }
 
 // Messages that are pleasantries rather than a real exchange.

@@ -61,9 +61,10 @@ function expandIpv6(address: string): string[] | null {
 }
 
 /**
- * Normalizes a client address into the unit we rate limit. IPv4 stays as is,
- * IPv4-mapped IPv6 becomes IPv4, and other IPv6 collapses to its /64 so a
- * client cannot dodge limits by rotating through the addresses of one subnet.
+ * Canonical form of one client address. IPv4 stays as is, IPv4-mapped IPv6
+ * becomes IPv4, and other IPv6 is lower-cased and written as eight groups
+ * without leading zeros. This is a real address (safe to hand to Cloudflare's
+ * `remoteip`); use `ipBucketKey` for the rate-limit bucket.
  */
 export function normalizeIp(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -82,7 +83,18 @@ export function normalizeIp(raw: string | null | undefined): string | null {
     const low = parseInt(mapped[2], 16);
     return [high >> 8, high & 255, low >> 8, low & 255].join(".");
   }
-  return `${groups.slice(0, 4).join(":")}::/64`;
+  return groups.map((group) => group.replace(/^0+(?=.)/, "")).join(":");
+}
+
+/**
+ * The unit we rate limit by: IPv4 as is, IPv6 collapsed to its /64 so a client
+ * cannot dodge limits by rotating through the addresses of one subnet. The
+ * result may be a CIDR string, so it is for bucketing only, never `remoteip`.
+ */
+export function ipBucketKey(ip: string): string {
+  if (!ip.includes(":")) return ip;
+  const groups = expandIpv6(ip);
+  return groups ? `${groups.slice(0, 4).join(":")}::/64` : ip;
 }
 
 /**
@@ -155,6 +167,9 @@ export function createMemoryRateLimiter(
         const entry = entries.get(check.key);
         const count =
           entry && entry.windowStart === windowStart ? entry.count + 1 : 1;
+        // Re-insert so an active key moves to the end of the Map and
+        // eviction (oldest first) drops idle counters before busy ones.
+        entries.delete(check.key);
         entries.set(check.key, {
           windowStart,
           count,

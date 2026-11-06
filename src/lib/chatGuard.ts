@@ -2,6 +2,7 @@ import type { VisitorContact } from "@/lib/chatContact";
 import {
   CHAT_RATE_LIMITS,
   hashForBucket,
+  ipBucketKey,
   longestDenial,
   type RateCheck,
   type RateLimiter,
@@ -52,7 +53,10 @@ export interface GuardDeps {
 export interface GuardInput {
   /** A validated UUID. Lower-cased here so case variants share a bucket. */
   conversationId: string;
-  /** Normalized client IP, or null when the platform did not provide one. */
+  /**
+   * Exact normalized client address (never a CIDR), or null when the platform
+   * did not provide one. Bucketed internally; passed as-is to Cloudflare.
+   */
   ip: string | null;
   turnstileToken?: string | null;
 }
@@ -134,7 +138,11 @@ export async function guardChatRequest(
   const conversationId = input.conversationId.toLowerCase();
   const conversation = await deps.getConversationState(conversationId);
 
-  const ipHash = hashForBucket(deps.hashSecret, "ip", input.ip ?? "unknown");
+  const ipHash = hashForBucket(
+    deps.hashSecret,
+    "ip",
+    input.ip ? ipBucketKey(input.ip) : "unknown",
+  );
   const conversationHash = hashForBucket(deps.hashSecret, "conversation", conversationId);
   const { ipPerMinute, ipPerHour, conversationPerMinute, conversationPerHour } =
     CHAT_RATE_LIMITS;

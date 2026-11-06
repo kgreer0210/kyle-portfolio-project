@@ -15,9 +15,6 @@ import { useTurnstile } from "./useTurnstile";
 const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
 const STORAGE_KEY = "kygr_chat_state_v1";
 const EMAIL_PROMPT_AFTER_TURNS = 3;
-// Public by design. When unset, the widget skips Turnstile entirely.
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || undefined;
-
 type SendOutcome = "ok" | "rejected" | "failed";
 
 type ChatRole = "user" | "assistant";
@@ -100,7 +97,16 @@ function newConversationId(): string {
   });
 }
 
-export default function ChatWidget() {
+export default function ChatWidget({
+  turnstileSiteKey,
+}: {
+  /**
+   * Public Turnstile site key, supplied by the server layout only when the
+   * server will verify tokens. When undefined the widget skips Turnstile: it
+   * loads no script and never waits for a token.
+   */
+  turnstileSiteKey?: string;
+}) {
   // Hydrate from sessionStorage so refresh keeps the conversation alive.
   // loadPersistedState is SSR-safe (returns empty state on the server), and
   // the initial closed-widget DOM doesn't depend on any of these values, so
@@ -147,7 +153,7 @@ export default function ChatWidget() {
     reset: resetTurnstile,
     retry: retryTurnstile,
     interactive: turnstileInteractive,
-  } = useTurnstile(TURNSTILE_SITE_KEY, isOpen && !gateAccepted);
+  } = useTurnstile(turnstileSiteKey, isOpen && !gateAccepted);
 
   // The visitor already gave contact details in chat, so skip the form.
   const sharedContactInChat = messages.some(
@@ -292,7 +298,7 @@ export default function ChatWidget() {
         // First message only. No token means no request: a blocked or failed
         // script must never become a way around verification.
         let turnstileFields: { turnstileToken?: string } = {};
-        if (TURNSTILE_SITE_KEY && !gateAcceptedRef.current) {
+        if (turnstileSiteKey && !gateAcceptedRef.current) {
           const result = await getTurnstileToken();
           if (!result.token) {
             setVerificationBlocked(true);
@@ -404,7 +410,7 @@ export default function ChatWidget() {
         setStreamingText("");
       }
     },
-    [getTurnstileToken, resetTurnstile],
+    [getTurnstileToken, resetTurnstile, turnstileSiteKey],
   );
 
   const handleStart = async (e: React.FormEvent) => {
@@ -763,7 +769,7 @@ export default function ChatWidget() {
                   )}
                 </>
               )}
-              {TURNSTILE_SITE_KEY && !gateAccepted && (
+              {turnstileSiteKey && !gateAccepted && (
                 <div>
                   {turnstileInteractive && (
                     <p className="text-xs text-(--color-text-secondary) mb-1">

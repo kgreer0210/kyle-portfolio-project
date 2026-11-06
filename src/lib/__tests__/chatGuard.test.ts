@@ -291,3 +291,38 @@ describe("rate limits", () => {
     expect(hit.mock.calls[1][0]).toHaveLength(4);
   });
 });
+
+describe("IPv6 clients", () => {
+  const first = "2001:db8:abcd:12:1111:2222:3333:4444";
+  const sameSubnet = "2001:db8:abcd:12:0:0:0:1";
+  const otherSubnet = "2001:db8:abcd:13:0:0:0:1";
+
+  function recordKeys() {
+    const hit = vi.fn<RateLimiter["hit"]>(async (checks) =>
+      checks.map(() => ({ allowed: true, retryAfterSeconds: 1 })),
+    );
+    return { hit, ipKeys: () => hit.mock.calls.map((c) => c[0][0].key) };
+  }
+
+  it("buckets by /64 but hands Cloudflare the exact address", async () => {
+    const { hit, ipKeys } = recordKeys();
+    const { deps, verifyToken } = setup({ limiter: { hit } });
+
+    await guardChatRequest({ conversationId: ID, ip: first, turnstileToken: "tok" }, deps);
+    await guardChatRequest({ conversationId: ID, ip: sameSubnet, turnstileToken: "tok" }, deps);
+    await guardChatRequest({ conversationId: ID, ip: otherSubnet, turnstileToken: "tok" }, deps);
+
+    const [a, b, c] = ipKeys();
+    expect(a).toBe(b);
+    expect(a).not.toBe(c);
+    expect(a).not.toContain("2001");
+    expect(verifyToken.mock.calls.map((call) => call[1])).toEqual([
+      first,
+      sameSubnet,
+      otherSubnet,
+    ]);
+    for (const [, remoteIp] of verifyToken.mock.calls) {
+      expect(remoteIp).not.toContain("/");
+    }
+  });
+});

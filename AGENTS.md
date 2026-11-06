@@ -80,7 +80,10 @@ Abuse protection and contact capture (see README "Chat abuse protection"):
   the phone line and contact form still visible, never an unverified message.
 - `src/lib/chatContact.ts` parses email and US phone, merges without overwriting
   captured values, and decides when the assistant may ask for contact (once).
-  Contact values stay out of prompts, logs, and client responses.
+  The generated system prompt carries only on-file flags, never a stored value,
+  and logs and client responses never include contact details. The visitor's own
+  messages still go to the model provider unredacted, as before; do not claim
+  more than that.
 - Storage helpers in `src/lib/chatStorage.ts` throw `ChatStorageError`
   (content-free; logged by operation and code only). The chat route turns any
   state-read, conversation-write, or user-message failure into 503

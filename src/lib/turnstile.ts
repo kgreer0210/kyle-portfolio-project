@@ -55,6 +55,21 @@ export function getTurnstileConfig(
   };
 }
 
+/**
+ * The site key to hand the browser, or undefined unless the server will really
+ * verify (site key, secret, and hostnames all set). Without this, a site key
+ * on its own would make the widget wait for or demand a token the server is
+ * about to bypass. Only the public site key is returned; no secret reaches the
+ * browser.
+ */
+export function getPublicTurnstileSiteKey(
+  env: Record<string, string | undefined> = process.env,
+): string | undefined {
+  return getTurnstileConfig(env).enabled
+    ? env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    : undefined;
+}
+
 export type TurnstileOutcome =
   | { status: "verified" }
   | {

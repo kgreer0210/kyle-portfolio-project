@@ -1,15 +1,14 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import ChatWidget from "@/components/ChatWidget";
+import { getPublicTurnstileSiteKey } from "@/lib/turnstile";
 import type { TurnstileApi, TurnstileRenderOptions } from "@/lib/turnstileClient";
 
-// NEXT_PUBLIC_* values are inlined when the module loads, so each test sets
-// the environment first and imports the widget afterwards.
-async function renderWidget(siteKey: string | null) {
-  vi.resetModules();
-  vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", siteKey ?? "");
-  const { default: ChatWidget } = await import("@/components/ChatWidget");
-  render(<ChatWidget />);
+// The server layout decides whether Turnstile is on and passes the site key
+// down; the widget never reads Turnstile environment variables itself.
+function renderWidget(siteKey: string | null) {
+  render(<ChatWidget turnstileSiteKey={siteKey ?? undefined} />);
   fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
 }
 
@@ -57,7 +56,6 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
-  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
@@ -65,7 +63,7 @@ describe("ChatWidget without a Turnstile site key", () => {
   it("sends no Turnstile fields and never loads the script", async () => {
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget(null);
+    renderWidget(null);
 
     submitFirstMessage();
 
@@ -74,9 +72,32 @@ describe("ChatWidget without a Turnstile site key", () => {
     expect(document.head.querySelector("script[src*=turnstile]")).toBeNull();
   });
 
+  it("does not load, wait for, or block on Turnstile when the server has it half-configured", async () => {
+    // A site key with no secret: the server bypasses verification, so the
+    // layout hands the widget nothing and the browser must not wait for a token.
+    const siteKey = getPublicTurnstileSiteKey({
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: "site-key",
+      TURNSTILE_ALLOWED_HOSTNAMES: "kygrsolutions.com",
+    });
+    expect(siteKey).toBeUndefined();
+    const fetchMock = vi.fn(async () => textResponse("Happy to help"));
+    vi.stubGlobal("fetch", fetchMock);
+    renderWidget(siteKey ?? null);
+
+    submitFirstMessage();
+
+    await screen.findByText("Happy to help");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(requestBody(fetchMock)).not.toHaveProperty("turnstileToken");
+    expect(document.head.querySelector("script[src*=turnstile]")).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /try the security check again/i }),
+    ).toBeNull();
+  });
+
   it("keeps the composer for visitors who skip the optional name", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => textResponse("Happy to help")));
-    await renderWidget(null);
+    renderWidget(null);
 
     submitFirstMessage();
 
@@ -95,7 +116,7 @@ describe("ChatWidget without a Turnstile site key", () => {
         }),
       ),
     );
-    await renderWidget(null);
+    renderWidget(null);
 
     submitFirstMessage("I need a website for my bakery");
 
@@ -119,7 +140,7 @@ describe("ChatWidget when the server cannot save", () => {
         }),
       ),
     );
-    await renderWidget(null);
+    renderWidget(null);
 
     submitFirstMessage("I need a website for my bakery");
 
@@ -135,7 +156,7 @@ describe("ChatWidget with a Turnstile site key", () => {
     const { api, state } = installTurnstile();
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
 
     await waitFor(() => expect(api.render).toHaveBeenCalled());
     expect(state.options).toMatchObject({
@@ -154,7 +175,7 @@ describe("ChatWidget with a Turnstile site key", () => {
     const { api, state } = installTurnstile();
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
     await waitFor(() => expect(api.render).toHaveBeenCalled());
     state.options?.callback("token-1");
     submitFirstMessage();
@@ -173,7 +194,7 @@ describe("ChatWidget with a Turnstile site key", () => {
   it("sends nothing, keeps the message, and offers retry plus contact options when the script is blocked", async () => {
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
     const tag = await waitFor(() => {
       const found = document.head.querySelector<HTMLScriptElement>(
         "script[src*=turnstile]",
@@ -208,7 +229,7 @@ describe("ChatWidget with a Turnstile site key", () => {
   it("retries the script and sends once a token arrives", async () => {
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
     const tag = await waitFor(() => {
       const found = document.head.querySelector<HTMLScriptElement>(
         "script[src*=turnstile]",
@@ -239,7 +260,7 @@ describe("ChatWidget with a Turnstile site key", () => {
     const { api, state } = installTurnstile();
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
     await waitFor(() => expect(api.render).toHaveBeenCalled());
     state.options?.["error-callback"]?.("300030");
 
@@ -258,7 +279,7 @@ describe("ChatWidget with a Turnstile site key", () => {
     });
     const fetchMock = vi.fn(async () => textResponse("Happy to help"));
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
 
     submitFirstMessage();
 
@@ -277,7 +298,7 @@ describe("ChatWidget with a Turnstile site key", () => {
         }),
       ),
     );
-    await renderWidget("site-key");
+    renderWidget("site-key");
     await waitFor(() => expect(api.render).toHaveBeenCalled());
     state.options?.callback("tok");
 
@@ -302,7 +323,7 @@ describe("ChatWidget with a Turnstile site key", () => {
       }),
     );
     vi.stubGlobal("fetch", fetchMock);
-    await renderWidget("site-key");
+    renderWidget("site-key");
     await waitFor(() => expect(api.render).toHaveBeenCalled());
     state.options?.callback("spent-token");
 

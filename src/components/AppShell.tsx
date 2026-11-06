@@ -20,7 +20,14 @@ function isAppRoute(pathname: string): boolean {
   );
 }
 
-export default function AppShell({ children }: { children: ReactNode }) {
+export default function AppShell({
+  children,
+  turnstileSiteKey,
+}: {
+  children: ReactNode;
+  /** Set by the server only when Turnstile verification is fully configured. */
+  turnstileSiteKey?: string;
+}) {
   const pathname = usePathname();
   const renderAppChrome = isAppRoute(pathname);
 
@@ -49,7 +56,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <BackToTop />
-      <ChatWidget />
+      <ChatWidget turnstileSiteKey={turnstileSiteKey} />
     </>
   );
 }

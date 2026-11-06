@@ -139,23 +139,43 @@ describe("mergeContactFromMessage", () => {
 });
 
 describe("assistantAskedForContact", () => {
-  it("recognizes a question asking how to reach the visitor", () => {
+  const asked = (content: string) =>
+    assistantAskedForContact([{ role: "assistant", content }]);
+
+  it("recognizes 'What is the best email or phone number for you?'", () => {
+    expect(asked("What is the best email or phone number for you?")).toBe(true);
+  });
+
+  it.each([
+    "What's the best email or phone number for me to reach you?",
+    "What's your best email or phone number?",
+    "What's your number?",
+    "How should Kyle reach you?",
+    "How can I reach you?",
+    "Great question. What's the best way to contact you?",
+    "What's the best number to call you on?",
+    "Is there an email you'd like Kyle to follow up with you on?",
+  ])("recognizes the ask %j", (content) => {
+    expect(asked(content)).toBe(true);
+  });
+
+  it("finds the ask when it follows an answer in the same message", () => {
     expect(
-      assistantAskedForContact([
-        {
-          role: "assistant",
-          content: "What's the best email or phone number for me to reach you?",
-        },
-      ]),
+      asked(
+        "A site like that usually takes a few weeks. What's the best email or phone number for you?",
+      ),
     ).toBe(true);
   });
 
-  it("does not treat sharing Kyle's number as an ask", () => {
-    expect(
-      assistantAskedForContact([
-        { role: "assistant", content: "You can call me at (478) 777-1266." },
-      ]),
-    ).toBe(false);
+  it.each([
+    "You can call me at (478) 777-1266.",
+    "My direct line is (478) 777-1266. Does that help?",
+    "Would you like my number?",
+    "Want me to share Kyle's phone number?",
+    "What kind of phone system does your office use?",
+    "How many pages do you need?",
+  ])("does not count %j as asking for contact", (content) => {
+    expect(asked(content)).toBe(false);
   });
 
   it("ignores the visitor's own messages", () => {
@@ -217,6 +237,21 @@ describe("shouldAskForContact", () => {
     expect(
       shouldAskForContact(engaged, { email: null, phone: "+14787771266" }),
     ).toBe(false);
+  });
+
+  it("does not ask again after 'What is the best email or phone number for you?'", () => {
+    const asked = [
+      ...engaged,
+      {
+        role: "assistant" as const,
+        content: "What is the best email or phone number for you?",
+      },
+      {
+        role: "user" as const,
+        content: "I'd rather not share that, can you just explain how the process works first",
+      },
+    ];
+    expect(shouldAskForContact(asked, EMPTY_CONTACT)).toBe(false);
   });
 
   it("asks at most once", () => {

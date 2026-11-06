@@ -96,7 +96,7 @@ beyond Cloudflare's free Turnstile widget.
 
 | Variable | Where | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | build + runtime, public | Turnstile widget site key |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public; handed to the browser by the server layout only when the other two server values are set | Turnstile widget site key |
 | `TURNSTILE_SECRET_KEY` | server only | Turnstile `siteverify` secret |
 | `TURNSTILE_ALLOWED_HOSTNAMES` | server only | Comma-separated **exact** hostnames the widget may be solved on |
 | `RATE_LIMIT_SECRET` | server only | Random secret (for example `openssl rand -hex 32`) that keys the HMAC of client IPs. Not a Supabase key. |
@@ -125,8 +125,13 @@ beyond Cloudflare's free Turnstile widget.
   fails closed on purpose; contact options stay available throughout.
   Rejected tokens (replayed, expired, wrong action or hostname) are refused with
   a friendly "send it again" message and the widget requests a fresh token.
-- `NEXT_PUBLIC_*` values are inlined at build time. After adding or changing the
-  site key, redeploy so the browser bundle picks it up.
+- The browser only gets the site key when the server will actually verify. The
+  root layout (a server component) reads the three server-side values and passes
+  the site key to the chat widget only if the site key, secret, **and**
+  hostnames are all set. With any of them missing, the widget loads no script,
+  waits for no token, and shows no retry state, matching the server's bypass.
+  No secret ever reaches the browser. The layout reads the values at build time,
+  so redeploy after adding or changing any of the three.
 
 **Vercel setup (names only; nothing is configured by the repo)**
 
@@ -156,7 +161,7 @@ The limit store reuses the existing server-side Supabase Secret Key through the
 normal client in `src/lib/supabase/env.ts` (`SUPABASE_SERVICE_ROLE_KEY`, then
 `SUPABASE_SECRET_KEY`); no new Supabase variable is needed. `RATE_LIMIT_SECRET`
 is a separate HMAC secret, not a Supabase key. Counters are keyed by an HMAC of the server-derived IP (Vercel's
-`x-vercel-forwarded-for`, with IPv6 collapsed to its /64) and of the
+`x-vercel-forwarded-for`; IPv6 is collapsed to its /64 for the bucket only, while Cloudflare's `remoteip` gets the exact address) and of the
 conversation id; raw IPs are never stored. Limits run before the model is
 called and before any message is stored. If the database limiter errors (or the
 migration is missing), the route logs and falls back to a per-instance
@@ -172,8 +177,16 @@ number; it never gates an answer. Emails and common US phone formats are parsed
 from every visitor message (conservatively, so dates, amounts, and IDs are
 ignored) and saved on the conversation immediately as `visitor_email` and
 `visitor_phone` (E.164). A captured value is only replaced by an explicit
-correction. Both appear in the end-of-chat digest. Contact values are never put
-in the model prompt, logs, or client responses.
+correction. Both appear in the end-of-chat digest. The system
+prompt we generate carries only "contact on file: email/phone/none" flags, never a
+stored value, and logs and client responses never include contact details.
+
+**Privacy boundary:** the visitor's own messages are still sent to the model
+provider (OpenRouter) as part of the conversation, exactly as before this
+change, so an email or phone number a visitor types in chat reaches OpenRouter.
+The transcript is deliberately not redacted, because that would degrade the
+chat. This change adds no new exposure: no contact metadata in prompts, logs, or
+client responses.
 
 Storage failures are never silent. If the conversation state cannot be read, or
 the conversation row or user message cannot be written, `/api/chat` answers 503

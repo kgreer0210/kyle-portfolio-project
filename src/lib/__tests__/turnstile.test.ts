@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  getPublicTurnstileSiteKey,
   getTurnstileConfig,
   parseAllowedHostnames,
   TURNSTILE_VERIFY_URL,
@@ -52,6 +53,30 @@ describe("getTurnstileConfig", () => {
     expect(
       getTurnstileConfig({ ...full, TURNSTILE_ALLOWED_HOSTNAMES: " , " }),
     ).toEqual({ enabled: false, reason: "missing-hostnames" });
+  });
+});
+
+describe("getPublicTurnstileSiteKey", () => {
+  const full = {
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: "site-123",
+    TURNSTILE_SECRET_KEY: "secret",
+    TURNSTILE_ALLOWED_HOSTNAMES: "kygrsolutions.com",
+  };
+
+  it("hands the browser the site key only when the server will verify", () => {
+    expect(getPublicTurnstileSiteKey(full)).toBe("site-123");
+  });
+
+  it.each([
+    ["the secret", { ...full, TURNSTILE_SECRET_KEY: undefined }],
+    ["the hostname list", { ...full, TURNSTILE_ALLOWED_HOSTNAMES: "" }],
+    ["every server value", { NEXT_PUBLIC_TURNSTILE_SITE_KEY: "site-123" }],
+  ])("hides the site key when the server is missing %s", (_label, env) => {
+    expect(getPublicTurnstileSiteKey(env)).toBeUndefined();
+  });
+
+  it("never returns a secret", () => {
+    expect(getPublicTurnstileSiteKey(full)).not.toContain("secret");
   });
 });
 

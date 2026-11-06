@@ -5,6 +5,7 @@ import {
   createSupabaseRateLimiter,
   getClientIp,
   hashForBucket,
+  ipBucketKey,
   longestDenial,
   normalizeIp,
   withFallback,
@@ -22,12 +23,13 @@ describe("normalizeIp", () => {
     expect(normalizeIp("::ffff:203.0.113.9")).toBe("203.0.113.9");
   });
 
-  it("collapses IPv6 to its /64 so one subnet is one bucket", () => {
-    const a = normalizeIp("2001:db8:abcd:12:1111:2222:3333:4444");
-    const b = normalizeIp("2001:DB8:abcd:12::1");
-    expect(a).toBe("2001:0db8:abcd:0012::/64");
-    expect(b).toBe(a);
-    expect(normalizeIp("2001:db8:abcd:13::1")).not.toBe(a);
+  it("keeps the exact IPv6 address, never a CIDR", () => {
+    expect(normalizeIp("2001:DB8:abcd:12:1111:2222:3333:4444")).toBe(
+      "2001:db8:abcd:12:1111:2222:3333:4444",
+    );
+    expect(normalizeIp("2001:db8:abcd:12::1")).toBe("2001:db8:abcd:12:0:0:0:1");
+    expect(normalizeIp("[2001:db8::1]")).toBe("2001:db8:0:0:0:0:0:1");
+    expect(normalizeIp("2001:db8::1%eth0")).not.toContain("/");
   });
 
   it("rejects values that are not IP addresses", () => {
@@ -35,6 +37,20 @@ describe("normalizeIp", () => {
     expect(normalizeIp("999.1.1.1")).toBeNull();
     expect(normalizeIp("")).toBeNull();
     expect(normalizeIp(null)).toBeNull();
+  });
+});
+
+describe("ipBucketKey", () => {
+  it("leaves IPv4 alone", () => {
+    expect(ipBucketKey("203.0.113.9")).toBe("203.0.113.9");
+  });
+
+  it("collapses IPv6 to its /64 so one subnet is one bucket", () => {
+    const a = ipBucketKey(normalizeIp("2001:db8:abcd:12:1111:2222:3333:4444")!);
+    const b = ipBucketKey(normalizeIp("2001:DB8:abcd:12::1")!);
+    expect(a).toBe("2001:0db8:abcd:0012::/64");
+    expect(b).toBe(a);
+    expect(ipBucketKey(normalizeIp("2001:db8:abcd:13::1")!)).not.toBe(a);
   });
 });
 
@@ -55,6 +71,12 @@ describe("getClientIp", () => {
     expect(
       getClientIp(headers({ "x-forwarded-for": "198.51.100.1, 10.0.0.1" })),
     ).toBe("198.51.100.1");
+  });
+
+  it("returns the exact IPv6 address for Cloudflare, not its /64 bucket", () => {
+    expect(
+      getClientIp(headers({ "x-vercel-forwarded-for": "2001:db8:abcd:12::1" })),
+    ).toBe("2001:db8:abcd:12:0:0:0:1");
   });
 
   it("ignores garbage and returns null when nothing usable is present", () => {
@@ -116,6 +138,18 @@ describe("createMemoryRateLimiter", () => {
     expect(results.map((r) => r.allowed)).toEqual([true, true]);
     const again = await limiter.hit([{ key: "a", limit: 1, windowSeconds: 60 }]);
     expect(again[0].allowed).toBe(false);
+  });
+
+  it("evicts idle counters before ones that are still being hit", async () => {
+    const limiter = createMemoryRateLimiter(() => 0, 5);
+    const busy = { key: "busy", limit: 3, windowSeconds: 3600 };
+    await limiter.hit([busy]);
+    for (let i = 0; i < 20; i++) {
+      await limiter.hit([{ key: `idle${i}`, limit: 1, windowSeconds: 3600 }]);
+      await limiter.hit([busy]);
+    }
+    // busy has now been hit 21 times in one window; it must still be limited.
+    expect((await limiter.hit([busy]))[0].allowed).toBe(false);
   });
 
   it("stays bounded under many distinct keys", async () => {
