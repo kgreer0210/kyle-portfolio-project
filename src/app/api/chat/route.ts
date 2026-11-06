@@ -8,7 +8,11 @@ import {
   mergeContactFromMessage,
   shouldAskForContact,
 } from "@/lib/chatContact";
-import { guardChatRequest, type GuardDeps } from "@/lib/chatGuard";
+import {
+  guardChatRequest,
+  type GuardDecision,
+  type GuardDeps,
+} from "@/lib/chatGuard";
 import {
   appendMessage,
   getConversationState,
@@ -64,6 +68,24 @@ function json(
     status,
     headers: { "Content-Type": "application/json", ...headers },
   });
+}
+
+/**
+ * Storage failed before the model was called. Answer with plain JSON (never a
+ * stream) and nothing from the request: no contact details, no transcript.
+ */
+function storageUnavailable(error: unknown) {
+  console.error("[chat] storage unavailable", {
+    name: error instanceof Error ? error.name : "unknown",
+  });
+  return json(
+    {
+      error:
+        "I couldn't save that just now, so I haven't sent it. Please try again in a moment, or reach me directly.",
+      code: "storage_unavailable",
+    },
+    503,
+  );
 }
 
 function buildGuardDeps(ip: string | null): GuardDeps {
@@ -169,14 +191,21 @@ export async function POST(req: NextRequest) {
   // Abuse checks run before anything is stored or the model is called, so a
   // rejected request leaves no conversation row or message behind.
   const ip = getClientIp(req.headers);
-  const decision = await guardChatRequest(
-    {
-      conversationId,
-      ip,
-      turnstileToken: body.turnstileToken,
-    },
-    buildGuardDeps(ip),
-  );
+  let decision: GuardDecision;
+  try {
+    decision = await guardChatRequest(
+      {
+        conversationId,
+        ip,
+        turnstileToken: body.turnstileToken,
+      },
+      buildGuardDeps(ip),
+    );
+  } catch (error) {
+    // The conversation state could not be read. Carrying on would treat any
+    // stored email or phone as unknown, so stop here.
+    return storageUnavailable(error);
+  }
   if (!decision.ok) {
     return json(
       {
@@ -212,15 +241,20 @@ export async function POST(req: NextRequest) {
   // the stream. We don't await persistence in parallel with the model call
   // because if the row isn't there the cascade would fail when we try to
   // append the assistant response later.
-  await upsertConversation({
-    conversationId,
-    visitorName,
-    visitorEmail: contact.email,
-    visitorPhone: contact.phone,
-    turnstileState: decision.turnstileState,
-  });
-
-  await appendMessage(conversationId, "user", lastUserMessage.content);
+  // A failed write could drop captured contact details or the Turnstile pass,
+  // so any storage failure ends the request before the model runs.
+  try {
+    await upsertConversation({
+      conversationId,
+      visitorName,
+      visitorEmail: contact.email,
+      visitorPhone: contact.phone,
+      turnstileState: decision.turnstileState,
+    });
+    await appendMessage(conversationId, "user", lastUserMessage.content);
+  } catch (error) {
+    return storageUnavailable(error);
+  }
 
   const systemPrompt = buildSystemPrompt({
     visitorName,
@@ -247,7 +281,11 @@ export async function POST(req: NextRequest) {
       // This runs after the stream has been fully consumed by the client.
       onFinish: async ({ text }) => {
         if (text && text.trim().length > 0) {
-          await appendMessage(conversationId, "assistant", text);
+          try {
+            await appendMessage(conversationId, "assistant", text);
+          } catch {
+            // Already logged without content; the visitor has their reply.
+          }
         }
       },
     });

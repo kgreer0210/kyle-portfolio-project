@@ -328,6 +328,7 @@ export default function ChatWidget() {
             code === "turnstile_required" ||
             code === "turnstile_failed" ||
             code === "turnstile_unavailable" ||
+            code === "storage_unavailable" ||
             code === "rate_limited";
           if (code.startsWith("turnstile_")) {
             gateAcceptedRef.current = false;

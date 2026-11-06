@@ -81,8 +81,13 @@ Abuse protection and contact capture (see README "Chat abuse protection"):
 - `src/lib/chatContact.ts` parses email and US phone, merges without overwriting
   captured values, and decides when the assistant may ask for contact (once).
   Contact values stay out of prompts, logs, and client responses.
+- Storage helpers in `src/lib/chatStorage.ts` throw `ChatStorageError`
+  (content-free; logged by operation and code only). The chat route turns any
+  state-read, conversation-write, or user-message failure into 503
+  `storage_unavailable` JSON before the model runs, and never continues on an
+  unknown contact state.
 - Rejections are non-streaming JSON with a `code` (`turnstile_required`,
-  `turnstile_failed`, `turnstile_unavailable`, `rate_limited`, `invalid_request`) that the widget uses to
+  `turnstile_failed`, `turnstile_unavailable`, `storage_unavailable`, `rate_limited`, `invalid_request`) that the widget uses to
   restore the message for a retry.
 
 `diagnostic-questions.md` keeps its historical filename but now contains the

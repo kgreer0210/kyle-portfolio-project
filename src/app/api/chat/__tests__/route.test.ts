@@ -320,3 +320,90 @@ describe("POST /api/chat contact capture", () => {
     expect(promptOfLastCall()).not.toContain("ASK NOW");
   });
 });
+
+describe("POST /api/chat when storage fails", () => {
+  const storedContact = {
+    exists: true,
+    turnstileState: "verified" as const,
+    contact: { email: "jane@example.com", phone: "+14787771266" },
+  };
+
+  async function expectFriendlyRetry(response: Response) {
+    expect(response.status).toBe(503);
+    expect(response.headers.get("content-type")).toContain("application/json");
+    const text = await response.text();
+    expect(JSON.parse(text)).toMatchObject({ code: "storage_unavailable" });
+    expect(text).toMatch(/try again/i);
+    // Nothing from the request or the stored record comes back to the client.
+    expect(text).not.toMatch(/jane@example|1266|Hello there/);
+  }
+
+  it("stops before the model, and writes nothing, when the state read fails", async () => {
+    // The stored email and phone are unknown at this moment. Proceeding would
+    // merge only this message and could leave a stored column unrestored.
+    storage.getConversationState.mockRejectedValueOnce(new Error("read failed"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const response = await POST(chatRequest(firstMessage("Hello there, my email is bob@example.com")));
+
+    await expectFriendlyRetry(response);
+    expect(storage.upsertConversation).not.toHaveBeenCalled();
+    expect(storage.appendMessage).not.toHaveBeenCalled();
+    expect(streamText).not.toHaveBeenCalled();
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toMatch(/bob@|Hello there/);
+  });
+
+  it("keeps the stored phone and email by never reaching a write when the read fails", async () => {
+    storage.getConversationState.mockRejectedValueOnce(new Error("read failed"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await POST(chatRequest(firstMessage("What does the process look like?")));
+    expect(storage.upsertConversation).not.toHaveBeenCalled();
+
+    // Once the read works again, the next turn writes the preserved values.
+    storage.getConversationState.mockResolvedValue(storedContact);
+    const retry = await POST(chatRequest(firstMessage("What does the process look like?")));
+    expect(retry.status).toBe(200);
+    expect(storage.upsertConversation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        visitorEmail: "jane@example.com",
+        visitorPhone: "+14787771266",
+      }),
+    );
+  });
+
+  it("stops before the model when the conversation write fails", async () => {
+    storage.getConversationState.mockResolvedValue(storedContact);
+    storage.upsertConversation.mockRejectedValueOnce(new Error("write failed"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const response = await POST(chatRequest(firstMessage("Hello there")));
+
+    await expectFriendlyRetry(response);
+    expect(storage.appendMessage).not.toHaveBeenCalled();
+    expect(streamText).not.toHaveBeenCalled();
+  });
+
+  it("stops before the model when the user message cannot be saved", async () => {
+    storage.appendMessage.mockRejectedValueOnce(new Error("insert failed"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const response = await POST(chatRequest(firstMessage("Hello there")));
+
+    await expectFriendlyRetry(response);
+    expect(streamText).not.toHaveBeenCalled();
+  });
+
+  it("does not report the Turnstile pass as saved when the write fails", async () => {
+    enableTurnstile();
+    stubSiteverify(
+      Response.json({ success: true, action: "chat", hostname: "kygrsolutions.com" }),
+    );
+    storage.upsertConversation.mockRejectedValueOnce(new Error("write failed"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const response = await POST(chatRequest(firstMessage("Hello there", { turnstileToken: "good" })));
+
+    await expectFriendlyRetry(response);
+    expect(streamText).not.toHaveBeenCalled();
+  });
+});

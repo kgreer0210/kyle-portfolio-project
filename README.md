@@ -175,6 +175,19 @@ ignored) and saved on the conversation immediately as `visitor_email` and
 correction. Both appear in the end-of-chat digest. Contact values are never put
 in the model prompt, logs, or client responses.
 
+Storage failures are never silent. If the conversation state cannot be read, or
+the conversation row or user message cannot be written, `/api/chat` answers 503
+JSON (`storage_unavailable`, a friendly "try again" message with no request
+content) **before** the model runs, and the widget puts the message back so the
+visitor can resend. Proceeding on an unknown state would have skipped writes
+that restore a stored email, phone, or Turnstile pass. The same applies to
+`/api/chat/end`: a failed read answers 503 and leaves the conversation active so
+a later call can still finalize it and send the digest. Storage errors are
+logged by operation and database code only, never the message, details, or
+payload. Because writes now fail visibly, **apply the migrations before
+deploying** (a missing `visitor_phone` or `turnstile_state` column fails the
+write for a message that carries a phone or a Turnstile pass).
+
 ### Passkeys
 
 Passkey registration and management are available from both portal and admin

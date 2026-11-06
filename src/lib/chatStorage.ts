@@ -1,6 +1,33 @@
 import type { ConversationState, TurnstileState } from "@/lib/chatGuard";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
+export type ChatStorageOperation = "read" | "write" | "append";
+
+/**
+ * A storage read or write the chat flow depends on failed. Deliberately
+ * content-free: the message names only the operation, never a payload, so it
+ * is safe to log and cannot carry a visitor's contact details or transcript.
+ */
+export class ChatStorageError extends Error {
+  constructor(
+    readonly operation: ChatStorageOperation,
+    readonly code?: string,
+  ) {
+    super(`Chat storage ${operation} failed`);
+    this.name = "ChatStorageError";
+  }
+}
+
+function storageFailure(
+  operation: ChatStorageOperation,
+  error: { code?: string } | null,
+): ChatStorageError {
+  // Log the operation and Postgres/PostgREST code only: error messages and
+  // details can echo row values such as an email or phone number.
+  console.error(`[chat-storage] ${operation} failed`, { code: error?.code });
+  return new ChatStorageError(operation, error?.code);
+}
+
 export type ChatRole = "user" | "assistant" | "system";
 
 export interface ChatMessageRecord {
@@ -51,9 +78,9 @@ export function buildConversationWrites(
 
 /**
  * Reads what the guard and contact capture need to know about a conversation.
- * A read failure is logged and reported as "unknown" (exists, no gate pass, no
- * contact) so a database hiccup cannot make every message look like a brand
- * new conversation.
+ * Throws ChatStorageError on a read failure. Treating a failed read as "no
+ * contact on file" would let the next write skip a stored email or phone, so
+ * the caller must stop and let the visitor retry instead.
  */
 export async function getConversationState(
   conversationId: string,
@@ -65,14 +92,7 @@ export async function getConversationState(
     .eq("id", conversationId)
     .maybeSingle();
 
-  if (error) {
-    console.error("Failed to read chat conversation state:", error.message);
-    return {
-      exists: true,
-      turnstileState: null,
-      contact: { email: null, phone: null },
-    };
-  }
+  if (error) throw storageFailure("read", error);
   return {
     exists: Boolean(data),
     turnstileState:
@@ -114,9 +134,7 @@ export async function upsertConversation(
       onConflict: "id",
       ignoreDuplicates: true,
     });
-  if (insertErr) {
-    console.error("Failed to insert chat conversation:", insertErr);
-  }
+  if (insertErr) throw storageFailure("write", insertErr);
 
   // Step 2: if the caller supplied non-null metadata, update those columns.
   // Skip the update entirely when there's nothing new — that's the path that
@@ -126,14 +144,13 @@ export async function upsertConversation(
       .from("chat_conversations")
       .update(writes)
       .eq("id", input.conversationId);
-    if (updateErr) {
-      console.error("Failed to update chat conversation metadata:", updateErr);
-    }
+    if (updateErr) throw storageFailure("write", updateErr);
   }
 }
 
 /**
  * Append a single message to a conversation. Used per-turn during the chat.
+ * Throws ChatStorageError if the insert fails.
  */
 export async function appendMessage(
   conversationId: string,
@@ -146,9 +163,7 @@ export async function appendMessage(
     role,
     content,
   });
-  if (error) {
-    console.error("Failed to append chat message:", error);
-  }
+  if (error) throw storageFailure("append", error);
 }
 
 /**
@@ -181,7 +196,7 @@ export async function claimConversationForFinalize(
     .select("id");
 
   if (error) {
-    console.error("Failed to claim chat conversation for finalize:", error);
+    console.error("[chat-storage] claim failed", { code: error.code });
     return false;
   }
   return Array.isArray(data) && data.length === 1;
@@ -230,12 +245,14 @@ export async function writeConversationAnalytics(
     .update(updates)
     .eq("id", conversationId);
   if (error) {
-    console.error("Failed to write chat conversation analytics:", error);
+    console.error("[chat-storage] analytics write failed", { code: error.code });
   }
 }
 
 /**
- * Fetch all messages for a conversation, ordered chronologically. Used by
+ * Fetch all messages for a conversation, ordered chronologically. Throws
+ * ChatStorageError if either read fails, so a transient error can never look
+ * like an empty (abandoned) conversation. Used by
  * the conversation-end handler to assemble the transcript for summarization
  * and the email digest.
  */
@@ -253,9 +270,7 @@ export async function getConversationTranscript(
     .eq("id", conversationId)
     .maybeSingle();
 
-  if (convoErr) {
-    console.error("Failed to fetch chat conversation:", convoErr);
-  }
+  if (convoErr) throw storageFailure("read", convoErr);
 
   const { data: msgRows, error: msgErr } = await supabase
     .from("chat_messages")
@@ -263,9 +278,7 @@ export async function getConversationTranscript(
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
-  if (msgErr) {
-    console.error("Failed to fetch chat messages:", msgErr);
-  }
+  if (msgErr) throw storageFailure("read", msgErr);
 
   const conversation: ChatConversationRecord | null = convoRow
     ? {

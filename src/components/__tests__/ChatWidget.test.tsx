@@ -108,6 +108,28 @@ describe("ChatWidget without a Turnstile site key", () => {
   });
 });
 
+describe("ChatWidget when the server cannot save", () => {
+  it("restores the message and asks the visitor to retry", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        jsonError(503, {
+          code: "storage_unavailable",
+          error: "I couldn't save that just now, so I haven't sent it. Please try again in a moment, or reach me directly.",
+        }),
+      ),
+    );
+    await renderWidget(null);
+
+    submitFirstMessage("I need a website for my bakery");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/haven't sent it/i);
+    expect(screen.getByPlaceholderText(/short note/i)).toHaveValue(
+      "I need a website for my bakery",
+    );
+  });
+});
+
 describe("ChatWidget with a Turnstile site key", () => {
   it("renders an interaction-only widget for the chat action and sends its token", async () => {
     const { api, state } = installTurnstile();

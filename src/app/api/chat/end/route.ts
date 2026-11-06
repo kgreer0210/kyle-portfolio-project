@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  ChatStorageError,
   claimConversationForFinalize,
   getConversationTranscript,
   writeConversationAnalytics,
@@ -40,9 +41,22 @@ export async function POST(req: NextRequest) {
   // session ever produced any user content (and to know when it started for
   // the digest header). The decision to actually run scoring + email comes
   // AFTER an atomic claim below.
-  const { conversation, messages } = await getConversationTranscript(
-    body.conversationId,
-  );
+  let transcript;
+  try {
+    transcript = await getConversationTranscript(body.conversationId);
+  } catch (error) {
+    if (!(error instanceof ChatStorageError)) throw error;
+    // A failed read is not an empty conversation: leave it active so a later
+    // call can still finalize it and send the digest.
+    return NextResponse.json(
+      {
+        error: "Couldn't read this conversation just now. Please try again.",
+        code: "storage_unavailable",
+      },
+      { status: 503 },
+    );
+  }
+  const { conversation, messages } = transcript;
 
   if (!conversation) {
     return NextResponse.json(
