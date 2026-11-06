@@ -32,10 +32,10 @@ export default function Footer() {
           viewport={{ once: true }}
         >
           <a
-            href="tel:+14787775799"
+            href="tel:+14787771266"
             className="hover:text-blue-ncs transition-colors duration-300"
           >
-            (478) 777-5799
+            (478) 777-1266
           </a>
           {" | "}
           <a

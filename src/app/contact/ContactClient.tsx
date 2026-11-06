@@ -83,8 +83,8 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-headings">Phone</h3>
-                    <a href="tel:+14787775799" className="text-text-secondary">
-                      (478) 777-5799
+                    <a href="tel:+14787771266" className="text-text-secondary">
+                      (478) 777-1266
                     </a>
                   </div>
                 </div>

@@ -191,10 +191,10 @@ export default function Contact({ initialSubject }: ContactProps) {
           </a>
           , call me at{" "}
           <a
-            href="tel:+14787775799"
+            href="tel:+14787771266"
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
-            (478) 777-5799
+            (478) 777-1266
           </a>
           , or send details through this form, whatever&apos;s easiest. Hard
           problems welcome, wherever you&apos;re located.
