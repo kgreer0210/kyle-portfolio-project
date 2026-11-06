@@ -95,6 +95,13 @@ describe("POST /api/chat input handling", () => {
     expect(streamText).not.toHaveBeenCalled();
   });
 
+  it("rejects oversized message arrays before doing any work", async () => {
+    const messages = Array.from({ length: 101 }, () => ({ role: "user", content: "hi" }));
+    const response = await POST(chatRequest({ conversationId: uuid(5), messages }));
+    expect(response.status).toBe(400);
+    expect(storage.getConversationState).not.toHaveBeenCalled();
+  });
+
   it("requires the last message to be a non-empty user message", async () => {
     const response = await POST(
       chatRequest({

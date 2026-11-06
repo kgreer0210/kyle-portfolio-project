@@ -129,7 +129,7 @@ function windowStartSeconds(nowSeconds: number, windowSeconds: number): number {
  * it only bounds what a single serverless instance sees.
  */
 export function createMemoryRateLimiter(
-  now: () => number = Date.now,
+  now: () => number = () => Date.now(),
   maxEntries = 5000,
 ): RateLimiter {
   const entries = new Map<string, { windowStart: number; count: number; windowSeconds: number }>();

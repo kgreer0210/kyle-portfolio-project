@@ -39,8 +39,9 @@ const UUID_REGEX =
 const chatRequestSchema = z.object({
   conversationId: z.string().regex(UUID_REGEX),
   visitorName: z.string().nullish(),
-  visitorEmail: z.string().nullish(),
-  messages: z.array(z.unknown()).min(1),
+  visitorEmail: z.string().max(320).nullish(),
+  // The widget sends at most the last 40 turns; the route keeps the last 40.
+  messages: z.array(z.unknown()).min(1).max(100),
   turnstileToken: z.string().max(TURNSTILE_MAX_TOKEN_LENGTH).nullish(),
 });
 

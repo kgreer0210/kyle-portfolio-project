@@ -313,7 +313,8 @@ export default function ChatWidget() {
             conversationId: ctx.conversationId,
             visitorName: ctx.visitorName,
             visitorEmail: ctx.visitorEmail,
-            messages: nextMessages,
+            // The server only reads the most recent 40 turns.
+            messages: nextMessages.slice(-40),
             ...turnstileFields,
           }),
         });
