@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { formatUsPhone } from "./chatContact";
 import type { Qualification } from "./leadQualification";
 
 interface CallNotificationData {
@@ -369,6 +370,8 @@ export interface ChatDigestEmailData {
   conversationId: string;
   visitorName: string | null;
   visitorEmail: string | null;
+  /** E.164, e.g. +14787771266. */
+  visitorPhone?: string | null;
   startedAt: string;
   endedAt: string;
   /** Ordered chronologically: oldest message first. */
@@ -416,6 +419,101 @@ function formatTranscriptForEmailText(
 }
 
 /**
+ * Builds the digest subject, HTML, and plain-text bodies. Pure so the contact
+ * block and transcript can be tested without sending anything.
+ */
+export function buildChatDigestEmail(data: ChatDigestEmailData): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const visitorLabel = data.visitorName || "Anonymous visitor";
+  const phone = data.visitorPhone ? formatUsPhone(data.visitorPhone) : null;
+  const s = data.scoring;
+  const tier = s?.score_tier ?? null;
+  const tierLabel = tier ? tier.toUpperCase() : "UNQUALIFIED";
+  const color = tierBadgeColor(tier);
+
+  const subjectPrefix = tier ? `[${tierLabel}] ` : "";
+  const subject = `${subjectPrefix}Chat: ${visitorLabel}${data.visitorEmail ? ` <${data.visitorEmail}>` : ""}${!data.visitorEmail && phone ? ` ${phone}` : ""}`;
+
+  const scoringRows = s
+    ? `
+        <tr><td style="padding: 8px; font-weight: bold;">Score</td><td style="padding: 8px;"><span style="color: ${color}; font-weight: bold;">${s.overall_score}/100 (${tierLabel})</span></td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Intent</td><td style="padding: 8px;">${escapeHtml(s.intent)}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Project Type</td><td style="padding: 8px;">${escapeHtml(s.project_type)}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Project Fit</td><td style="padding: 8px;">${s.project_fit_score}/100</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Seriousness</td><td style="padding: 8px;">${s.seriousness_score}/100</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Budget Signal</td><td style="padding: 8px;">${escapeHtml(s.budget_signal)}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Timeline</td><td style="padding: 8px;">${escapeHtml(s.timeline)}</td></tr>
+      `
+    : `<tr><td style="padding: 8px; color: #888;" colspan="2">AI scoring was not available for this conversation.</td></tr>`;
+
+  const summaryBlock = s
+    ? `
+        <h3 style="color: #333; margin-top: 24px;">Summary</h3>
+        <p style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 0;">${escapeHtml(s.summary)}</p>
+        <h3 style="color: #333; margin-top: 24px;">Recommended next step</h3>
+        <p style="background-color: #fffbe6; padding: 15px; border-radius: 5px; margin: 0; border-left: 3px solid ${color};">${escapeHtml(s.recommended_action)}</p>
+      `
+    : "";
+
+  const transcriptHtml = formatTranscriptForEmailHtml(data.transcript);
+  const transcriptText = formatTranscriptForEmailText(data.transcript);
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 720px; margin: 0 auto;">
+      <h2 style="color: #0094c6;">New chat conversation</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px; font-weight: bold;">Visitor</td><td style="padding: 8px;">${escapeHtml(visitorLabel)}${data.visitorEmail ? ` &lt;${escapeHtml(data.visitorEmail)}&gt;` : ""}</td></tr>
+        ${phone ? `<tr><td style="padding: 8px; font-weight: bold;">Phone</td><td style="padding: 8px;">${escapeHtml(phone)}</td></tr>` : ""}
+        <tr><td style="padding: 8px; font-weight: bold;">Started</td><td style="padding: 8px;">${escapeHtml(data.startedAt)}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Ended</td><td style="padding: 8px;">${escapeHtml(data.endedAt)}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Conversation ID</td><td style="padding: 8px; font-family: monospace; font-size: 12px;">${escapeHtml(data.conversationId)}</td></tr>
+        ${scoringRows}
+      </table>
+      ${summaryBlock}
+      <hr style="border: none; border-top: 1px solid #ccc; margin: 24px 0;" />
+      <h3 style="color: #333;">Full transcript</h3>
+      <div>${transcriptHtml}</div>
+      <p style="margin-top: 24px; color: #666; font-size: 12px;">
+        Sent from your site chat widget. Reply directly to this email to respond to ${escapeHtml(visitorLabel)}.
+      </p>
+    </div>
+  `;
+
+  const text = [
+    `${subjectPrefix}New chat conversation`,
+    "",
+    `Visitor: ${visitorLabel}${data.visitorEmail ? ` <${data.visitorEmail}>` : ""}`,
+    ...(phone ? [`Phone: ${phone}`] : []),
+    `Started: ${data.startedAt}`,
+    `Ended: ${data.endedAt}`,
+    `Conversation ID: ${data.conversationId}`,
+    ...(s
+      ? [
+          "",
+          `Score: ${s.overall_score}/100 (${tierLabel})`,
+          `Intent: ${s.intent}`,
+          `Project type: ${s.project_type}`,
+          `Project fit: ${s.project_fit_score}/100`,
+          `Seriousness: ${s.seriousness_score}/100`,
+          `Budget signal: ${s.budget_signal}`,
+          `Timeline: ${s.timeline}`,
+          "",
+          `Summary: ${s.summary}`,
+          `Recommended: ${s.recommended_action}`,
+        ]
+      : ["", "AI scoring was not available for this conversation."]),
+    "",
+    "--- Transcript ---",
+    transcriptText,
+  ].join("\n");
+
+  return { subject, html, text };
+}
+
+/**
  * Sends the chat digest email via Resend. Mirrors the contact-form lead
  * email structure: AI scoring at the top, full transcript at the bottom,
  * everything in one place so Kyle can triage in his inbox.
@@ -434,89 +532,15 @@ export async function sendChatDigestEmail(
 
     const resend = new Resend(apiKey);
     const to = process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
-    const visitorLabel = data.visitorName || "Anonymous visitor";
-    const s = data.scoring;
-    const tier = s?.score_tier ?? null;
-    const tierLabel = tier ? tier.toUpperCase() : "UNQUALIFIED";
-    const color = tierBadgeColor(tier);
-
-    const subjectPrefix = tier ? `[${tierLabel}] ` : "";
-    const subjectLine = `${subjectPrefix}Chat: ${visitorLabel}${data.visitorEmail ? ` <${data.visitorEmail}>` : ""}`;
-
-    const scoringRows = s
-      ? `
-          <tr><td style="padding: 8px; font-weight: bold;">Score</td><td style="padding: 8px;"><span style="color: ${color}; font-weight: bold;">${s.overall_score}/100 (${tierLabel})</span></td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Intent</td><td style="padding: 8px;">${escapeHtml(s.intent)}</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Project Type</td><td style="padding: 8px;">${escapeHtml(s.project_type)}</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Project Fit</td><td style="padding: 8px;">${s.project_fit_score}/100</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Seriousness</td><td style="padding: 8px;">${s.seriousness_score}/100</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Budget Signal</td><td style="padding: 8px;">${escapeHtml(s.budget_signal)}</td></tr>
-          <tr><td style="padding: 8px; font-weight: bold;">Timeline</td><td style="padding: 8px;">${escapeHtml(s.timeline)}</td></tr>
-        `
-      : `<tr><td style="padding: 8px; color: #888;" colspan="2">AI scoring was not available for this conversation.</td></tr>`;
-
-    const summaryBlock = s
-      ? `
-          <h3 style="color: #333; margin-top: 24px;">Summary</h3>
-          <p style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 0;">${escapeHtml(s.summary)}</p>
-          <h3 style="color: #333; margin-top: 24px;">Recommended next step</h3>
-          <p style="background-color: #fffbe6; padding: 15px; border-radius: 5px; margin: 0; border-left: 3px solid ${color};">${escapeHtml(s.recommended_action)}</p>
-        `
-      : "";
-
-    const transcriptHtml = formatTranscriptForEmailHtml(data.transcript);
-    const transcriptText = formatTranscriptForEmailText(data.transcript);
+    const { subject, html, text } = buildChatDigestEmail(data);
 
     await resend.emails.send({
       from: "KYGR Chat Alerts <info@kygrsolutions.com>",
       to,
       replyTo: data.visitorEmail || undefined,
-      subject: subjectLine,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 720px; margin: 0 auto;">
-          <h2 style="color: #0094c6;">New chat conversation</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr><td style="padding: 8px; font-weight: bold;">Visitor</td><td style="padding: 8px;">${escapeHtml(visitorLabel)}${data.visitorEmail ? ` &lt;${escapeHtml(data.visitorEmail)}&gt;` : ""}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold;">Started</td><td style="padding: 8px;">${escapeHtml(data.startedAt)}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold;">Ended</td><td style="padding: 8px;">${escapeHtml(data.endedAt)}</td></tr>
-            <tr><td style="padding: 8px; font-weight: bold;">Conversation ID</td><td style="padding: 8px; font-family: monospace; font-size: 12px;">${escapeHtml(data.conversationId)}</td></tr>
-            ${scoringRows}
-          </table>
-          ${summaryBlock}
-          <hr style="border: none; border-top: 1px solid #ccc; margin: 24px 0;" />
-          <h3 style="color: #333;">Full transcript</h3>
-          <div>${transcriptHtml}</div>
-          <p style="margin-top: 24px; color: #666; font-size: 12px;">
-            Sent from your site chat widget. Reply directly to this email to respond to ${escapeHtml(visitorLabel)}.
-          </p>
-        </div>
-      `,
-      text: [
-        `${subjectPrefix}New chat conversation`,
-        "",
-        `Visitor: ${visitorLabel}${data.visitorEmail ? ` <${data.visitorEmail}>` : ""}`,
-        `Started: ${data.startedAt}`,
-        `Ended: ${data.endedAt}`,
-        `Conversation ID: ${data.conversationId}`,
-        ...(s
-          ? [
-              "",
-              `Score: ${s.overall_score}/100 (${tierLabel})`,
-              `Intent: ${s.intent}`,
-              `Project type: ${s.project_type}`,
-              `Project fit: ${s.project_fit_score}/100`,
-              `Seriousness: ${s.seriousness_score}/100`,
-              `Budget signal: ${s.budget_signal}`,
-              `Timeline: ${s.timeline}`,
-              "",
-              `Summary: ${s.summary}`,
-              `Recommended: ${s.recommended_action}`,
-            ]
-          : ["", "AI scoring was not available for this conversation."]),
-        "",
-        "--- Transcript ---",
-        transcriptText,
-      ].join("\n"),
+      subject,
+      html,
+      text,
     });
   } catch (error) {
     console.error("Failed to send chat digest email:", error);

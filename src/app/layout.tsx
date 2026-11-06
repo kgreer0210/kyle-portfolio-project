@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
+import { getPublicTurnstileSiteKey } from "@/lib/turnstile";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -133,7 +134,9 @@ export default function RootLayout({
             }),
           }}
         />
-        <AppShell>{children}</AppShell>
+        <AppShell turnstileSiteKey={getPublicTurnstileSiteKey()}>
+          {children}
+        </AppShell>
       </body>
     </html>
   );

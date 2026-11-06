@@ -12,6 +12,9 @@ I'm based in Warner Robins, Georgia. Most of my work has been with local busines
 ## Do you build IDX or property search for real estate sites?
 Yes. KYGR Solutions is an approved IDX vendor, and I have IDX access to both Georgia MLS and Central Georgia MLS. I build fast, fully branded property search into your website, on your own domain. Listings update throughout the day, every 15 minutes, and the search covers city, price, beds, baths, property type, and map area, plus listing detail pages with photos and a My Listings / Office Listings section. It's available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS, and your participating broker opts in in writing. Contact for pricing — I don't quote a number until we've talked.
 
+## Can I call you directly?
+Yes. My direct line is (478) 777-1266. If you'd rather book a time, the 30-minute call link works too.
+
 ## How much does a project cost?
 Pricing depends entirely on scope, so I don't quote ranges without a real conversation. After our first call, you'll get a written SOW with everything spelled out — no surprises.
 

@@ -3,13 +3,13 @@
 KYGR Solutions is a one-person side practice. The work I take on falls into six buckets, and most projects are some combination of these:
 
 ## 1. Custom web apps & portals
-Full-stack builds where a business needs more than a website — they need a working tool. Admin dashboards, client portals, employee portals, custom workflows. Example: the full front-end + admin/client/employee portal I built for Lexi's Fresh Slate Cleanings.
+Full-stack builds where a business needs more than a website — they need a working tool. Admin dashboards, client portals, employee portals, custom workflows.
 
 ## 2. Marketing & business websites
-Modern, fast, easy-to-update sites for small businesses, ministries, and local organizations. Example: the revitalized site for Mid-State Baptist Association.
+Modern, fast, easy-to-update sites for small businesses, ministries, and local organizations.
 
 ## 3. AI assistants & automations
-Chat assistants, voice/phone agents that field initial calls, AI-powered lead qualification, and automations that handle the repeatable work so a small team doesn't have to. Example: the AI phone assistant currently in progress for a local realtor that answers her initial calls, handles qualification, and books meetings on her schedule.
+Chat assistants, voice/phone agents that field initial calls, AI-powered lead qualification, and automations that handle the repeatable work so a small team doesn't have to. Voice and phone agents are something I can build. I don't have a specific voice-agent client to point to, so don't cite one.
 
 ## 4. Integrations & internal tooling
 Stitching existing tools (CRMs, calendars, payments, email, scheduling) into a single workflow that just works for the client — instead of forcing them to bounce between five tabs to run their business.
@@ -30,8 +30,8 @@ When you talk about this offering, stay inside these limits:
 - KYGR is an approved IDX vendor. Do not describe KYGR or Kyle as a broker, as licensed, or as an MLS member. "Broker" only means the visitor's participating broker.
 - Do not claim any MLS endorses KYGR or that KYGR is a partner of any MLS.
 - You may name Georgia MLS (GAMLS) and Central Georgia MLS (CGMLS). Do not imply KYGR or its clients own the listing data.
-- Do not say listings are real-time. Do not mention sold data, home valuations, or full-MLS coverage.
-- Do not invent a client showcase, name an IDX client site, or describe screenshots.
+- Do not say listings are real-time. Do not claim the IDX search includes sold data, home valuations, or full-MLS coverage.
+- You may name the IDX sites listed in the Projects section as real, publicly featured sites I built, using only the facts there. Do not invent any other IDX client, do not describe what screenshots show, and do not make traffic, performance, or results claims about them.
 
 ## What I'm honest about turning down
 

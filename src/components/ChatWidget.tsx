@@ -1,11 +1,21 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  extractEmails,
+  extractPhones,
+  isValidEmail,
+  formatUsPhone,
+  KYLE_PHONE_E164,
+} from "@/lib/chatContact";
+import { useTurnstile } from "./useTurnstile";
 
 const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
 const STORAGE_KEY = "kygr_chat_state_v1";
 const EMAIL_PROMPT_AFTER_TURNS = 3;
+type SendOutcome = "ok" | "rejected" | "failed";
 
 type ChatRole = "user" | "assistant";
 
@@ -87,11 +97,16 @@ function newConversationId(): string {
   });
 }
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-export default function ChatWidget() {
+export default function ChatWidget({
+  turnstileSiteKey,
+}: {
+  /**
+   * Public Turnstile site key, supplied by the server layout only when the
+   * server will verify tokens. When undefined the widget skips Turnstile: it
+   * loads no script and never waits for a token.
+   */
+  turnstileSiteKey?: string;
+}) {
   // Hydrate from sessionStorage so refresh keeps the conversation alive.
   // loadPersistedState is SSR-safe (returns empty state on the server), and
   // the initial closed-widget DOM doesn't depend on any of these values, so
@@ -123,10 +138,36 @@ export default function ChatWidget() {
   // know that before it happens.
   const [confirmingEnd, setConfirmingEnd] = useState(false);
 
+  // Turnstile only gates the first message of a conversation. The server
+  // remembers the pass, so a restored conversation never needs a new token.
+  const [gateAccepted, setGateAccepted] = useState(
+    persisted.messages.length > 0,
+  );
+  const gateAcceptedRef = useRef(gateAccepted);
+  // The security check could not run or complete. Shows a retry button and
+  // the normal ways to reach Kyle instead of letting the message through.
+  const [verificationBlocked, setVerificationBlocked] = useState(false);
+  const {
+    containerRef: turnstileContainerRef,
+    getToken: getTurnstileToken,
+    reset: resetTurnstile,
+    retry: retryTurnstile,
+    interactive: turnstileInteractive,
+  } = useTurnstile(turnstileSiteKey, isOpen && !gateAccepted);
+
+  // The visitor already gave contact details in chat, so skip the form.
+  const sharedContactInChat = messages.some(
+    (m) =>
+      m.role === "user" &&
+      (extractEmails(m.content).length > 0 ||
+        extractPhones(m.content).some((phone) => phone !== KYLE_PHONE_E164)),
+  );
+
   // Email prompt becomes visible after enough turns, unless visitor dismissed
-  // it or already provided an email. Fully derived from other state.
+  // it or already provided contact details. Fully derived from other state.
   const showEmailPrompt =
     !email &&
+    !sharedContactInChat &&
     !emailDismissed &&
     messages.filter((m) => m.role === "user").length >=
       EMAIL_PROMPT_AFTER_TURNS;
@@ -165,6 +206,9 @@ export default function ChatWidget() {
   useEffect(() => {
     emailRef.current = email;
   }, [email]);
+  useEffect(() => {
+    gateAcceptedRef.current = gateAccepted;
+  }, [gateAccepted]);
 
   // Auto-scroll to bottom on new messages or while streaming.
   useEffect(() => {
@@ -230,7 +274,7 @@ export default function ChatWidget() {
         visitorName: string | null;
         visitorEmail: string | null;
       },
-    ) => {
+    ): Promise<SendOutcome> => {
       // Cancel any prior in-flight stream before starting a new one. Also
       // creates the AbortController for THIS request and stashes it in a
       // ref so performEnd() can abort it from outside this closure.
@@ -248,7 +292,25 @@ export default function ChatWidget() {
       setStreaming(true);
       setStreamingText("");
       setError(null);
+      setVerificationBlocked(false);
+      let usedToken = false;
       try {
+        // First message only. No token means no request: a blocked or failed
+        // script must never become a way around verification.
+        let turnstileFields: { turnstileToken?: string } = {};
+        if (turnstileSiteKey && !gateAcceptedRef.current) {
+          const result = await getTurnstileToken();
+          if (!result.token) {
+            setVerificationBlocked(true);
+            setError(
+              "The security check didn't load. A content blocker or browser setting may be stopping it.",
+            );
+            return "rejected";
+          }
+          usedToken = true;
+          turnstileFields = { turnstileToken: result.token };
+        }
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -257,16 +319,34 @@ export default function ChatWidget() {
             conversationId: ctx.conversationId,
             visitorName: ctx.visitorName,
             visitorEmail: ctx.visitorEmail,
-            messages: nextMessages,
+            // The server only reads the most recent 40 turns.
+            messages: nextMessages.slice(-40),
+            ...turnstileFields,
           }),
         });
 
         if (!response.ok || !response.body) {
           const errBody = await response.json().catch(() => ({}));
-          throw new Error(
-            errBody.error || `Chat request failed (${response.status})`,
-          );
+          // The server refuses before storing anything, so the visitor can
+          // simply send the same message again.
+          const code = typeof errBody.code === "string" ? errBody.code : "";
+          const rejected =
+            code === "turnstile_required" ||
+            code === "turnstile_failed" ||
+            code === "turnstile_unavailable" ||
+            code === "storage_unavailable" ||
+            code === "rate_limited";
+          if (code.startsWith("turnstile_")) {
+            gateAcceptedRef.current = false;
+            setGateAccepted(false);
+          }
+          if (code === "turnstile_unavailable") setVerificationBlocked(true);
+          if (usedToken) resetTurnstile();
+          setError(errBody.error || `Chat request failed (${response.status})`);
+          return rejected ? "rejected" : "failed";
         }
+        gateAcceptedRef.current = true;
+        setGateAccepted(true);
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -285,7 +365,7 @@ export default function ChatWidget() {
             } catch {
               /* noop */
             }
-            return;
+            return "ok";
           }
           const chunk = decoder.decode(value, { stream: true });
           accumulated += chunk;
@@ -304,6 +384,7 @@ export default function ChatWidget() {
             { role: "assistant", content: accumulated },
           ]);
         }
+        return "ok";
       } catch (err) {
         // Aborts fire as DOMException(name='AbortError') — they're
         // expected when the user ends the conversation mid-stream and
@@ -312,13 +393,15 @@ export default function ChatWidget() {
           (err instanceof DOMException && err.name === "AbortError") ||
           (err instanceof Error && err.name === "AbortError")
         ) {
-          return;
+          return "ok";
         }
         const message =
           err instanceof Error
             ? err.message
             : "Something went wrong. Please try again.";
         setError(message);
+        if (usedToken) resetTurnstile();
+        return "failed";
       } finally {
         if (streamAbortRef.current === controller) {
           streamAbortRef.current = null;
@@ -327,7 +410,7 @@ export default function ChatWidget() {
         setStreamingText("");
       }
     },
-    [],
+    [getTurnstileToken, resetTurnstile, turnstileSiteKey],
   );
 
   const handleStart = async (e: React.FormEvent) => {
@@ -351,11 +434,17 @@ export default function ChatWidget() {
     setInitialName("");
     setInitialMessage("");
 
-    await sendMessage(next, {
+    const outcome = await sendMessage(next, {
       conversationId: id,
       visitorName: trimmedName,
       visitorEmail: email,
     });
+    if (outcome === "rejected") {
+      // Nothing was stored: put the message back in the form to resend.
+      setMessages((prev) => prev.slice(0, -1));
+      setInitialName(trimmedName);
+      setInitialMessage(trimmedMessage);
+    }
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -369,11 +458,15 @@ export default function ChatWidget() {
     ];
     setMessages(next);
     setDraft("");
-    await sendMessage(next, {
+    const outcome = await sendMessage(next, {
       conversationId,
       visitorName: name,
       visitorEmail: email,
     });
+    if (outcome === "rejected") {
+      setMessages((prev) => prev.slice(0, -1));
+      setDraft(trimmed);
+    }
   };
 
   const handleSaveEmail = async (e: React.FormEvent) => {
@@ -409,7 +502,10 @@ export default function ChatWidget() {
       setStreamingText("");
       setError(null);
       setEmailDismissed(false);
+      setVerificationBlocked(false);
       setConfirmingEnd(false);
+      gateAcceptedRef.current = false;
+      setGateAccepted(false);
       if (closePanel) setIsOpen(false);
     },
     [finalizeOnClose],
@@ -433,10 +529,18 @@ export default function ChatWidget() {
     setConfirmingEnd(true);
   };
 
+  const retryVerification = () => {
+    setVerificationBlocked(false);
+    setError(null);
+    retryTurnstile();
+  };
+
   const handleCancelEnd = () => setConfirmingEnd(false);
   const handleConfirmEnd = () => performEnd(true);
 
-  const showInitialForm = !name || messages.length === 0;
+  // Keyed on messages only: visitors who skip the optional name still need
+  // the composer.
+  const showInitialForm = messages.length === 0;
 
   return (
     <>
@@ -561,7 +665,7 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {showInitialForm && messages.length === 0 ? (
+              {showInitialForm ? (
                 <form onSubmit={handleStart} className="space-y-3 pt-2">
                   <div>
                     <p className="text-sm text-(--color-text-primary) mb-3">
@@ -623,6 +727,17 @@ export default function ChatWidget() {
                   >
                     {streaming ? "Starting…" : "Start the conversation"}
                   </button>
+                  {error && (
+                    <div
+                      role="alert"
+                      className="text-xs text-red-300 bg-red-900/30 border border-red-900/40 px-3 py-2 rounded-md"
+                    >
+                      {error}
+                    </div>
+                  )}
+                  {verificationBlocked && (
+                    <VerificationFallback onRetry={retryVerification} />
+                  )}
                 </form>
               ) : (
                 <>
@@ -649,7 +764,20 @@ export default function ChatWidget() {
                       {error}
                     </div>
                   )}
+                  {verificationBlocked && (
+                    <VerificationFallback onRetry={retryVerification} />
+                  )}
                 </>
+              )}
+              {turnstileSiteKey && !gateAccepted && (
+                <div>
+                  {turnstileInteractive && (
+                    <p className="text-xs text-(--color-text-secondary) mb-1">
+                      Quick security check
+                    </p>
+                  )}
+                  <div ref={turnstileContainerRef} />
+                </div>
               )}
               <div ref={messagesEndRef} />
             </div>
@@ -769,6 +897,34 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function VerificationFallback({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="text-xs text-(--color-text-secondary) bg-(--color-rich-black) border border-(--color-penn-blue) px-3 py-3 rounded-md space-y-2">
+      <button
+        type="button"
+        onClick={onRetry}
+        className="font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
+      >
+        Try the security check again
+      </button>
+      <p>
+        Or reach me directly: call{" "}
+        <a
+          href={`tel:${KYLE_PHONE_E164}`}
+          className="text-(--color-text-primary) underline"
+        >
+          {formatUsPhone(KYLE_PHONE_E164)}
+        </a>{" "}
+        or use the{" "}
+        <Link href="/contact" className="text-(--color-text-primary) underline">
+          contact form
+        </Link>
+        .
+      </p>
+    </div>
   );
 }
 

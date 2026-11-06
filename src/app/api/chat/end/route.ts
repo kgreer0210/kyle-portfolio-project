@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  ChatStorageError,
   claimConversationForFinalize,
   getConversationTranscript,
   writeConversationAnalytics,
 } from "@/lib/chatStorage";
+import { extractEmails } from "@/lib/chatContact";
 import { scoreChatTranscript } from "@/lib/chatLeadScoring";
 import { sendChatDigestEmail } from "@/lib/notifications";
 
@@ -39,9 +41,22 @@ export async function POST(req: NextRequest) {
   // session ever produced any user content (and to know when it started for
   // the digest header). The decision to actually run scoring + email comes
   // AFTER an atomic claim below.
-  const { conversation, messages } = await getConversationTranscript(
-    body.conversationId,
-  );
+  let transcript;
+  try {
+    transcript = await getConversationTranscript(body.conversationId);
+  } catch (error) {
+    if (!(error instanceof ChatStorageError)) throw error;
+    // A failed read is not an empty conversation: leave it active so a later
+    // call can still finalize it and send the digest.
+    return NextResponse.json(
+      {
+        error: "Couldn't read this conversation just now. Please try again.",
+        code: "storage_unavailable",
+      },
+      { status: 503 },
+    );
+  }
+  const { conversation, messages } = transcript;
 
   if (!conversation) {
     return NextResponse.json(
@@ -60,10 +75,13 @@ export async function POST(req: NextRequest) {
 
   const visitorName =
     body.visitorName?.trim().slice(0, 100) || conversation.visitorName || null;
+  // The email captured during the chat wins; the widget's form value only
+  // fills a gap, and must at least look like an email.
   const visitorEmail =
-    body.visitorEmail?.trim().slice(0, 255) ||
     conversation.visitorEmail ||
+    extractEmails(body.visitorEmail ?? "")[0] ||
     null;
+  const visitorPhone = conversation.visitorPhone || null;
 
   const userMessageCount = messages.filter((m) => m.role === "user").length;
   const terminalStatus: "completed" | "abandoned" =
@@ -88,6 +106,7 @@ export async function POST(req: NextRequest) {
   await writeConversationAnalytics(body.conversationId, {
     visitorName,
     visitorEmail,
+    visitorPhone,
   });
 
   // Empty conversations are now finalized as "abandoned" by the claim
@@ -112,6 +131,7 @@ export async function POST(req: NextRequest) {
     conversationId: body.conversationId,
     visitorName,
     visitorEmail,
+    visitorPhone,
     startedAt: conversation.startedAt,
     endedAt: new Date().toISOString(),
     transcript: messages.map((m) => ({ role: m.role, content: m.content })),

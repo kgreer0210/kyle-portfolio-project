@@ -1,69 +1,171 @@
 import { NextRequest } from "next/server";
 import { streamText, type ModelMessage } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { z } from "zod";
 import { buildSystemPrompt } from "@/lib/chatKnowledge";
 import {
+  extractEmails,
+  mergeContactFromMessage,
+  shouldAskForContact,
+} from "@/lib/chatContact";
+import {
+  guardChatRequest,
+  type GuardDecision,
+  type GuardDeps,
+} from "@/lib/chatGuard";
+import {
   appendMessage,
+  getConversationState,
   upsertConversation,
 } from "@/lib/chatStorage";
+import {
+  createMemoryRateLimiter,
+  createSupabaseRateLimiter,
+  ephemeralRateLimitSecret,
+  getClientIp,
+  withFallback,
+} from "@/lib/rateLimit";
+import { createAdminSupabaseClient } from "@/lib/supabase";
+import {
+  getTurnstileConfig,
+  TURNSTILE_MAX_TOKEN_LENGTH,
+  verifyTurnstileToken,
+} from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 // Up to 5 minutes per request to allow longer streaming completions on
 // Vercel Fluid Compute. Default would cut off mid-stream.
 export const maxDuration = 300;
 
-interface ChatRequestBody {
-  conversationId: string;
-  visitorName?: string | null;
-  visitorEmail?: string | null;
-  messages: Array<{ role: "user" | "assistant"; content: string }>;
-}
-
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const chatRequestSchema = z.object({
+  conversationId: z.string().regex(UUID_REGEX),
+  visitorName: z.string().nullish(),
+  visitorEmail: z.string().max(320).nullish(),
+  // The widget sends at most the last 40 turns; the route keeps the last 40.
+  messages: z.array(z.unknown()).min(1).max(100),
+  turnstileToken: z.string().max(TURNSTILE_MAX_TOKEN_LENGTH).nullish(),
+});
+
+const chatMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().refine((value) => value.trim().length > 0),
+});
+
+// Shared by every request on this instance. The memory limiter is the
+// fallback when the database limiter errors or RATE_LIMIT_SECRET is unset.
+const memoryLimiter = createMemoryRateLimiter();
+let warnedMissingRateLimitSecret = false;
+
+function json(
+  body: Record<string, unknown>,
+  status: number,
+  headers: Record<string, string> = {},
+) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+}
+
+/**
+ * Storage failed before the model was called. Answer with plain JSON (never a
+ * stream) and nothing from the request: no contact details, no transcript.
+ */
+function storageUnavailable(error: unknown) {
+  console.error("[chat] storage unavailable", {
+    name: error instanceof Error ? error.name : "unknown",
+  });
+  return json(
+    {
+      error:
+        "I couldn't save that just now, so I haven't sent it. Please try again in a moment, or reach me directly.",
+      code: "storage_unavailable",
+    },
+    503,
+  );
+}
+
+function buildGuardDeps(): GuardDeps {
+  const rateLimitSecret = process.env.RATE_LIMIT_SECRET;
+  if (!rateLimitSecret && !warnedMissingRateLimitSecret) {
+    warnedMissingRateLimitSecret = true;
+    console.warn(
+      "[chat-abuse][DIAGNOSTIC][NOT PRODUCTION SAFE] RATE_LIMIT_SECRET is not set; using per-instance rate limits only.",
+    );
+  }
+  const config = getTurnstileConfig();
+
+  return {
+    config,
+    limiter: rateLimitSecret
+      ? withFallback(
+          // Built per call so a missing Supabase env var is caught by the
+          // fallback instead of failing the request.
+          {
+            hit: (checks) =>
+              createSupabaseRateLimiter(createAdminSupabaseClient()).hit(checks),
+          },
+          memoryLimiter,
+          (error) =>
+            console.error(
+              "[chat-abuse] Rate limit store failed; using per-instance limits:",
+              error instanceof Error ? error.message : "unknown error",
+            ),
+        )
+      : memoryLimiter,
+    hashSecret: rateLimitSecret || ephemeralRateLimitSecret,
+    getConversationState,
+    verifyToken: (token, remoteIp) =>
+      config.enabled
+        ? verifyTurnstileToken({
+            token,
+            secret: config.secret,
+            allowedHostnames: config.allowedHostnames,
+            remoteIp,
+          })
+        : Promise.resolve({ status: "unavailable", reason: "misconfigured" }),
+    log: (level, message) => console[level](message),
+  };
+}
+
 export async function POST(req: NextRequest) {
-  let body: ChatRequestBody;
+  let rawBody: unknown;
   try {
-    body = (await req.json()) as ChatRequestBody;
+    rawBody = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ error: "Invalid JSON" }, 400);
   }
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    return new Response(
-      JSON.stringify({
-        error: "Chat is not configured. Please reach out via the contact form.",
-      }),
-      { status: 503, headers: { "Content-Type": "application/json" } },
+    return json(
+      { error: "Chat is not configured. Please reach out via the contact form." },
+      503,
     );
   }
 
-  if (!body.conversationId || !UUID_REGEX.test(body.conversationId)) {
-    return new Response(
-      JSON.stringify({ error: "Invalid conversationId" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
+  const parsed = chatRequestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return json(
+      {
+        error: "That request wasn't valid. Please refresh the page and try again.",
+        code: "invalid_request",
+      },
+      400,
     );
   }
-
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return new Response(
-      JSON.stringify({ error: "messages must be a non-empty array" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    );
-  }
+  const body = parsed.data;
+  // One bucket and one row per UUID, regardless of letter case.
+  const conversationId = body.conversationId.toLowerCase();
 
   const trimmedMessages = body.messages
-    .filter(
-      (m) =>
-        (m.role === "user" || m.role === "assistant") &&
-        typeof m.content === "string" &&
-        m.content.trim().length > 0,
-    )
+    .flatMap((m) => {
+      const message = chatMessageSchema.safeParse(m);
+      return message.success ? [message.data] : [];
+    })
     .slice(-40)
     .map((m) => ({
       role: m.role,
@@ -77,32 +179,88 @@ export async function POST(req: NextRequest) {
   // message would be incoherent.
   const lastUserMessage = trimmedMessages[trimmedMessages.length - 1];
   if (!lastUserMessage || lastUserMessage.role !== "user") {
-    return new Response(
-      JSON.stringify({
+    return json(
+      {
         error: "messages must end with a non-empty user message",
-      }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
+        code: "invalid_request",
+      },
+      400,
+    );
+  }
+
+  // Abuse checks run before anything is stored or the model is called, so a
+  // rejected request leaves no conversation row or message behind.
+  const ip = getClientIp(req.headers);
+  let decision: GuardDecision;
+  try {
+    decision = await guardChatRequest(
+      {
+        conversationId,
+        ip,
+        turnstileToken: body.turnstileToken,
+      },
+      buildGuardDeps(),
+    );
+  } catch (error) {
+    // The conversation state could not be read. Carrying on would treat any
+    // stored email or phone as unknown, so stop here.
+    return storageUnavailable(error);
+  }
+  if (!decision.ok) {
+    return json(
+      {
+        error: decision.message,
+        code: decision.code,
+        ...(decision.retryAfterSeconds
+          ? { retryAfterSeconds: decision.retryAfterSeconds }
+          : {}),
+      },
+      decision.status,
+      decision.retryAfterSeconds
+        ? { "Retry-After": String(decision.retryAfterSeconds) }
+        : {},
     );
   }
 
   const visitorName = body.visitorName?.trim().slice(0, 100) || null;
-  const visitorEmail = body.visitorEmail?.trim().slice(0, 255) || null;
+
+  // Contact capture runs on every user message, not just at the end, so a
+  // tab close can't lose it. The widget's email form value only fills a gap:
+  // it is re-sent on every turn, so letting it overwrite would undo an
+  // in-chat correction.
+  const formEmail = extractEmails(body.visitorEmail ?? "")[0] ?? null;
+  const contact = mergeContactFromMessage(
+    {
+      email: decision.conversation.contact.email ?? formEmail,
+      phone: decision.conversation.contact.phone,
+    },
+    lastUserMessage.content,
+  );
 
   // Persist conversation row + the incoming user message before kicking off
   // the stream. We don't await persistence in parallel with the model call
   // because if the row isn't there the cascade would fail when we try to
   // append the assistant response later.
-  await upsertConversation({
-    conversationId: body.conversationId,
-    visitorName,
-    visitorEmail,
-  });
-
-  await appendMessage(body.conversationId, "user", lastUserMessage.content);
+  // A failed write could drop captured contact details or the Turnstile pass,
+  // so any storage failure ends the request before the model runs.
+  try {
+    await upsertConversation({
+      conversationId,
+      visitorName,
+      visitorEmail: contact.email,
+      visitorPhone: contact.phone,
+      turnstileState: decision.turnstileState,
+    });
+    await appendMessage(conversationId, "user", lastUserMessage.content);
+  } catch (error) {
+    return storageUnavailable(error);
+  }
 
   const systemPrompt = buildSystemPrompt({
     visitorName,
-    visitorEmail,
+    hasEmail: Boolean(contact.email),
+    hasPhone: Boolean(contact.phone),
+    askForContact: shouldAskForContact(trimmedMessages, contact),
     messageCount: trimmedMessages.filter((m) => m.role === "user").length,
   });
 
@@ -123,23 +281,25 @@ export async function POST(req: NextRequest) {
       // This runs after the stream has been fully consumed by the client.
       onFinish: async ({ text }) => {
         if (text && text.trim().length > 0) {
-          await appendMessage(body.conversationId, "assistant", text);
+          try {
+            await appendMessage(conversationId, "assistant", text);
+          } catch {
+            // Already logged without content; the visitor has their reply.
+          }
         }
       },
     });
 
     return result.toTextStreamResponse({
       headers: {
-        "X-Conversation-Id": body.conversationId,
+        "X-Conversation-Id": conversationId,
       },
     });
   } catch (error) {
     console.error("Chat streaming failed:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Sorry, the chat service is temporarily unavailable.",
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
+    return json(
+      { error: "Sorry, the chat service is temporarily unavailable." },
+      500,
     );
   }
 }
