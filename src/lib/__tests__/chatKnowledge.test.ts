@@ -90,6 +90,11 @@ describe("system prompt copy rules", () => {
     expect(prompt).toMatch(/never invent another IDX client/);
   });
 
+  it("does not contradict itself about naming IDX client sites", () => {
+    expect(prompt).not.toMatch(/name an IDX client/i);
+    expect(prompt).not.toMatch(/Do not invent a client showcase/i);
+  });
+
   it("keeps the no-price and answer-first rules", () => {
     expect(prompt).toMatch(/Never quote a price/);
     expect(prompt).toMatch(/ANSWER FIRST/);

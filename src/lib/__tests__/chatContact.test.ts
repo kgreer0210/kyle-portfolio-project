@@ -82,9 +82,9 @@ describe("mergeContactFromMessage", () => {
     expect(
       mergeContactFromMessage(
         EMPTY_CONTACT,
-        "I'm at jane@example.com or (478) 777-1266",
+        "I'm at jane@example.com or (404) 555-0199",
       ),
-    ).toEqual({ email: "jane@example.com", phone: "+14787771266" });
+    ).toEqual({ email: "jane@example.com", phone: "+14045550199" });
   });
 
   it("keeps what it already has when a message has no contact details", () => {
@@ -120,11 +120,20 @@ describe("mergeContactFromMessage", () => {
     ).toEqual(EMPTY_CONTACT);
   });
 
+  it("does not record Kyle's own number when the visitor repeats it", () => {
+    expect(
+      mergeContactFromMessage(
+        EMPTY_CONTACT,
+        "Is (478) 777-1266 the best number to call you?",
+      ),
+    ).toEqual(EMPTY_CONTACT);
+  });
+
   it("treats email and phone independently", () => {
-    const merged = mergeContactFromMessage(withEmail, "call me at 478-777-1266");
+    const merged = mergeContactFromMessage(withEmail, "call me at 404-555-0199");
     expect(merged).toEqual({
       email: "first@example.com",
-      phone: "+14787771266",
+      phone: "+14045550199",
     });
   });
 });

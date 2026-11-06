@@ -13,6 +13,10 @@ export const EMPTY_CONTACT: VisitorContact = { email: null, phone: null };
 
 const MAX_EMAIL_LENGTH = 254;
 
+// Kyle's published direct line (faq.md). A visitor repeating it back is not
+// giving us their own number.
+export const KYLE_PHONE_E164 = "+14787771266";
+
 // File extensions that look like a TLD ("icon@2x.png").
 const NOT_A_TLD = new Set([
   "png", "jpg", "jpeg", "gif", "svg", "webp", "avif", "ico", "bmp",
@@ -138,7 +142,11 @@ export function mergeContactFromMessage(
   const isCorrection = CORRECTION_CUE.test(message);
   return {
     email: mergeField(existing.email, extractEmails(message), isCorrection),
-    phone: mergeField(existing.phone, extractPhones(message), isCorrection),
+    phone: mergeField(
+      existing.phone,
+      extractPhones(message).filter((phone) => phone !== KYLE_PHONE_E164),
+      isCorrection,
+    ),
   };
 }
 

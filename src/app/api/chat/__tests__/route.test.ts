@@ -62,6 +62,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -203,6 +204,9 @@ describe("POST /api/chat without Turnstile keys", () => {
 
 describe("POST /api/chat rate limiting", () => {
   it("answers 429 as JSON with Retry-After, and stores nothing for the refused turn", async () => {
+    // Fixed windows align to the epoch minute; pin the clock mid-window.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-06T12:00:10.000Z"));
     const ip = "198.51.100.77";
     const conversationId = uuid(4242);
     storage.getConversationState.mockResolvedValue({ ...newConversation, exists: true });
@@ -231,10 +235,10 @@ describe("POST /api/chat contact capture", () => {
   }
 
   it("stores a phone number on the very message that contains it", async () => {
-    await POST(chatRequest(firstMessage("You can call me at (478) 777-1266")));
+    await POST(chatRequest(firstMessage("You can call me at (404) 555-0199")));
 
     expect(storage.upsertConversation).toHaveBeenCalledWith(
-      expect.objectContaining({ visitorPhone: "+14787771266", visitorEmail: null }),
+      expect.objectContaining({ visitorPhone: "+14045550199", visitorEmail: null }),
     );
   });
 

@@ -215,8 +215,10 @@ Public / non-secret:
 - `WEBAUTHN_RP_ID`
 - `WEBAUTHN_RP_NAME`
 
-Chat abuse protection (add values in the secret store; absent values bypass
-Turnstile with a diagnostic log):
+Chat abuse protection (add values in the secret store). A missing site key,
+secret, or hostname list bypasses Turnstile with a diagnostic log. A missing
+`RATE_LIMIT_SECRET` keeps Turnstile but falls back to per-instance in-memory
+rate limits, also with a diagnostic log:
 
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public) and `TURNSTILE_ALLOWED_HOSTNAMES`
   (exact hostnames, comma-separated, no wildcards)

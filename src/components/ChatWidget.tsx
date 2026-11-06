@@ -2,7 +2,12 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { extractEmails, extractPhones } from "@/lib/chatContact";
+import {
+  extractEmails,
+  extractPhones,
+  isValidEmail,
+  KYLE_PHONE_E164,
+} from "@/lib/chatContact";
 import { useTurnstile } from "./useTurnstile";
 
 const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
@@ -93,10 +98,6 @@ function newConversationId(): string {
   });
 }
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 export default function ChatWidget() {
   // Hydrate from sessionStorage so refresh keeps the conversation alive.
   // loadPersistedState is SSR-safe (returns empty state on the server), and
@@ -147,7 +148,7 @@ export default function ChatWidget() {
     (m) =>
       m.role === "user" &&
       (extractEmails(m.content).length > 0 ||
-        extractPhones(m.content).length > 0),
+        extractPhones(m.content).some((phone) => phone !== KYLE_PHONE_E164)),
   );
 
   // Email prompt becomes visible after enough turns, unless visitor dismissed
