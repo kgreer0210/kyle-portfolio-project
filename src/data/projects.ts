@@ -79,7 +79,7 @@ export const projects: Project[] = [
     id: "mise-ai",
     title: "Mise AI",
     description:
-      "A private, invite-only cooking app I built for my family. It brings AI recipe creation and refinement, saved recipes, weekly meal planning, and grocery lists together.",
+      "A private, invite-only cooking app I built for my family. It brings AI recipe creation and refinement, saved recipes, weekly meal planning with Busy Week planning, and grocery lists together.",
     image: "/projects/mise-ai/landing.png",
     technologies: [
       "Next.js 16",
@@ -115,7 +115,7 @@ export const projects: Project[] = [
           features: [
             "Classic and Pantry modes",
             "Cuisine picker to start from a craving",
-            "Saved recipes to come back to",
+            "More than a dozen cuisines to choose from",
           ],
         },
         {
