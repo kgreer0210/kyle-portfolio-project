@@ -79,16 +79,17 @@ export const projects: Project[] = [
     id: "mise-ai",
     title: "Mise AI",
     description:
-      'A modern SaaS application built to solve the eternal "What\'s for dinner?" problem for my household. Features AI recipe generation, interactive weekly meal planning, and smart grocery list aggregation.',
+      "A private, invite-only cooking app I built for my family. It brings AI recipe creation and refinement, saved recipes, weekly meal planning, and grocery lists together.",
     image: "/projects/mise-ai/landing.png",
     technologies: [
       "Next.js 16",
       "TypeScript",
       "Tailwind CSS",
       "Supabase",
-      "OpenAI API",
+      "OpenRouter",
       "Zustand",
       "Motion",
+      "Vercel",
     ],
     liveUrl: "https://mise-ai.app/",
     status: "completed",
@@ -96,14 +97,14 @@ export const projects: Project[] = [
     challenge:
       "Built out of a personal desire to see an actual AI recipe generation app that did exactly what my wife and I needed. The challenge was to create a seamless flow from AI inspiration to a practical, organized grocery list that actually works for a busy household.",
     outcome:
-      "Reduces meal-planning friction with AI recipes, weekly planners, and smart grocery lists households actually use.",
+      "Gives my family one place to go from an AI recipe idea to a planned week and a grocery list.",
     backendShowcase: {
       available: true,
       title: "Inside the App",
       subtitle:
         "A closer look at recipe generation, saved recipes, and Chef's Week, the weekly dinner planner.",
       description:
-        "A look at the recipe generator, a generated recipe, Chef's Week planning, and the pricing tiers in Mise AI.",
+        "A look at the recipe generator, a generated recipe, Chef's Week planning, and the pricing page I retired when Mise AI went invite-only.",
       screenshots: [
         {
           id: "recipe-generator",
@@ -114,7 +115,7 @@ export const projects: Project[] = [
           features: [
             "Classic and Pantry modes",
             "Cuisine picker to start from a craving",
-            "Weekly recipe allowance meter",
+            "Saved recipes to come back to",
           ],
         },
         {
@@ -145,14 +146,14 @@ export const projects: Project[] = [
         },
         {
           id: "pricing",
-          title: "Plans and pricing",
+          title: "Earlier pricing page (retired)",
           description:
-            "Free, Plus, and Pro tiers, with Chef's Week planning on Plus and Pro.",
+            "Before I made Mise AI invite-only, it had public Free, Plus, and Pro plans. I removed the pricing page, payment UI, and plan gating in November 2026.",
           image: "/projects/mise-ai/pricing.png",
           features: [
-            "Free, Plus, and Pro plans",
-            "Monthly or yearly billing",
-            "Chef's Week on paid plans",
+            "Paid plans retired",
+            "Payment and plan gating removed",
+            "/pricing now redirects home",
           ],
         },
       ],
