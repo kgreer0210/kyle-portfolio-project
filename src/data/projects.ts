@@ -104,7 +104,7 @@ export const projects: Project[] = [
       subtitle:
         "A closer look at recipe generation, saved recipes, and Chef's Week, the weekly dinner planner.",
       description:
-        "A look at the recipe generator, a generated recipe, Chef's Week planning, and the pricing page I retired when Mise AI went invite-only.",
+        "A look at the recipe generator, a generated recipe, and Chef's Week planning in Mise AI.",
       screenshots: [
         {
           id: "recipe-generator",
@@ -142,18 +142,6 @@ export const projects: Project[] = [
             "Cuisine, meal style, and protein preferences",
             "Warns before replacing a planned dinner",
             "Build a grocery list from the week",
-          ],
-        },
-        {
-          id: "pricing",
-          title: "Earlier pricing page (retired)",
-          description:
-            "Before I made Mise AI invite-only, it had public Free, Plus, and Pro plans. I removed the pricing page, payment UI, and plan gating in November 2026.",
-          image: "/projects/mise-ai/pricing.png",
-          features: [
-            "Paid plans retired",
-            "Payment and plan gating removed",
-            "/pricing now redirects home",
           ],
         },
       ],
