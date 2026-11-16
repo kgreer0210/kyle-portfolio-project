@@ -62,6 +62,16 @@ export default function HomeClient() {
               settle for &quot;good enough.&quot; I sweat the details nobody
               else would notice, because the work should be right.
             </p>
+            <p className="text-lg text-text-secondary max-w-3xl mx-auto leading-relaxed mt-4">
+              Based in Middle Georgia? See{" "}
+              <Link
+                href="/website-design-middle-georgia"
+                className="text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm"
+              >
+                website design for Warner Robins, Macon, Perry, and Byron
+              </Link>
+              .
+            </p>
           </motion.div>
         </section>
 
