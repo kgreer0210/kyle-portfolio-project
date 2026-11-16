@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
   // statically trace those reads — so without this, the .md files won't be
   // bundled into the serverless function and the system prompt would ship
   // empty in production (no bio, no scoping rules, no guardrails).
+  // The public blog was removed (PR #90) and every /blog URL now 404s. Send the
+  // removed section, including the old post that still earns impressions, to
+  // the homepage with a permanent (308) redirect.
+  async redirects() {
+    return [
+      {
+        source: "/blog/life-is-full-and-i-wouldnt-trade-it",
+        destination: "/",
+        permanent: true,
+      },
+      { source: "/blog", destination: "/", permanent: true },
+      { source: "/blog/:path*", destination: "/", permanent: true },
+    ];
+  },
   outputFileTracingIncludes: {
     "/api/chat": ["./src/data/knowledge/**/*.md"],
     "/api/chat/end": ["./src/data/knowledge/**/*.md"],

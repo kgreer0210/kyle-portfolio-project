@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 import { getPublicTurnstileSiteKey } from "@/lib/turnstile";
+import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kygrsolutions.com"),
+  metadataBase: new URL(CANONICAL_SITE_URL),
   title: {
     default: "KYGR Solutions | Website, Software & Application Development",
     template: "%s | KYGR Solutions",
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://kygrsolutions.com",
+    url: CANONICAL_SITE_URL,
     siteName: "KYGR Solutions",
     title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
@@ -116,7 +117,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "ProfessionalService",
               name: "KYGR Solutions",
-              url: "https://kygrsolutions.com",
+              url: CANONICAL_SITE_URL,
               description:
                 "Custom website development, software development, application development, AI automations, and tech stack reviews for businesses ready to grow.",
               founder: { "@type": "Person", name: "Kyle Greer" },
@@ -130,7 +131,7 @@ export default function RootLayout({
                 "Technology Consulting",
                 "IDX Property Search",
               ],
-              sameAs: ["https://kygrsolutions.com"],
+              sameAs: [CANONICAL_SITE_URL],
             }),
           }}
         />

@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/api/",
     },
-    sitemap: "https://kygrsolutions.com/sitemap.xml",
+    sitemap: `${CANONICAL_SITE_URL}/sitemap.xml`,
   };
 }
 

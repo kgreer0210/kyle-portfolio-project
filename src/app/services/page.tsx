@@ -4,6 +4,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Services",
   description: "Custom software services including website development, web & mobile apps, and business process automation — for businesses ready to grow.",
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 export default function ServicesPage() {

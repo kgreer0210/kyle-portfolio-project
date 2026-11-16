@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import IdxClient from "./IdxClient";
 import { idxOffering } from "@/data/idx";
+import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 
 const description =
   "KYGR Solutions is an approved IDX vendor with access to Georgia MLS and Central Georgia MLS. Custom, branded property search on your own domain, with listings updated throughout the day. Contact for pricing.";
@@ -34,11 +35,11 @@ export default function IdxPage() {
     name: idxOffering.headline,
     serviceType: "IDX property search",
     description,
-    url: "https://kygrsolutions.com/idx",
+    url: `${CANONICAL_SITE_URL}/idx`,
     provider: {
       "@type": "ProfessionalService",
       name: "KYGR Solutions",
-      url: "https://kygrsolutions.com",
+      url: CANONICAL_SITE_URL,
     },
     areaServed: "Georgia",
   };
