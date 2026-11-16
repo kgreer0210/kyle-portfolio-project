@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import WebsiteDesignMiddleGeorgiaClient from "./WebsiteDesignMiddleGeorgiaClient";
+import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 import {
   EMAIL,
   PHONE_SCHEMA,
@@ -39,7 +40,7 @@ export default function WebsiteDesignMiddleGeorgiaPage() {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: "KYGR Solutions",
-    url: "https://kygrsolutions.com",
+    url: CANONICAL_SITE_URL,
     telephone: PHONE_SCHEMA,
     email: EMAIL,
     description: websiteDesignMgDescription,
@@ -57,6 +58,7 @@ export default function WebsiteDesignMiddleGeorgiaPage() {
   const faqPage = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    url: `${CANONICAL_SITE_URL}${WEBSITE_DESIGN_MG_PATH}`,
     mainEntity: websiteDesignMgFaqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
