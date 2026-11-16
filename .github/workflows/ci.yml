@@ -34,9 +34,9 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          # The repo declares no Node version (.nvmrc/engines absent);
-          # 22 matches the environment the dependency upgrades were
-          # validated against.
+          # The repo declares no Node version (.nvmrc absent; engines
+          # pins npm only). 22 matches the environment the dependency
+          # upgrades were validated against.
           node-version: 22
           cache: npm
 
