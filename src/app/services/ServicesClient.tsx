@@ -57,6 +57,19 @@ export default function ServicesClient() {
                     </li>
                   ))}
                 </ul>
+                {index === 0 ? (
+                  <p className="mt-6 text-text-secondary text-lg">
+                    If you&apos;re looking for a web designer in Warner Robins,
+                    Macon, Perry, or Byron,{" "}
+                    <Link
+                      href="/website-design-middle-georgia"
+                      className="text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm"
+                    >
+                      here&apos;s how I work with Middle Georgia owners
+                    </Link>
+                    .
+                  </p>
+                ) : null}
               </div>
               <div className="flex-1 w-full flex justify-center items-center">
                 <div className="w-full aspect-square max-w-sm rounded-2xl bg-linear-to-br from-penn-blue/40 to-blue-ncs/10 border border-blue-ncs/20 flex items-center justify-center p-6 md:p-8">

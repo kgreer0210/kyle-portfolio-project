@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+const LABELS: Record<string, string> = {
+  idx: "IDX",
+  "website-design-middle-georgia": "Website Design in Middle Georgia",
+};
+
 export default function Breadcrumb() {
   const pathname = usePathname();
   if (pathname === "/") return null;
@@ -16,9 +21,8 @@ export default function Breadcrumb() {
         const href = `/${paths.slice(0, index + 1).join("/")}`;
         const isLast = index === paths.length - 1;
         const label =
-          path.toLowerCase() === "idx"
-            ? "IDX"
-            : path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+          LABELS[path.toLowerCase()] ??
+          path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
 
         return (
           <div key={path} className="flex items-center gap-2">

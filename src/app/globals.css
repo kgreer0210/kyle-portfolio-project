@@ -227,3 +227,21 @@ html {
 .client-workspace [role="tab"] { border-radius: 0; }
 .client-workspace .rounded-3xl { border-radius: 0.75rem; }
 .client-workspace [role="progressbar"] { background: var(--penn-blue); }
+
+/* Middle Georgia landing page FAQ: native <details> accordion. */
+.mg-faq > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+}
+.mg-faq > summary::-webkit-details-marker { display: none; }
+.mg-faq > summary::marker { content: ""; }
+.mg-faq > summary:focus-visible { outline: 2px solid var(--blue-ncs); outline-offset: 3px; }
+.mg-faq-chevron { transition: transform 150ms ease; flex-shrink: 0; }
+.mg-faq[open] .mg-faq-chevron { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .mg-faq-chevron { transition: none; }
+}
