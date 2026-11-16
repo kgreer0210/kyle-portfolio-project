@@ -203,11 +203,12 @@ Single-context: one `GLOSSARY.md` at the repo root and ADRs in `docs/adr/`. See
 ## Cursor Cloud specific instructions
 
 Cloud agents install dependencies with `npm ci` (`.cursor/environment.json`).
-The repo does not pin Node in `package.json` `engines` or `.nvmrc`. CI uses
+The repo does not pin a Node version (no `.nvmrc`, and `engines` does not set `node`). CI uses
 Node 22, which matches the default Cloud Agent image, so install does not
 switch Node versions. The root `Dockerfile` is the production image (`node:20`)
 and is not the agent base image. `package.json` pins `packageManager` to
-`npm@12.0.1`; CI applies that pin with `corepack enable npm` before `npm ci`.
+`npm@12.2.2` and `engines.npm` to the same version. Node stays unpinned.
+CI applies the packageManager pin with `corepack enable npm` before `npm ci`.
 
 Agents use a Supabase **dev** project. Never use the production service-role
 key. `.env.example` lists variable names with empty values. Put secret values
