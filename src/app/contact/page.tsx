@@ -5,6 +5,9 @@ import { firstParam } from "@/lib/searchParams";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Tell me about the idea you've been carrying around. The first call is free, and we'll figure out what it would take.",
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 interface ContactPageProps {

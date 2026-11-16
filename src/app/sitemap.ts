@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://kygrsolutions.com";
+  const baseUrl = CANONICAL_SITE_URL;
 
   return [
     {
