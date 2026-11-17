@@ -9,7 +9,6 @@ import {
   DEXTER_LIVE_URL,
   DEXTER_PROJECT_PATH,
   GAMLS_LISTING_DATA_URL,
-  GAMLS_RULES_URL,
   GAMLS_WEBSITE_URL,
   IDX_PAGE_H1,
   LISA_LIVE_URL,
@@ -238,13 +237,6 @@ export default function IdxClient() {
               <Link href={DEXTER_PROJECT_PATH} className={textLink}>
                 See the Dexter Gordy project
               </Link>
-              .
-            </p>
-            <p className={bodyText}>
-              {idxBothMls.rule}{" "}
-              <ExternalLink href={GAMLS_RULES_URL}>
-                {idxBothMls.ruleLinkLabel}
-              </ExternalLink>
               .
             </p>
             <p className={bodyText}>

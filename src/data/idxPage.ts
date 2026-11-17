@@ -24,8 +24,6 @@ export const LISA_LIVE_URL = "https://lisardunnrealtor.com";
 // Official sources named on the page.
 export const GAMLS_WEBSITE_URL =
   "https://www.gamls.com/products/officeagentwebsite";
-export const GAMLS_RULES_URL =
-  "https://media.georgiamls.com/gamls/docs/membership/gamls_rules_and_regulations.pdf";
 export const GAMLS_LISTING_DATA_URL =
   "https://www.gamls.com/membership/listingdata";
 export const GAMLS_RETS_FAQ_URL = "https://www.gamls.com/vendors/retsfaq";
@@ -70,8 +68,6 @@ export const idxBothMls = {
     "Many Middle Georgia agents participate in both MLSs. Buyers should not have to search twice, and a home listed on both should not appear twice.",
   dexter:
     "On Dexter Gordy's site I built a map-based search that starts in Middle Georgia, with a one-click “Search all of Georgia” option. It merges both feeds, and a home listed on both MLSs shows up once.",
-  rule: "Georgia MLS has a rule on this: a Georgia MLS participant may co-mingle listings from other MLS IDX feeds in a single search, provided the displays follow IDX rules and the participant holds participatory rights in those MLSs. It is in Section 12.u of the",
-  ruleLinkLabel: "Georgia MLS rules and regulations (PDF)",
   cgmlsOnly:
     "If you are only on Central Georgia MLS, that is enough for a custom search on that feed. Lisa Dunn's site is the example: it searches Central Georgia MLS only, not both MLSs.",
 } as const;
@@ -159,7 +155,7 @@ export const idxFaqs = [
   {
     question: "Can one website search both Georgia MLS and Central Georgia MLS?",
     answer:
-      "Yes, if you participate in both. I am an approved IDX vendor with access to Georgia MLS and Central Georgia MLS, and I can build one search across both feeds on your own domain. A home listed on both MLSs shows up once. Georgia MLS rules also allow a participant to co-mingle listings from other MLS IDX feeds in a single search when they hold participatory rights in those MLSs.",
+      "Yes, if you participate in both. I am an approved IDX vendor with access to Georgia MLS and Central Georgia MLS, and I can build one search across both feeds on your own domain. A home listed on both MLSs shows up once.",
   },
   {
     question: "What is IDX for realtors?",
@@ -216,7 +212,6 @@ export const idxPageCopy: string[] = [
   idxBothMls.heading,
   idxBothMls.intro,
   idxBothMls.dexter,
-  idxBothMls.rule,
   idxBothMls.cgmlsOnly,
   idxWhatIs.heading,
   idxWhatIs.body,
