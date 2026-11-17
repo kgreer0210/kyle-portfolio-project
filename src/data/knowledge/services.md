@@ -22,7 +22,7 @@ KYGR Solutions is an approved IDX vendor, and I have IDX access to both Georgia 
 
 What it includes: search by city, price, beds, baths, property type, and map area; listing detail pages with photos; a My Listings / Office Listings section; design matched to the agent's site. I handle the MLS paperwork with their broker.
 
-Available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS. Their participating broker opts in in writing.
+Available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS. Their broker signs a form approving their website, I keep it on file for MLS audits, and I handle that paperwork.
 
 Pricing: contact for pricing. Do not quote a number.
 

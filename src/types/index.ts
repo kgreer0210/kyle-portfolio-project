@@ -18,6 +18,9 @@ export interface Project {
   role?: string;
   challenge?: string;
   outcome?: string;
+  // Short contextual link shown on the project page only. Keep it out of
+  // description/outcome, which feed the visitor assistant.
+  idxLink?: { text: string; linkLabel: string; href: string };
   backendShowcase?: {
     available: boolean;
     title?: string;

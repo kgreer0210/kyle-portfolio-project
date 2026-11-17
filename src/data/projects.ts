@@ -37,6 +37,11 @@ export const projects: Project[] = [
       "Dexter needed more than a brochure site. Buyers want to search homes, so the site pulls IDX listing data from two sources, Central Georgia MLS and Georgia MLS, into one map-based search that starts in Middle Georgia and opens up with a single \"Search all of Georgia\" option. A home listed on both MLSs shows up once, and every listing carries the attribution and disclaimers its MLS requires.",
     outcome:
       "Buyers can search homes on a map, browse Dexter's featured listings and recent sales, and call, text, or send a Dream Home request from any listing, all on a site that's built to keep MLS attribution right.",
+    idxLink: {
+      text: "I also build custom IDX search for Georgia MLS and Central Georgia MLS agents.",
+      linkLabel: "See my IDX page",
+      href: "/idx",
+    },
     backendShowcase: {
       available: true,
       title: "Inside the Site",
@@ -169,6 +174,12 @@ export const projects: Project[] = [
       "Lisa's old WordPress site needed to become a modern website in both English and Spanish. I rebuilt it from scratch, brought her listings in through the Central Georgia MLS IDX approval process, and followed her brokerage's licensing and disclaimer rules, so her license and the office license show up correctly.",
     outcome:
       "Central Georgia MLS approved the site for IDX, and it launched on Lisa's own domain on November 4, 2026. Visitors can browse active listings across Central Georgia, with Lisa's own listings highlighted, in English or Spanish.",
+    idxLink: {
+      text: "This site uses Central Georgia MLS IDX only.",
+      linkLabel:
+        "Need branded property search on your own domain? See my IDX page for agents.",
+      href: "/idx",
+    },
     backendShowcase: {
       available: true,
       title: "Inside the Site",
