@@ -228,7 +228,7 @@ html {
 .client-workspace .rounded-3xl { border-radius: 0.75rem; }
 .client-workspace [role="progressbar"] { background: var(--penn-blue); }
 
-/* Middle Georgia landing page FAQ: native <details> accordion. */
+/* FAQ native <details> accordion, shared by the Middle Georgia landing page and /idx. */
 .mg-faq > summary {
   list-style: none;
   display: flex;

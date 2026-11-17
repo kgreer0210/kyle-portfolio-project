@@ -16,7 +16,7 @@ export const idxOffering = {
     "Each MLS's display rules (listing firm attribution, source credit, required disclaimers) handled for you",
     "I handle the MLS paperwork with your broker",
   ],
-  note: "Available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS. Your participating broker opts in in writing.",
+  note: "Available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS. Your broker signs a form approving your website, I keep it on file for MLS audits, and I handle that paperwork.",
   pricing: "Contact for pricing",
   cta: "Talk to me about IDX for your site",
 } as const;

@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { projects } from "../../../data/projects";
 import { BackendShowcase, Breadcrumb } from "../../../components";
@@ -85,6 +86,18 @@ export default function ProjectDetailClient() {
                   {project.outcome}
                 </p>
               </section>
+            )}
+
+            {project.idxLink && (
+              <p className="text-lg text-text-secondary leading-relaxed">
+                {project.idxLink.text}{" "}
+                <Link
+                  href={project.idxLink.href}
+                  className="text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs"
+                >
+                  {project.idxLink.linkLabel}
+                </Link>
+              </p>
             )}
           </div>
 

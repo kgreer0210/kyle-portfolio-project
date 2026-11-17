@@ -12,8 +12,9 @@ describe("IDX public copy", () => {
     expect(publicCopy).toContain("Talk to me about IDX for your site");
     expect(publicCopy).toContain("every 15 minutes");
     expect(publicCopy).toContain(
-      "Your participating broker opts in in writing.",
+      "Your broker signs a form approving your website, I keep it on file for MLS audits, and I handle that paperwork.",
     );
+    expect(publicCopy).not.toContain("opts in in writing");
   });
 
   it("does not make prohibited MLS claims", () => {

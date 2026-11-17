@@ -10,7 +10,7 @@ No — I'm a full-time software developer at Robins Financial Credit Union, and 
 I'm based in Warner Robins, Georgia. Most of my work has been with local businesses in middle Georgia, but I'm fully open to remote clients across the U.S.
 
 ## Do you build IDX or property search for real estate sites?
-Yes. KYGR Solutions is an approved IDX vendor, and I have IDX access to both Georgia MLS and Central Georgia MLS. I build fast, fully branded property search into your website, on your own domain. Listings update throughout the day, every 15 minutes, and the search covers city, price, beds, baths, property type, and map area, plus listing detail pages with photos and a My Listings / Office Listings section. It's available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS, and your participating broker opts in in writing. Contact for pricing — I don't quote a number until we've talked.
+Yes. KYGR Solutions is an approved IDX vendor, and I have IDX access to both Georgia MLS and Central Georgia MLS. I build fast, fully branded property search into your website, on your own domain. Listings update throughout the day, every 15 minutes, and the search covers city, price, beds, baths, property type, and map area, plus listing detail pages with photos and a My Listings / Office Listings section. It's available to agents and brokerages that participate in Georgia MLS or Central Georgia MLS, and your broker signs a form approving your website, I keep it on file for MLS audits, and I handle that paperwork. Contact for pricing — I don't quote a number until we've talked.
 
 ## Can I call you directly?
 Yes. My direct line is (478) 777-1266. If you'd rather book a time, the 30-minute call link works too.
