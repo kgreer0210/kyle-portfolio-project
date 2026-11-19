@@ -45,7 +45,7 @@ export interface Skill {
 export interface Testimonial {
   id: number;
   name: string;
-  role: string;
+  role?: string;
   quote: string | string[];
   company: string;
 }
