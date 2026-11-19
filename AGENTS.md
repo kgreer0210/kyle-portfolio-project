@@ -225,6 +225,7 @@ Public / non-secret:
 - `WEBAUTHN_ORIGIN`
 - `WEBAUTHN_RP_ID`
 - `WEBAUTHN_RP_NAME`
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` (GA4; tag omitted when unset)
 
 Chat abuse protection (add values in the secret store). A missing site key,
 secret, or hostname list bypasses Turnstile with a diagnostic log. A missing

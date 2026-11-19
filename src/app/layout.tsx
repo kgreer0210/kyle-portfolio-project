@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 import { getPublicTurnstileSiteKey } from "@/lib/turnstile";
@@ -99,6 +100,9 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Public GA4 Measurement ID. When unset or empty, the gtag script is omitted.
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -139,6 +143,7 @@ export default function RootLayout({
           {children}
         </AppShell>
       </body>
+      {gaMeasurementId ? <GoogleAnalytics gaId={gaMeasurementId} /> : null}
     </html>
   );
 }
