@@ -41,6 +41,10 @@ export default function Testimonials() {
   // Plain touch events (supported by every iOS Safari version) so a horizontal
   // swipe changes slides while vertical page scrolling is left untouched.
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length !== 1) {
+      touchStart.current = null;
+      return;
+    }
     const touch = event.touches[0];
     touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
   };
@@ -92,8 +96,8 @@ export default function Testimonials() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Don&apos;t just take my word for it. Here&apos;s what my clients have
-          to say. I&apos;m happy to share more on a call.
+          Here&apos;s what my clients have to say. I&apos;m happy to share more on a
+          call.
         </motion.p>
       </motion.div>
 
@@ -121,6 +125,9 @@ export default function Testimonials() {
             aria-live="polite"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
+            onTouchCancel={() => {
+              touchStart.current = null;
+            }}
           >
             {testimonials.map((testimonial, index) => {
               const isActive = index === currentIndex;
@@ -180,7 +187,7 @@ export default function Testimonials() {
               <button
                 type="button"
                 onClick={prevSlide}
-                className={`${arrowButtonClass} lg:absolute lg:-left-16 lg:top-[calc(50%-2.125rem)] lg:-translate-y-1/2`}
+                className={`${arrowButtonClass} lg:absolute lg:-left-16 lg:top-[calc(50%_-_2.125rem)] lg:-translate-y-1/2`}
                 aria-label="Previous testimonial"
               >
                 <svg
@@ -227,7 +234,7 @@ export default function Testimonials() {
               <button
                 type="button"
                 onClick={nextSlide}
-                className={`${arrowButtonClass} lg:absolute lg:-right-16 lg:top-[calc(50%-2.125rem)] lg:-translate-y-1/2`}
+                className={`${arrowButtonClass} lg:absolute lg:-right-16 lg:top-[calc(50%_-_2.125rem)] lg:-translate-y-1/2`}
                 aria-label="Next testimonial"
               >
                 <svg
