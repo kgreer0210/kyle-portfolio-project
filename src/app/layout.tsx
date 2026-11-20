@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
+import GoogleAnalyticsGate from "@/components/GoogleAnalyticsGate";
 import { getPublicTurnstileSiteKey } from "@/lib/turnstile";
 import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
 
@@ -99,6 +100,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Public GA4 Measurement ID. When unset or empty, the gtag script is omitted.
+// GoogleAnalyticsGate also keeps it off admin, portal, and auth routes.
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -139,6 +144,7 @@ export default function RootLayout({
           {children}
         </AppShell>
       </body>
+      {gaMeasurementId ? <GoogleAnalyticsGate measurementId={gaMeasurementId} /> : null}
     </html>
   );
 }
