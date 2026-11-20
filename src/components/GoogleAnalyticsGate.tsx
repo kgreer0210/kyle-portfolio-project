@@ -28,7 +28,8 @@ export default function GoogleAnalyticsGate({
   // to. Updating the flag here guarantees it is current before that event.
   setGaDisabled(measurementId, excluded);
 
-  // Re-assert after commit in case React discarded the render above.
+  // Re-assert the committed route's value after each route change commits.
+  // (A discarded render is corrected the next time this component renders.)
   useIsomorphicLayoutEffect(() => {
     setGaDisabled(measurementId, excluded);
   }, [measurementId, excluded]);
