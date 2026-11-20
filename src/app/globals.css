@@ -114,6 +114,18 @@ textarea:focus {
   border: 1px solid var(--penn-blue);
 }
 
+/* Homepage testimonial carousel: only the active slide is displayed (the
+   flex utility would otherwise override the hidden attribute). */
+.testimonial-slide[hidden] { display: none; }
+.testimonial-slide { animation: testimonial-fade-in 250ms ease-out; }
+@keyframes testimonial-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .testimonial-slide { animation: none; }
+}
+
 /* Header and footer */
 header,
 footer {
