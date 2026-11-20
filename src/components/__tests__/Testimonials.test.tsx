@@ -47,4 +47,20 @@ describe("Testimonials", () => {
     });
     expect(firstSlide).toHaveAttribute("aria-hidden", "false");
   });
+
+  it("displays only the active slide and keeps controls before the card", () => {
+    const { container } = render(<Testimonials />);
+    const slides = Array.from(container.querySelectorAll("figure"));
+    expect(slides).toHaveLength(4);
+    expect(slides.filter((slide) => !slide.hidden)).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Next testimonial" }));
+    expect(slides.map((slide) => slide.hidden)).toEqual([true, false, true, true]);
+
+    const next = screen.getByRole("button", { name: "Next testimonial" });
+    const track = container.querySelector('[aria-live="polite"]')!;
+    expect(
+      next.compareDocumentPosition(track) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });

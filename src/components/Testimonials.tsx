@@ -115,79 +115,15 @@ export default function Testimonials() {
           aria-label="Client testimonials"
         >
           {/*
-            Every slide sits in the same grid cell, so the track is always as
-            tall as the longest quote and switching slides never changes the
-            section height. Inactive slides use visibility:hidden, which keeps
-            them out of the tab order and accessibility tree.
+            Controls sit above the card so their position never depends on
+            the active card's height: repeated clicks land in the same spot.
           */}
-          <div
-            className="grid overflow-hidden"
-            aria-live="polite"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={() => {
-              touchStart.current = null;
-            }}
-          >
-            {testimonials.map((testimonial, index) => {
-              const isActive = index === currentIndex;
-              const paragraphs = Array.isArray(testimonial.quote)
-                ? testimonial.quote
-                : [testimonial.quote];
-              const lastIndex = paragraphs.length - 1;
-
-              return (
-                <figure
-                  key={testimonial.id}
-                  role="group"
-                  aria-roledescription="slide"
-                  aria-label={`${index + 1} of ${total}`}
-                  aria-hidden={!isActive}
-                  className={`col-start-1 row-start-1 min-w-0 card p-5 sm:p-6 md:p-8 rounded-2xl bg-oxford-blue/90 border border-penn-blue shadow-xl flex flex-col transition-[opacity,visibility] duration-300 motion-reduce:transition-none ${
-                    isActive ? "visible opacity-100" : "invisible opacity-0"
-                  }`}
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="w-8 h-8 md:w-10 md:h-10 mb-4 shrink-0 text-blue-ncs opacity-50"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h3.983v10h-9.984z" />
-                  </svg>
-
-                  <blockquote className="text-text-primary text-base leading-relaxed md:leading-loose mb-6 grow">
-                    {paragraphs.map((paragraph, pIndex) => (
-                      <p
-                        key={pIndex}
-                        className={pIndex > 0 ? "mt-3 md:mt-4" : undefined}
-                      >
-                        {pIndex === 0 && <QuoteMark side="open" />}
-                        {paragraph}
-                        {pIndex === lastIndex && <QuoteMark side="close" />}
-                      </p>
-                    ))}
-                  </blockquote>
-
-                  <figcaption className="mt-auto pt-5 md:pt-6 border-t border-penn-blue">
-                    <TestimonialAuthor
-                      name={testimonial.name}
-                      role={testimonial.role}
-                      company={testimonial.company}
-                    />
-                  </figcaption>
-                </figure>
-              );
-            })}
-          </div>
-
-          {/* Controls row: mt-6 + 44px buttons = 4.25rem; desktop arrows offset by half of it to center on the card. */}
           {total > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex items-center justify-center gap-2 mb-6">
               <button
                 type="button"
                 onClick={prevSlide}
-                className={`${arrowButtonClass} lg:absolute lg:-left-16 lg:top-[calc(50%_-_2.125rem)] lg:-translate-y-1/2`}
+                className={arrowButtonClass}
                 aria-label="Previous testimonial"
               >
                 <svg
@@ -234,7 +170,7 @@ export default function Testimonials() {
               <button
                 type="button"
                 onClick={nextSlide}
-                className={`${arrowButtonClass} lg:absolute lg:-right-16 lg:top-[calc(50%_-_2.125rem)] lg:-translate-y-1/2`}
+                className={arrowButtonClass}
                 aria-label="Next testimonial"
               >
                 <svg
@@ -254,6 +190,73 @@ export default function Testimonials() {
               </button>
             </div>
           )}
+
+          {/*
+            Only the active slide is displayed, so the card is exactly as tall
+            as its own review. Inactive slides stay in the DOM with the hidden
+            attribute (display:none), which also removes them from the tab
+            order and accessibility tree.
+          */}
+          <div
+            className="overflow-hidden"
+            aria-live="polite"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={() => {
+              touchStart.current = null;
+            }}
+          >
+            {testimonials.map((testimonial, index) => {
+              const isActive = index === currentIndex;
+              const paragraphs = Array.isArray(testimonial.quote)
+                ? testimonial.quote
+                : [testimonial.quote];
+              const lastIndex = paragraphs.length - 1;
+
+              return (
+                <figure
+                  key={testimonial.id}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${index + 1} of ${total}`}
+                  aria-hidden={!isActive}
+                  hidden={!isActive}
+                  className="testimonial-slide min-w-0 card p-5 sm:p-6 md:p-8 rounded-2xl bg-oxford-blue/90 border border-penn-blue shadow-xl flex flex-col"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="w-8 h-8 md:w-10 md:h-10 mb-4 shrink-0 text-blue-ncs opacity-50"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h3.983v10h-9.984z" />
+                  </svg>
+
+                  <blockquote className="text-text-primary text-base leading-relaxed md:leading-loose mb-6">
+                    {paragraphs.map((paragraph, pIndex) => (
+                      <p
+                        key={pIndex}
+                        className={pIndex > 0 ? "mt-3 md:mt-4" : undefined}
+                      >
+                        {pIndex === 0 && <QuoteMark side="open" />}
+                        {paragraph}
+                        {pIndex === lastIndex && <QuoteMark side="close" />}
+                      </p>
+                    ))}
+                  </blockquote>
+
+                  <figcaption className="pt-5 md:pt-6 border-t border-penn-blue">
+                    <TestimonialAuthor
+                      name={testimonial.name}
+                      role={testimonial.role}
+                      company={testimonial.company}
+                    />
+                  </figcaption>
+                </figure>
+              );
+            })}
+          </div>
+
         </div>
       </motion.div>
     </motion.section>
