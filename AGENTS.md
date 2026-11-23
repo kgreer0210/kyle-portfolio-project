@@ -207,7 +207,7 @@ The repo does not pin a Node version (no `.nvmrc`, and `engines` does not set `n
 Node 22, which matches the default Cloud Agent image, so install does not
 switch Node versions. The root `Dockerfile` is the production image (`node:20`)
 and is not the agent base image. `package.json` pins `packageManager` to
-`npm@12.2.2` and `engines.npm` to the same version. Node stays unpinned.
+`npm@12.2.3` and `engines.npm` to the same version. Node stays unpinned.
 CI applies the packageManager pin with `corepack enable npm` before `npm ci`.
 
 Agents use a Supabase **dev** project. Never use the production service-role
