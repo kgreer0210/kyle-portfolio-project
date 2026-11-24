@@ -98,7 +98,7 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
             onClick={() => setSelectedScreenshot(null)}
           >
             <motion.div
-              className="bg-oxford-blue/95 backdrop-blur-sm border border-penn-blue rounded-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+              className="bg-oxford-blue/95 backdrop-blur-sm border border-penn-blue rounded-2xl max-w-4xl w-full max-h-[90vh] supports-[height:100dvh]:max-h-[90dvh] overflow-y-auto overscroll-contain"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               onClick={(e) => e.stopPropagation()}
@@ -176,7 +176,7 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
             onClick={closeImageModal}
           >
             <motion.div
-              className="relative max-w-7xl max-h-[95vh] sm:max-h-[90vh] w-full"
+              className="relative max-w-7xl max-h-[90vh] supports-[height:100dvh]:max-h-[90dvh] w-full"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               onClick={(e) => e.stopPropagation()}
@@ -193,7 +193,7 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
                 alt="Large view"
                 width={1200}
                 height={800}
-                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+                className="w-full h-auto max-h-[85vh] supports-[height:100dvh]:max-h-[85dvh] object-contain rounded-lg"
                 quality={100}
               />
             </motion.div>

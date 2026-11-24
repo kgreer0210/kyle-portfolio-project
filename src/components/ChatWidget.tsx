@@ -586,7 +586,7 @@ export default function ChatWidget({
         {isOpen && (
           <motion.div
             key="chat-panel"
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem)] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
