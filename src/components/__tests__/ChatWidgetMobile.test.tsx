@@ -65,3 +65,25 @@ describe("ChatWidget fields", () => {
     );
   });
 });
+
+// iOS Safari zooms the page when a focused field's text is under 16px.
+// Tailwind's text-base is 16px; text-xs and text-sm are smaller.
+function expectAtLeast16px(field: HTMLElement) {
+  expect(field.className).toMatch(/(^|\s)text-base(\s|$)/);
+  expect(field.className).not.toMatch(/(^|\s)text-(xs|sm)(\s|$)/);
+}
+
+describe("ChatWidget field text size", () => {
+  it("keeps the start form fields at 16px or more", () => {
+    openChat();
+
+    expectAtLeast16px(screen.getByLabelText(/first name/i));
+    expectAtLeast16px(screen.getByLabelText(/what brought you here/i));
+  });
+
+  it("keeps the composer at 16px or more", async () => {
+    await startConversation();
+
+    expectAtLeast16px(screen.getByLabelText(/your message/i));
+  });
+});

@@ -706,7 +706,7 @@ export default function ChatWidget({
                       onChange={(e) => setInitialName(e.target.value)}
                       placeholder="What should I call you? (optional)"
                       maxLength={100}
-                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs"
+                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs"
                     />
                   </div>
                   <div>
@@ -724,7 +724,7 @@ export default function ChatWidget({
                       maxLength={2000}
                       required
                       rows={4}
-                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs resize-none"
+                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs resize-none"
                     />
                   </div>
                   <button
@@ -808,7 +808,7 @@ export default function ChatWidget({
                     onChange={(e) => setEmailDraft(e.target.value)}
                     placeholder="you@example.com"
                     maxLength={255}
-                    className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-xs rounded-md px-2 py-1.5 focus:outline-none focus:border-blue-ncs"
+                    className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-2 py-1.5 min-w-0 focus:outline-none focus:border-blue-ncs"
                   />
                   <button
                     type="submit"
@@ -894,7 +894,7 @@ export default function ChatWidget({
                   }
                   disabled={streaming}
                   maxLength={4000}
-                  className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs disabled:opacity-60"
+                  className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 min-w-0 focus:outline-none focus:border-blue-ncs disabled:opacity-60"
                 />
                 <button
                   type="submit"
