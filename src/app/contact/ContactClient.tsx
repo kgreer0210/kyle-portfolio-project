@@ -138,7 +138,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
               </h3>
               <ul className="space-y-4">
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     1
                   </span>
                   <p className="text-sm text-text-secondary">
@@ -146,7 +146,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     2
                   </span>
                   <p className="text-sm text-text-secondary">
@@ -154,7 +154,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     3
                   </span>
                   <p className="text-sm text-text-secondary">

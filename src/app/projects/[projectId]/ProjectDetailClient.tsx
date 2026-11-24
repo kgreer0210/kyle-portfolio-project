@@ -125,7 +125,7 @@ export default function ProjectDetailClient() {
               </div>
               <motion.button
                 onClick={() => router.push("/contact")}
-                className="w-full mt-8 py-4 rounded-xl bg-blue-ncs text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
+                className="w-full mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >

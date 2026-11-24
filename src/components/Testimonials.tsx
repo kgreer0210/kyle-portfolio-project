@@ -139,7 +139,7 @@ export default function Testimonials() {
                     >
                       <span
                         aria-hidden="true"
-                        className={`block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                        className={`block h-2 rounded-full transition-[width,background-color] duration-300 motion-reduce:transition-none ${
                           isActive
                             ? "w-6 bg-blue-ncs"
                             : "w-2 bg-penn-blue group-hover:bg-blue-ncs/50"

@@ -7,6 +7,8 @@
   --color-penn-blue: #001242;
   --color-lapis-lazuli: #005e7c;
   --color-blue-ncs: #0094c6;
+  /* Background behind white text: 4.85:1 with white, where Blue NCS is 3.47:1. */
+  --color-blue-ncs-strong: #007aa5;
   --color-text-primary: #e0e6f0;
   --color-text-secondary: #a8b2d1;
   --color-text-headings: #ffffff;
@@ -26,6 +28,7 @@
   --penn-blue: #001242;
   --lapis-lazuli: #005e7c;
   --blue-ncs: #0094c6;
+  --blue-ncs-strong: #007aa5;
 
   /* Text Colors */
   --text-primary: #e0e6f0;
@@ -33,79 +36,91 @@
   --text-headings: #ffffff;
 }
 
-/* Base body styles */
-body {
-  background: var(--rich-black);
-  color: var(--text-primary);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
+/* Element defaults live in the base layer, so Tailwind utilities on a
+   component always win without `!`. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background: var(--rich-black);
+    color: var(--text-primary);
+    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    /* clip, not hidden: hidden makes body a scroll container, which lets iOS
+       pan the page sideways. */
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-headings);
+  }
+
+  p {
+    color: var(--text-primary);
+  }
+
+  /* Only style plain content links globally.
+     Component links with Tailwind classes should control their own colors. */
+  a:not([class]) {
+    color: var(--blue-ncs);
+    transition: color 0.3s ease;
+  }
+
+  a:not([class]):hover {
+    text-decoration: underline;
+  }
+
+  input,
+  textarea {
+    background-color: var(--rich-black);
+    color: var(--text-primary);
+    border: 1px solid var(--penn-blue);
+    transition: border-color 0.3s ease;
+  }
+
+  input:focus,
+  textarea:focus {
+    border: 2px solid var(--blue-ncs);
+    outline: none;
+  }
 }
 
-/* Typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: var(--text-headings);
-}
+@layer components {
+  /* White text sits on the strong cyan; hover darkens it further and never
+     returns to Blue NCS. */
+  .btn-primary {
+    background-color: var(--blue-ncs-strong);
+    color: var(--text-headings);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
 
-h1 {
-  color: var(--blue-ncs);
-}
+  .btn-primary:hover {
+    background-color: var(--lapis-lazuli);
+  }
 
-p {
-  color: var(--text-primary);
-}
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--blue-ncs);
+    color: var(--blue-ncs);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-/* Only style plain content links globally.
-   Component links with Tailwind classes should control their own colors. */
-a:not([class]) {
-  color: var(--blue-ncs);
-  transition: all 0.3s ease;
-}
-
-a:not([class]):hover {
-  text-decoration: underline;
-}
-
-/* Buttons */
-.btn-primary {
-  background-color: var(--blue-ncs);
-  color: var(--text-headings);
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--lapis-lazuli);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  border: 1px solid var(--blue-ncs);
-  color: var(--blue-ncs);
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--penn-blue);
-  color: var(--text-headings);
-}
-
-/* Form inputs */
-input,
-textarea {
-  background-color: var(--rich-black);
-  color: var(--text-primary);
-  border: 1px solid var(--penn-blue);
-  transition: all 0.3s ease;
-}
-
-input:focus,
-textarea:focus {
-  border: 2px solid var(--blue-ncs);
-  outline: none;
+  .btn-secondary:hover {
+    background-color: var(--penn-blue);
+    color: var(--text-headings);
+  }
 }
 
 /* Cards and containers */
@@ -135,7 +150,7 @@ footer {
 /* Navigation */
 .nav-link {
   color: var(--text-secondary);
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .nav-link:hover {
@@ -168,11 +183,6 @@ footer {
   .backdrop-blur-sm {
     background-color: rgba(0, 0, 34, 0.9);
   }
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
 }
 
 /* Custom scrollbar */
@@ -224,7 +234,7 @@ html {
   border-radius: 0.5rem; padding: 0.625rem 1rem;
   font-size: 0.875rem; font-weight: 600; transition: background 150ms, border-color 150ms;
 }
-.client-primary { background: var(--blue-ncs); color: white; }
+.client-primary { background: var(--blue-ncs-strong); color: white; }
 .client-primary:hover { background: var(--lapis-lazuli); }
 .client-secondary { border: 1px solid var(--penn-blue); color: var(--text-primary); }
 .client-secondary:hover { border-color: var(--blue-ncs); }

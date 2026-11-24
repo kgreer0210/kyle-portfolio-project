@@ -240,7 +240,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
               placeholder="Your name"
               disabled={isSubmitting}
             />
@@ -268,7 +268,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
               placeholder="your.email@example.com"
               disabled={isSubmitting}
             />
@@ -295,7 +295,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               name="subject"
               value={formData.subject}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 text-base appearance-none cursor-pointer disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base appearance-none cursor-pointer disabled:opacity-50"
               disabled={isSubmitting}
             >
               <option value="" disabled>Select a service...</option>
@@ -333,7 +333,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               value={formData.message}
               onChange={handleInputChange}
               rows={6}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-all duration-300 resize-y text-base"
+              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 resize-y text-base"
               placeholder="Tell me about your project..."
               disabled={isSubmitting}
             />
@@ -375,7 +375,7 @@ export default function Contact({ initialSubject }: ContactProps) {
             <motion.button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-11"
+              className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-[background-color,box-shadow] duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-11"
               whileHover={!isSubmitting ? { scale: 1.05, y: -3 } : {}}
               whileTap={!isSubmitting ? { scale: 0.95 } : {}}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -411,7 +411,7 @@ export default function Contact({ initialSubject }: ContactProps) {
                 href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block btn-primary px-6 py-3 rounded-lg font-medium hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="inline-block btn-primary px-6 py-3 rounded-lg font-medium hover:bg-lapis-lazuli transition-[background-color,box-shadow] duration-300 shadow-lg hover:shadow-xl"
               >
                 Book a 30-minute call
               </a>

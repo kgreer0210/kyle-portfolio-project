@@ -89,7 +89,7 @@ export default function HomeClient() {
             </div>
             <Link href="/services">
               <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs hover:text-white transition-all"
+                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -153,7 +153,7 @@ export default function HomeClient() {
               </p>
               <Link href="/contact">
                 <motion.button
-                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
+                  className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -225,7 +225,7 @@ export default function HomeClient() {
               </p>
               <Link href={IDX_PATH}>
                 <motion.button
-                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
+                  className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -329,7 +329,7 @@ export default function HomeClient() {
             </div>
             <Link href="/projects">
               <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs hover:text-white transition-all"
+                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -416,7 +416,7 @@ export default function HomeClient() {
             <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
               <Link href="/contact">
                 <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-blue-ncs text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-all shadow-xl shadow-blue-ncs/20"
+                  className="w-full sm:w-auto px-10 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors shadow-xl shadow-blue-ncs/20"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -425,7 +425,7 @@ export default function HomeClient() {
               </Link>
               <Link href="/about">
                 <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-transparent border border-penn-blue text-text-primary font-bold rounded-full text-lg hover:border-blue-ncs transition-all"
+                  className="w-full sm:w-auto px-10 py-4 bg-transparent border border-penn-blue text-text-primary font-bold rounded-full text-lg hover:border-blue-ncs transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
