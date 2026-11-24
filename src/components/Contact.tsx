@@ -234,7 +234,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
+              className="w-full pl-4 pr-12 sm:px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
               placeholder="Your name"
               disabled={isSubmitting}
             />
@@ -257,7 +257,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
+              className="w-full pl-4 pr-12 sm:px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 text-base"
               placeholder="your.email@example.com"
               disabled={isSubmitting}
             />
@@ -312,7 +312,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               value={formData.message}
               onChange={handleInputChange}
               rows={6}
-              className="w-full px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 resize-y text-base"
+              className="w-full pl-4 pr-12 sm:px-4 py-3 sm:py-3 rounded-lg bg-rich-black text-text-primary border border-penn-blue focus:border-blue-ncs focus:outline-none transition-colors duration-300 resize-y text-base"
               placeholder="Tell me about your project..."
               disabled={isSubmitting}
             />

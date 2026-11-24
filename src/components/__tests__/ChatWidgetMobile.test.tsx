@@ -4,12 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const sendGAEvent = vi.hoisted(() => vi.fn());
 vi.mock("@next/third-parties/google", () => ({ sendGAEvent }));
+const route = vi.hoisted(() => ({ pathname: "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
 
 import ChatWidget from "@/components/ChatWidget";
 
 beforeEach(() => {
   window.sessionStorage.clear();
   window.history.replaceState(null, "", "/");
+  route.pathname = "/";
   sendGAEvent.mockClear();
   Element.prototype.scrollIntoView = vi.fn();
 });
@@ -26,6 +29,26 @@ describe("ChatWidget floating button", () => {
     expect(
       screen.getByRole("button", { name: /chat with my ai/i }),
     ).toBeInTheDocument();
+  });
+
+  it("shrinks to its icon on /contact phones so it clears the form fields", () => {
+    route.pathname = "/contact";
+    render(<ChatWidget />);
+
+    const button = screen.getByRole("button", { name: "Chat with my AI" });
+    const label = button.querySelector("span")!;
+    expect(label).toHaveClass("sr-only", "sm:not-sr-only");
+    expect(button).toHaveClass("min-w-[48px]", "p-3");
+  });
+
+  it("keeps the full label on other pages", () => {
+    route.pathname = "/services";
+    render(<ChatWidget />);
+
+    const label = screen
+      .getByRole("button", { name: "Chat with my AI" })
+      .querySelector("span")!;
+    expect(label).not.toHaveClass("sr-only");
   });
 });
 

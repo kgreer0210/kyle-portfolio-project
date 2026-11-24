@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   extractEmails,
@@ -116,6 +117,10 @@ export default function ChatWidget({
   // lazy initialization can't cause a hydration mismatch.
   const [persisted] = useState(loadPersistedState);
   const fieldId = useId();
+  // On /contact the full pill would sit over the form fields on phones, so
+  // the trigger shrinks to its icon there below sm. The text stays as the
+  // accessible name.
+  const compactTrigger = usePathname() === "/contact";
   const [isOpen, setIsOpen] = useState(false);
   // An empty transition keeps motion's default tuning for the trigger.
   const triggerEntrance = useEntranceTransition({});
@@ -560,7 +565,7 @@ export default function ChatWidget({
           <motion.button
             key="chat-trigger"
             onClick={() => setIsOpen(true)}
-            className={`${FLOATING_CORNER} z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]`}
+            className={`${FLOATING_CORNER} z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center gap-2 min-h-[48px] ${compactTrigger ? "min-w-[48px] p-3 sm:px-4 sm:py-3" : "px-4 py-3"}`}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -581,7 +586,11 @@ export default function ChatWidget({
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
-            <span className="text-sm font-semibold">Chat with my AI</span>
+            <span
+              className={`text-sm font-semibold${compactTrigger ? " sr-only sm:not-sr-only" : ""}`}
+            >
+              Chat with my AI
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
