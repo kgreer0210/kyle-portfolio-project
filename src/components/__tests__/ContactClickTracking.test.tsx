@@ -103,6 +103,16 @@ describe("contact page click tracking", () => {
     );
   });
 
+  it("labels every Calendly link with the exact approved text", () => {
+    render(<ContactClient />);
+    const callLinks = linksTo(CONSULT_CALL_URL);
+    expect(callLinks.length).toBeGreaterThan(0);
+    for (const link of callLinks) {
+      const label = (link.textContent ?? "").replace("(opens in a new tab)", "").trim();
+      expect(label).toBe("Book a 30-min call");
+    }
+  });
+
   it("places the form before the contact information in reading order", () => {
     render(<ContactClient />);
     const firstField = screen.getByLabelText(/Name/);

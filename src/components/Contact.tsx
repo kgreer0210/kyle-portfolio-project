@@ -180,7 +180,7 @@ export default function Contact({ initialSubject }: ContactProps) {
         <p
           className="text-text-secondary text-base sm:text-lg mb-6 md:mb-8 text-center"
         >
-          Have an idea you keep coming back to? You can{" "}
+          Have an idea you keep coming back to?{" "}
           <a
             href={CONSULT_CALL_URL}
             target="_blank"
@@ -188,7 +188,7 @@ export default function Contact({ initialSubject }: ContactProps) {
             onClick={() => trackBookCallClick("contact_page")}
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
-            book a 30-min call
+            Book a 30-min call
           </a>
           , call me at{" "}
           <a
