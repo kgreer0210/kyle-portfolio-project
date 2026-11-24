@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   extractEmails,
   extractPhones,
@@ -112,6 +112,7 @@ export default function ChatWidget({
   // the initial closed-widget DOM doesn't depend on any of these values, so
   // lazy initialization can't cause a hydration mismatch.
   const [persisted] = useState(loadPersistedState);
+  const fieldId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(
     persisted.conversationId,
@@ -559,9 +560,9 @@ export default function ChatWidget({
               transition: { type: "spring", stiffness: 400, damping: 17 },
             }}
             whileTap={{ scale: 0.95 }}
-            aria-label="Open chat with Kyle's AI assistant"
           >
             <svg
+              aria-hidden="true"
               className="w-5 h-5"
               fill="none"
               stroke="currentColor"
@@ -691,11 +692,16 @@ export default function ChatWidget({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
+                    <label
+                      htmlFor={`${fieldId}-name`}
+                      className="block text-xs font-semibold text-(--color-text-secondary) mb-1"
+                    >
                       First name
                     </label>
                     <input
+                      id={`${fieldId}-name`}
                       type="text"
+                      autoComplete="given-name"
                       value={initialName}
                       onChange={(e) => setInitialName(e.target.value)}
                       placeholder="What should I call you? (optional)"
@@ -704,10 +710,14 @@ export default function ChatWidget({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
+                    <label
+                      htmlFor={`${fieldId}-message`}
+                      className="block text-xs font-semibold text-(--color-text-secondary) mb-1"
+                    >
                       What brought you here?
                     </label>
                     <textarea
+                      id={`${fieldId}-message`}
                       value={initialMessage}
                       onChange={(e) => setInitialMessage(e.target.value)}
                       placeholder="A short note about what you're trying to figure out — even a rough idea is fine."
@@ -792,6 +802,8 @@ export default function ChatWidget({
                 <form onSubmit={handleSaveEmail} className="flex gap-2">
                   <input
                     type="email"
+                    aria-label="Your email"
+                    autoComplete="email"
                     value={emailDraft}
                     onChange={(e) => setEmailDraft(e.target.value)}
                     placeholder="you@example.com"
@@ -874,6 +886,7 @@ export default function ChatWidget({
               >
                 <input
                   type="text"
+                  aria-label="Your message"
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder={

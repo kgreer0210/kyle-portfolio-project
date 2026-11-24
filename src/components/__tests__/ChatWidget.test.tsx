@@ -9,7 +9,7 @@ import type { TurnstileApi, TurnstileRenderOptions } from "@/lib/turnstileClient
 // down; the widget never reads Turnstile environment variables itself.
 function renderWidget(siteKey: string | null) {
   render(<ChatWidget turnstileSiteKey={siteKey ?? undefined} />);
-  fireEvent.click(screen.getByRole("button", { name: /open chat/i }));
+  fireEvent.click(screen.getByRole("button", { name: /chat with my ai/i }));
 }
 
 function installTurnstile() {
