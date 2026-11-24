@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Particles, { homepageParticleProps } from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 import ChatWidget from "@/components/ChatWidget";
+import { FLOATING_CLEARANCE } from "@/components/floatingControls";
 
 const appPrefixes = [
   "/login",
@@ -50,7 +51,7 @@ export default function AppShell({
 
       <Header />
 
-      <div className="relative z-10">
+      <div className={`relative z-10 ${FLOATING_CLEARANCE}`}>
         {children}
         <Footer />
       </div>
