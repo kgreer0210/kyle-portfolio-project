@@ -52,6 +52,7 @@ describe("/idx page copy", () => {
       /home valuation/i,
       /full[- ]MLS/i,
       /endors/i,
+      /MLS approved|approved the site/i,
       /partner/i,
       /\blicensed\b/i,
       /MLS member/i,
@@ -104,5 +105,22 @@ describe("/idx page copy", () => {
     ]);
     expect(CANONICAL_SITE_URL).toBe("https://www.kygrsolutions.com");
     expect(IDX_PAGE_TITLE.length).toBeGreaterThan(0);
+  });
+});
+
+describe("/idx FAQ links", () => {
+  it("never use a raw URL path as text", () => {
+    for (const faq of idxFaqs) {
+      expect(faq.answer).not.toMatch(/\s\/[a-z-]+/);
+    }
+  });
+
+  it("link the Middle Georgia page with descriptive text found in the answer", () => {
+    const faq = idxFaqs.find((f) => "link" in f && f.link);
+    expect(faq).toBeDefined();
+    const link = (faq as { link: { text: string; href: string } }).link;
+    expect(link.href).toBe("/website-design-middle-georgia");
+    expect(link.text).toMatch(/website design/i);
+    expect(faq!.answer).toContain(link.text);
   });
 });

@@ -7,6 +7,7 @@ import {
   PHONE_DISPLAY,
   PHONE_HREF,
 } from "../data/contact";
+import { trackEmailClick, trackPhoneClick } from "../lib/analytics";
 
 const currentYear = new Date().getFullYear();
 
@@ -39,6 +40,7 @@ export default function Footer() {
         >
           <a
             href={PHONE_HREF}
+            onClick={() => trackPhoneClick("footer")}
             className="hover:text-blue-ncs transition-colors duration-300"
           >
             {PHONE_DISPLAY}
@@ -46,6 +48,7 @@ export default function Footer() {
           {" | "}
           <a
             href={EMAIL_HREF}
+            onClick={() => trackEmailClick("footer")}
             className="hover:text-blue-ncs transition-colors duration-300"
           >
             {BUSINESS_EMAIL}

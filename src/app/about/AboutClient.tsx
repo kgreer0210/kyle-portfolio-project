@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
-import Link from "next/link";
 import Image from "next/image";
 import { Breadcrumb } from "../../components";
+import CallAndMessageCtas from "../../components/CallAndMessageCtas";
 
 export default function AboutClient() {
   return (
@@ -30,22 +30,22 @@ export default function AboutClient() {
               viewport={{ once: true }}
             >
               <h2 className="text-3xl font-bold text-text-headings mb-6">
-                About
+                Who I am
               </h2>
               <div className="space-y-6 text-lg text-text-primary leading-relaxed">
                 <p>
-                  I&apos;m Kyle Greer, a husband, a father of three, a man of
+                  I’m Kyle Greer, a husband, a father of three, a man of
                   faith, and the founder of KYGR Solutions. My peace comes from
-                  the Lord, so hard problems don&apos;t scare me. They&apos;re
+                  the Lord, so hard problems don’t scare me. They’re
                   how I grow. I started this business to serve people well,
-                  honor God, and be a faithful steward of the skills I&apos;ve
+                  honor God, and be a faithful steward of the skills I’ve
                   been given.
                 </p>
                 <p>
-                  I love taking the idea you&apos;ve been carrying around and
+                  I love taking the idea you’ve been carrying around and
                   guiding it all the way to finished software that does exactly
-                  what you pictured, and then some. I don&apos;t settle for
-                  &quot;good enough.&quot; I sweat the small details nobody else
+                  what you pictured, and then some. I don’t settle for
+                  “good enough.” I sweat the small details nobody else
                   would notice, because the work should be right. My favorite
                   part is the moment a client sees it working and realizes their
                   life just got easier.
@@ -85,7 +85,7 @@ export default function AboutClient() {
               Why I build
             </h2>
             <p className="text-xl text-text-primary leading-relaxed max-w-3xl mb-10">
-              Because my peace comes from the Lord, hard things don&apos;t scare
+              Because my peace comes from the Lord, hard things don’t scare
               me. I turn the ideas people carry around into something real, and
               serving people that way brings me joy.
             </p>
@@ -144,7 +144,7 @@ export default function AboutClient() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold text-blue-ncs mb-6">
-              Where we&apos;re headed
+              Where I’m headed
             </h2>
             <p className="text-2xl text-text-primary leading-relaxed font-medium">
               In five years, I want KYGR Solutions known for lasting
@@ -214,21 +214,13 @@ export default function AboutClient() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-bold text-text-headings mb-6">
-            Got an idea you&apos;ve been carrying around?
+            Got an idea you’ve been carrying around?
           </h2>
           <p className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
-            Let&apos;s talk about it. I&apos;ll help you figure out what it
+            Let’s talk about it. I’ll help you figure out what it
             would take to make it real.
           </p>
-          <Link href="/contact">
-            <motion.button
-              className="px-10 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get a Free Consult
-            </motion.button>
-          </Link>
+          <CallAndMessageCtas location="about" className="justify-center" />
         </motion.div>
       </div>
     </main>

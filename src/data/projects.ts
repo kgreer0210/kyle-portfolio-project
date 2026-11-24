@@ -19,7 +19,7 @@ export const projects: Project[] = [
     id: "dexter-gordy-realtor",
     title: "Dexter Gordy Realtor",
     description:
-      "A custom website for Middle Georgia Realtor Dexter Gordy, with IDX home search across Central Georgia MLS and Georgia MLS, his featured and recently sold listings, and quick ways for buyers to reach him.",
+      "A custom website for Middle Georgia Realtor Dexter Gordy, with IDX home search across Central Georgia MLS and Georgia MLS, his featured listings, and quick ways for buyers to reach him.",
     image: "/projects/dexter-gordy-realtor/hero.png",
     technologies: [
       "Next.js",
@@ -36,7 +36,7 @@ export const projects: Project[] = [
     challenge:
       "Dexter needed more than a brochure site. Buyers want to search homes, so the site pulls IDX listing data from two sources, Central Georgia MLS and Georgia MLS, into one map-based search that starts in Middle Georgia and opens up with a single \"Search all of Georgia\" option. A home listed on both MLSs shows up once, and every listing carries the attribution and disclaimers its MLS requires.",
     outcome:
-      "Buyers can search homes on a map, browse Dexter's featured listings and recent sales, and call, text, or send a Dream Home request from any listing, all on a site that's built to keep MLS attribution right.",
+      "Buyers can search homes on a map, browse Dexter's featured listings, and call, text, or send a Dream Home request from any listing, all on a site that's built to keep MLS attribution right.",
     idxLink: {
       text: "I also build custom IDX search for Georgia MLS and Central Georgia MLS agents.",
       linkLabel: "See my IDX page",
@@ -46,9 +46,9 @@ export const projects: Project[] = [
       available: true,
       title: "Inside the Site",
       subtitle:
-        "A closer look at the IDX home search, with listing data provided by Central Georgia MLS and Georgia MLS, and the page of homes Dexter has recently sold.",
+        "A closer look at the IDX home search, with listing data provided by Central Georgia MLS and Georgia MLS.",
       description:
-        "A look at the IDX home search and the sold properties page built for Dexter Gordy Realtor.",
+        "A look at the IDX home search built for Dexter Gordy Realtor.",
       screenshots: [
         {
           id: "home-search",
@@ -62,19 +62,6 @@ export const projects: Project[] = [
             "One merged feed with duplicate listings shown once",
             "Each listing attributed to its source MLS",
             "Listing detail pages with a photo gallery and call/text buttons",
-          ],
-        },
-        {
-          id: "sold-properties",
-          title: "Sold properties",
-          description:
-            "A page of homes Dexter has sold recently, alongside his featured listings on the homepage.",
-          image: "/projects/dexter-gordy-realtor/sold.png",
-          features: [
-            "Dexter's recently sold homes",
-            "Featured listings on the homepage",
-            "Dream Home and contact lead forms",
-            "MLS-compliant attribution on every listing",
           ],
         },
       ],
@@ -171,9 +158,9 @@ export const projects: Project[] = [
     status: "completed",
     role: "Design, full-stack development, IDX integration, hosting, and domain cutover",
     challenge:
-      "Lisa's old WordPress site needed to become a modern website in both English and Spanish. I rebuilt it from scratch, brought her listings in through the Central Georgia MLS IDX approval process, and followed her brokerage's licensing and disclaimer rules, so her license and the office license show up correctly.",
+      "Lisa's old WordPress site needed to become a modern website in both English and Spanish. I rebuilt it from scratch, set the site up for IDX listings under Central Georgia MLS rules, and followed her brokerage's licensing and disclaimer rules, so her license and the office license show up correctly.",
     outcome:
-      "Central Georgia MLS approved the site for IDX, and it launched on Lisa's own domain on November 4, 2026. Visitors can browse active listings across Central Georgia, with Lisa's own listings highlighted, in English or Spanish.",
+      "The site is set up for IDX listings under CGMLS rules, and it launched on Lisa's own domain on November 4, 2026. Visitors can browse active listings across Central Georgia, with Lisa's own listings highlighted, in English or Spanish.",
     idxLink: {
       text: "This site uses Central Georgia MLS IDX only.",
       linkLabel:

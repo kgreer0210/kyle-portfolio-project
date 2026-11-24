@@ -10,6 +10,8 @@ export const testimonials: Testimonial[] = [
       'Since implementing the site, I\'ve been able to step back from the constant "busy work" and focus more on the strategic side of my business. Tasks that once demanded my personal presence are now handled efficiently through the systems Kyle put in place. This has given me the freedom to dedicate more time to background work and business growth—something I never imagined possible before.',
       "Kyle's attention to detail, understanding of my company's needs, and ability to deliver a solution that truly works for us has been invaluable. His work has helped my business flourish in ways I couldn't have anticipated, and I'm incredibly grateful for his expertise and vision.",
     ],
+    excerpt:
+      'Since implementing the site, I\'ve been able to step back from the constant "busy work" and focus more on the strategic side of my business.',
     company: "Lexi's Fresh Slate Cleanings",
   },
   {
@@ -29,6 +31,8 @@ export const testimonials: Testimonial[] = [
       "He took the time to understand my vision and the specific needs of my real estate business, creating a professional, attractive, and user-friendly website that represents my brand beautifully.",
       "I'm impressed with  his dedication, patience, responsiveness, and willingness to listen to my ideas and make adjustments to ensure my satisfaction. His commitment to quality and customer service truly made a difference",
     ],
+    excerpt:
+      "I had an excellent experience working with Kyle Greer at KYGR Solutions on the development of my website.",
     company: "Lisa Dunn Real Estate",
   },
   {
