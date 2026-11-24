@@ -47,7 +47,7 @@ export default function Hero() {
           </h1>
 
           <p className="max-w-[580px] text-base leading-relaxed text-text-secondary! sm:text-lg">
-            Have an idea you&apos;ve been carrying around? I&apos;ll turn it
+            Have an idea you’ve been carrying around? I’ll turn it
             into a website, app, or automation that does exactly what you
             pictured, and then some, so you get your time back. Down the street
             or across the country.
@@ -111,7 +111,7 @@ export default function Hero() {
             <div className="relative mx-3 h-56 overflow-hidden rounded-lg sm:h-72 xl:h-[340px]">
               <Image
                 src={lexisProject.image}
-                alt="Screenshot of the Lexi's Fresh Slate Cleanings website homepage"
+                alt="Screenshot of the Lexi’s Fresh Slate Cleanings website homepage"
                 fill
                 preload
                 sizes="(min-width: 1280px) 516px, (min-width: 640px) 620px, 100vw"
