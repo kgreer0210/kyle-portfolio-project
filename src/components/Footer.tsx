@@ -1,6 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
+import {
+  BUSINESS_EMAIL,
+  EMAIL_HREF,
+  PHONE_DISPLAY,
+  PHONE_HREF,
+} from "../data/contact";
 
 const currentYear = new Date().getFullYear();
 
@@ -32,17 +38,17 @@ export default function Footer() {
           viewport={{ once: true }}
         >
           <a
-            href="tel:+14787771266"
+            href={PHONE_HREF}
             className="hover:text-blue-ncs transition-colors duration-300"
           >
-            (478) 777-1266
+            {PHONE_DISPLAY}
           </a>
           {" | "}
           <a
-            href="mailto:info@kygrsolutions.com"
+            href={EMAIL_HREF}
             className="hover:text-blue-ncs transition-colors duration-300"
           >
-            info@kygrsolutions.com
+            {BUSINESS_EMAIL}
           </a>
         </motion.p>
         <motion.div

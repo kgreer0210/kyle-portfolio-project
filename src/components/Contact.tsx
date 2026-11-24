@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useState, FormEvent } from "react";
+import { CONSULT_CALL_URL, PHONE_DISPLAY, PHONE_HREF } from "../data/contact";
 import { IDX_SUBJECT } from "../data/idx";
 import { services } from "../data/services";
 import {
@@ -45,8 +46,6 @@ export default function Contact({ initialSubject }: ContactProps) {
     message: string;
     tier?: "high" | "medium" | "low";
   }>({ type: null, message: "" });
-
-  const consultLink = "https://calendly.com/kylegreer-kygrsolutions/30min";
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -182,7 +181,7 @@ export default function Contact({ initialSubject }: ContactProps) {
         >
           Have an idea you keep coming back to? You can{" "}
           <a
-            href={consultLink}
+            href={CONSULT_CALL_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
@@ -191,10 +190,10 @@ export default function Contact({ initialSubject }: ContactProps) {
           </a>
           , call me at{" "}
           <a
-            href="tel:+14787771266"
+            href={PHONE_HREF}
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
-            (478) 777-1266
+            {PHONE_DISPLAY}
           </a>
           , or send details through this form, whatever&apos;s easiest. Hard
           problems welcome, wherever you&apos;re located.
@@ -409,7 +408,7 @@ export default function Contact({ initialSubject }: ContactProps) {
                 now? I&apos;ll review the details before we hop on.
               </p>
               <a
-                href={consultLink}
+                href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block btn-primary px-6 py-3 rounded-lg font-medium hover:bg-lapis-lazuli transition-[background-color,box-shadow] duration-300 shadow-lg hover:shadow-xl"

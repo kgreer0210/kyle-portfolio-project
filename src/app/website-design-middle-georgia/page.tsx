@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import WebsiteDesignMiddleGeorgiaClient from "./WebsiteDesignMiddleGeorgiaClient";
 import { CANONICAL_SITE_URL } from "@/lib/siteUrl";
+import { BUSINESS_EMAIL, PHONE_SCHEMA } from "@/data/contact";
 import {
-  EMAIL,
-  PHONE_SCHEMA,
   WEBSITE_DESIGN_MG_PATH,
   websiteDesignMgAreaServed,
   websiteDesignMgDescription,
@@ -42,7 +41,7 @@ export default function WebsiteDesignMiddleGeorgiaPage() {
     name: "KYGR Solutions",
     url: CANONICAL_SITE_URL,
     telephone: PHONE_SCHEMA,
-    email: EMAIL,
+    email: BUSINESS_EMAIL,
     description: websiteDesignMgDescription,
     founder: { "@type": "Person", name: "Kyle Greer" },
     areaServed: [

@@ -1,3 +1,5 @@
+import { sendGAEvent } from "@next/third-parties/google";
+
 /**
  * GA4 is limited to the public marketing site. The admin CRM, client portal,
  * and their auth pages never load or report to Google Analytics.
@@ -27,4 +29,59 @@ export function setGaDisabled(measurementId: string, disabled: boolean): void {
   if (typeof window === "undefined") return;
   (window as unknown as Record<string, unknown>)[gaDisableKey(measurementId)] =
     disabled;
+}
+
+/** Where on the site a tracked CTA lives. Sent to GA4 as `cta_location`. */
+export const CTA_LOCATIONS = [
+  "header",
+  "mobile_menu",
+  "hero",
+  "home_tech_review",
+  "home_final",
+  "services",
+  "about",
+  "contact_page",
+  "footer",
+  "chat",
+  "idx",
+  "local_landing",
+] as const;
+
+export type CtaLocation = (typeof CTA_LOCATIONS)[number];
+
+// The only place GA4 event names exist. Every event goes through here so the
+// analytics exclusion applies to all of them.
+function trackEvent(name: string, params: Record<string, string>): void {
+  if (typeof window === "undefined") return;
+  if (isAnalyticsExcludedPath(window.location.pathname)) return;
+  sendGAEvent("event", name, params);
+}
+
+/**
+ * A Lead: fire only after a Message has sent successfully. Clicks that show
+ * intent (call, phone, email) are tracked separately and are not Leads.
+ */
+export function trackLead({
+  subject,
+  ctaLocation,
+}: {
+  subject: string;
+  ctaLocation: CtaLocation;
+}): void {
+  trackEvent("generate_lead", { subject, cta_location: ctaLocation });
+}
+
+/** A click on a Book a 30-min call (Consult call) link. */
+export function trackBookCallClick(ctaLocation: CtaLocation): void {
+  trackEvent("book_call_click", { cta_location: ctaLocation });
+}
+
+/** A click on a tel: link. */
+export function trackPhoneClick(ctaLocation: CtaLocation): void {
+  trackEvent("phone_click", { cta_location: ctaLocation });
+}
+
+/** A click on a mailto: link. */
+export function trackEmailClick(ctaLocation: CtaLocation): void {
+  trackEvent("email_click", { cta_location: ctaLocation });
 }

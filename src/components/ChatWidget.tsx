@@ -10,9 +10,9 @@ import {
   formatUsPhone,
   KYLE_PHONE_E164,
 } from "@/lib/chatContact";
+import { CONSULT_CALL_URL } from "@/data/contact";
 import { useTurnstile } from "./useTurnstile";
 
-const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
 const STORAGE_KEY = "kygr_chat_state_v1";
 const EMAIL_PROMPT_AFTER_TURNS = 3;
 type SendOutcome = "ok" | "rejected" | "failed";
@@ -654,7 +654,7 @@ export default function ChatWidget({
                 Ready to talk to Kyle directly?
               </span>
               <a
-                href={CALENDLY_URL}
+                href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
