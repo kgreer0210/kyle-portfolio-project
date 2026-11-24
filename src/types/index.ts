@@ -47,6 +47,8 @@ export interface Testimonial {
   name: string;
   role?: string;
   quote: string | string[];
+  /** A short verbatim substring of `quote`, shown before the full review. */
+  excerpt?: string;
   company: string;
 }
 
