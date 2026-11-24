@@ -3,7 +3,11 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { CONSULT_CALL_URL } from "../data/contact";
-import { trackBookCallClick, type CtaLocation } from "../lib/analytics";
+import {
+  trackBookCallClick,
+  trackMessageClick,
+  type CtaLocation,
+} from "../lib/analytics";
 import { useHoverMotion } from "../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
@@ -14,7 +18,7 @@ const tap = { scale: 0.98 };
 /**
  * The standard CTA pair: "Book a 30-min call" (Calendly, primary) and
  * "Send me a message" (the contact form, secondary). Each is a single link
- * styled as a button, and the Calendly click is tracked for `location`.
+ * styled as a button, and both clicks are tracked for `location`.
  */
 export default function CallAndMessageCtas({
   location,
@@ -39,6 +43,7 @@ export default function CallAndMessageCtas({
       </MotionLink>
       <MotionLink
         href="/contact"
+        onClick={() => trackMessageClick(location)}
         className="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-transparent px-8 py-4 text-center text-lg font-bold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
         {...press}
       >

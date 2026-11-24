@@ -9,7 +9,11 @@ import { CONSULT_CALL_URL } from "../data/contact";
 import { IDX_PATH, idxOffering } from "../data/idx";
 import { getFeaturedProjects } from "../data/projects";
 import { services } from "../data/services";
-import { trackBookCallClick, type CtaLocation } from "../lib/analytics";
+import {
+  trackBookCallClick,
+  trackMessageClick,
+  type CtaLocation,
+} from "../lib/analytics";
 import { useHoverMotion, useReveal } from "../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
@@ -48,10 +52,17 @@ function BookCallLink({
 }
 
 /** Secondary CTA: a text link to the contact form. */
-function SendMessageLink({ className = "" }: { className?: string }) {
+function SendMessageLink({
+  location,
+  className = "",
+}: {
+  location: CtaLocation;
+  className?: string;
+}) {
   return (
     <Link
       href="/contact"
+      onClick={() => trackMessageClick(location)}
       className={`font-bold text-blue-ncs underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm ${className}`}
     >
       Send me a message
@@ -85,7 +96,7 @@ export default function HomeClient() {
 
   return (
     <div>
-      <main className="relative z-10">
+      <div className="relative z-10">
         {/* Hero Section */}
         <Hero />
 
@@ -189,7 +200,7 @@ export default function HomeClient() {
                   ctaLocation="home_tech_review"
                   className={primaryLinkClass}
                 />
-                <SendMessageLink />
+                <SendMessageLink location="home_tech_review" />
               </div>
             </div>
 
@@ -427,12 +438,12 @@ export default function HomeClient() {
               </MotionLink>
             </div>
             <p className="relative z-10 mt-8 text-lg text-text-secondary">
-              Prefer to write? <SendMessageLink />
+              Prefer to write? <SendMessageLink location="home_final" />
             </p>
           </motion.div>
         </section>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

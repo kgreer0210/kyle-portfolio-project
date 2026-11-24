@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { getPublishedProjects } from "@/data/projects";
 
 const params = vi.hoisted(() => ({ projectId: "dexter-gordy-realtor" }));
@@ -11,7 +11,9 @@ vi.mock("next/navigation", () => ({
   useParams: () => params,
   useRouter: () => ({ push: vi.fn() }),
 }));
+vi.mock("@/lib/analytics", () => ({ trackMessageClick: vi.fn() }));
 
+import { trackMessageClick } from "@/lib/analytics";
 import ProjectsClient from "../ProjectsClient";
 import ProjectDetailClient from "../[projectId]/ProjectDetailClient";
 
@@ -69,5 +71,11 @@ describe("/projects/[projectId] page", () => {
     ).toHaveAttribute("href", "/contact");
     expect(screen.queryByText(/Inquire About Similar Project/)).toBeNull();
     expect(container.querySelector("a button")).toBeNull();
+  });
+
+  it("tracks the Send me a message click as message_click from project_detail", () => {
+    render(<ProjectDetailClient />);
+    fireEvent.click(screen.getByRole("link", { name: "Send me a message" }));
+    expect(trackMessageClick).toHaveBeenCalledWith("project_detail");
   });
 });

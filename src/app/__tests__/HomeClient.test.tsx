@@ -102,10 +102,12 @@ describe("home CTAs", () => {
       cta_location: location,
     });
 
-    expect(section.getByRole("link", { name: "Send me a message" })).toHaveAttribute(
-      "href",
-      "/contact",
-    );
+    const message = section.getByRole("link", { name: "Send me a message" });
+    expect(message).toHaveAttribute("href", "/contact");
+    clickWithoutNavigating(message);
+    expect(sendGAEvent).toHaveBeenCalledWith("event", "message_click", {
+      cta_location: location,
+    });
   });
 
   it("links About me to /about from the closing CTA", () => {
@@ -138,10 +140,10 @@ describe("home service cards", () => {
 
 describe("home copy and images", () => {
   it("uses curly quotes in home copy", () => {
-    render(<HomeClient />);
+    const { container } = render(<HomeClient />);
     // Review text is verbatim Google review content, owned by the
     // testimonials data, so leave it out of the home copy check.
-    const main = screen.getByRole("main").cloneNode(true) as HTMLElement;
+    const main = container.cloneNode(true) as HTMLElement;
     main.querySelectorAll("figure").forEach((figure) => figure.remove());
     expect(main.textContent).not.toContain('"');
     expect(main.textContent).toContain("I don’t settle for “good enough.”");
@@ -160,7 +162,7 @@ describe("home copy and images", () => {
   it("sizes the featured project images to their card", () => {
     const doc = serverDocument();
     const titles = getFeaturedProjects().map((project) => project.title);
-    const images = Array.from(doc.querySelectorAll("main img")).filter((img) =>
+    const images = Array.from(doc.querySelectorAll("img")).filter((img) =>
       titles.includes(img.getAttribute("alt") ?? ""),
     );
     expect(images).toHaveLength(titles.length);

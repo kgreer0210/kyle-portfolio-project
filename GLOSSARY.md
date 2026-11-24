@@ -14,9 +14,15 @@ A written enquiry a visitor sends through the contact form.
 _Avoid_: Email (when meaning the form), consult request
 
 **Lead**:
-A visitor who has sent a Message. Clicking to book a Consult call, call, or
-email shows intent but is not, by itself, a Lead.
+A visitor who has sent a Message. Clicking to book a Consult call, call,
+email, or open the contact form to write a Message shows intent but is not,
+by itself, a Lead.
 _Avoid_: Conversion (for clicks), prospect
+
+**Intent click**:
+A click on a Consult call, phone, email, or "Send me a message" link. It is
+counted separately from Leads and never counts as one.
+_Avoid_: Conversion, lead (for a click)
 
 ## Social proof
 

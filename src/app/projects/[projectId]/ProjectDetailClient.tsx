@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { projects } from "../../../data/projects";
 import { BackendShowcase, Breadcrumb } from "../../../components";
+import { trackMessageClick } from "../../../lib/analytics";
 import { useHoverMotion, useReveal } from "../../../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
@@ -32,7 +33,7 @@ export default function ProjectDetailClient() {
   }
 
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <div className="mb-12">
@@ -123,6 +124,7 @@ export default function ProjectDetailClient() {
               </div>
               <MotionLink
                 href="/contact"
+                onClick={() => trackMessageClick("project_detail")}
                 className="flex w-full items-center justify-center mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 {...linkPress}
               >
@@ -150,7 +152,7 @@ export default function ProjectDetailClient() {
           </motion.div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -5,7 +5,10 @@ import { CONSULT_CALL_URL } from "@/data/contact";
 
 vi.mock("motion/react", () => import("@/test/motionMock"));
 vi.mock("next/navigation", () => ({ usePathname: () => "/about" }));
-vi.mock("@/lib/analytics", () => ({ trackBookCallClick: vi.fn() }));
+vi.mock("@/lib/analytics", () => ({
+  trackBookCallClick: vi.fn(),
+  trackMessageClick: vi.fn(),
+}));
 
 import { trackBookCallClick } from "@/lib/analytics";
 import AboutClient from "../AboutClient";

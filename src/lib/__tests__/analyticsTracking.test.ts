@@ -9,6 +9,7 @@ import {
   trackBookCallClick,
   trackEmailClick,
   trackLead,
+  trackMessageClick,
   trackPhoneClick,
 } from "../analytics";
 
@@ -41,6 +42,25 @@ describe("CTA click events", () => {
     expect(sendGAEvent).toHaveBeenCalledWith("event", "book_call_click", {
       cta_location: "hero",
     });
+  });
+
+  it("sends message_click with the CTA location", () => {
+    trackMessageClick("home_final");
+
+    expect(sendGAEvent).toHaveBeenCalledTimes(1);
+    expect(sendGAEvent).toHaveBeenCalledWith("event", "message_click", {
+      cta_location: "home_final",
+    });
+  });
+
+  it("never treats a message click as a Lead", () => {
+    trackMessageClick("hero");
+
+    expect(sendGAEvent).not.toHaveBeenCalledWith(
+      "event",
+      "generate_lead",
+      expect.anything(),
+    );
   });
 
   it("sends phone_click with the CTA location", () => {
@@ -78,6 +98,7 @@ describe("excluded paths", () => {
     trackBookCallClick("header");
     trackPhoneClick("footer");
     trackEmailClick("footer");
+    trackMessageClick("hero");
 
     expect(sendGAEvent).not.toHaveBeenCalled();
   });
@@ -91,5 +112,12 @@ describe("a broken gtag", () => {
     expect(() =>
       trackLead({ subject: "New website", ctaLocation: "contact_page" }),
     ).not.toThrow();
+  });
+
+  it("never throws from a message click", () => {
+    sendGAEvent.mockImplementationOnce(() => {
+      throw new Error("gtag blocked");
+    });
+    expect(() => trackMessageClick("services")).not.toThrow();
   });
 });

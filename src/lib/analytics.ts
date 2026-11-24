@@ -45,6 +45,7 @@ export const CTA_LOCATIONS = [
   "chat",
   "idx",
   "local_landing",
+  "project_detail",
 ] as const;
 
 export type CtaLocation = (typeof CTA_LOCATIONS)[number];
@@ -80,6 +81,15 @@ export function trackLead({
 /** A click on a Book a 30-min call (Consult call) link. */
 export function trackBookCallClick(ctaLocation: CtaLocation): void {
   trackEvent("book_call_click", { cta_location: ctaLocation });
+}
+
+/**
+ * A click on a "Send me a message" link to the contact form. This shows
+ * intent only: a Lead (`generate_lead`) still fires only once the Message
+ * actually sends.
+ */
+export function trackMessageClick(ctaLocation: CtaLocation): void {
+  trackEvent("message_click", { cta_location: ctaLocation });
 }
 
 /** A click on a tel: link. */

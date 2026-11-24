@@ -11,11 +11,13 @@ vi.mock("@/lib/analytics", () => ({
   trackBookCallClick: vi.fn(),
   trackPhoneClick: vi.fn(),
   trackEmailClick: vi.fn(),
+  trackMessageClick: vi.fn(),
 }));
 
 import {
   trackBookCallClick,
   trackEmailClick,
+  trackMessageClick,
   trackPhoneClick,
 } from "@/lib/analytics";
 import WebsiteDesignMiddleGeorgiaClient from "../WebsiteDesignMiddleGeorgiaClient";
@@ -30,6 +32,16 @@ describe("/website-design-middle-georgia page", () => {
     const formLinks = container.querySelectorAll('a[href="/contact"]');
     expect(formLinks.length).toBe(2);
     formLinks.forEach((a) => expect(a).toHaveTextContent("Send me a message"));
+  });
+
+  it("tracks every Send me a message click as message_click from local_landing", () => {
+    const { container } = render(<WebsiteDesignMiddleGeorgiaClient />);
+    const formLinks = container.querySelectorAll('a[href="/contact"]');
+    formLinks.forEach((a) => fireEvent.click(a));
+    expect(trackMessageClick).toHaveBeenCalledTimes(formLinks.length);
+    for (const call of vi.mocked(trackMessageClick).mock.calls) {
+      expect(call).toEqual(["local_landing"]);
+    }
   });
 
   it("tracks Calendly, phone, and email clicks as local_landing", () => {

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CONSULT_CALL_URL } from "../data/contact";
 import { projects } from "../data/projects";
-import { trackBookCallClick } from "../lib/analytics";
+import { trackBookCallClick, trackMessageClick } from "../lib/analytics";
 import { useHoverMotion, useReveal } from "../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
@@ -68,6 +68,7 @@ export default function Hero() {
             </MotionLink>
             <MotionLink
               href="/contact"
+              onClick={() => trackMessageClick("hero")}
               className="inline-flex w-full items-center justify-center rounded-[10px] border border-white/25 bg-transparent px-7 py-4 text-center text-base font-semibold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
               {...ctaPress}
             >

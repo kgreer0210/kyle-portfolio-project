@@ -5,9 +5,12 @@ import { CONSULT_CALL_URL } from "@/data/contact";
 
 vi.mock("motion/react", () => import("@/test/motionMock"));
 vi.mock("next/navigation", () => ({ usePathname: () => "/services" }));
-vi.mock("@/lib/analytics", () => ({ trackBookCallClick: vi.fn() }));
+vi.mock("@/lib/analytics", () => ({
+  trackBookCallClick: vi.fn(),
+  trackMessageClick: vi.fn(),
+}));
 
-import { trackBookCallClick } from "@/lib/analytics";
+import { trackBookCallClick, trackMessageClick } from "@/lib/analytics";
 import ServicesClient from "../ServicesClient";
 
 beforeEach(() => vi.clearAllMocks());
@@ -26,6 +29,10 @@ describe("/services page", () => {
 
     fireEvent.click(call);
     expect(trackBookCallClick).toHaveBeenCalledWith("services");
+
+    fireEvent.click(message);
+    expect(trackMessageClick).toHaveBeenCalledTimes(1);
+    expect(trackMessageClick).toHaveBeenCalledWith("services");
   });
 
   it("drops the old consult label", () => {

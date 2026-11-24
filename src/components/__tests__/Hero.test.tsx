@@ -59,4 +59,19 @@ describe("Hero CTAs", () => {
       cta_location: "hero",
     });
   });
+
+  it("tracks the message click as message_click from hero, not as a Lead", () => {
+    render(<Hero />);
+    const message = screen.getByRole("link", { name: "Send me a message" });
+    message.addEventListener("click", (e) => e.preventDefault());
+    fireEvent.click(message);
+    expect(sendGAEvent).toHaveBeenCalledWith("event", "message_click", {
+      cta_location: "hero",
+    });
+    expect(sendGAEvent).not.toHaveBeenCalledWith(
+      "event",
+      "generate_lead",
+      expect.anything(),
+    );
+  });
 });

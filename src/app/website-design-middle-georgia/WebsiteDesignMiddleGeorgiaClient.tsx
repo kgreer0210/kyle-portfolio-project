@@ -22,10 +22,12 @@ import {
 import {
   trackBookCallClick,
   trackEmailClick,
+  trackMessageClick,
   trackPhoneClick,
 } from "@/lib/analytics";
 
 const trackPhone = () => trackPhoneClick("local_landing");
+const trackMessage = () => trackMessageClick("local_landing");
 const trackEmail = () => trackEmailClick("local_landing");
 
 const LEXI_PATH = "/projects/lexisFreshSlateCleanings";
@@ -79,7 +81,7 @@ function Section({
 export default function WebsiteDesignMiddleGeorgiaClient() {
   const { section: reveal } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
@@ -107,7 +109,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </div>
           <p className="mt-4 text-base text-text-secondary">
             Prefer to write?{" "}
-            <Link href="/contact" className={textLink}>
+            <Link href="/contact" className={textLink} onClick={trackMessage}>
               Send me a message
             </Link>
             .
@@ -430,7 +432,11 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
             >
               Call {PHONE_DISPLAY}
             </a>
-            <Link href="/contact" className={secondaryButton}>
+            <Link
+              href="/contact"
+              className={secondaryButton}
+              onClick={trackMessage}
+            >
               Send me a message
             </Link>
           </div>
@@ -447,6 +453,6 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </p>
         </motion.section>
       </div>
-    </main>
+    </div>
   );
 }

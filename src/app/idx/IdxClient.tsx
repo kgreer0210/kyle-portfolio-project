@@ -39,10 +39,12 @@ import { WEBSITE_DESIGN_MG_PATH } from "../../data/websiteDesignMiddleGeorgia";
 import {
   trackBookCallClick,
   trackEmailClick,
+  trackMessageClick,
   trackPhoneClick,
 } from "@/lib/analytics";
 
 const trackCall = () => trackBookCallClick("idx");
+const trackMessage = () => trackMessageClick("idx");
 const trackPhone = () => trackPhoneClick("idx");
 const trackEmail = () => trackEmailClick("idx");
 
@@ -154,7 +156,7 @@ function FaqAnswer({
 export default function IdxClient() {
   const { section: reveal } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
@@ -169,7 +171,11 @@ export default function IdxClient() {
             {idxPageIntro}
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href={IDX_CONTACT_HREF} className={primaryButton}>
+            <Link
+              href={IDX_CONTACT_HREF}
+              className={primaryButton}
+              onClick={trackMessage}
+            >
               Send me a message
             </Link>
             <ExternalLink
@@ -436,7 +442,11 @@ export default function IdxClient() {
             {idxFinalCta.body}
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href={IDX_CONTACT_HREF} className={primaryButton}>
+            <Link
+              href={IDX_CONTACT_HREF}
+              className={primaryButton}
+              onClick={trackMessage}
+            >
               Send me a message
             </Link>
             <ExternalLink
@@ -479,6 +489,6 @@ export default function IdxClient() {
           </p>
         </motion.section>
       </div>
-    </main>
+    </div>
   );
 }

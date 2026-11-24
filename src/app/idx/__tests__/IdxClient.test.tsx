@@ -9,11 +9,13 @@ vi.mock("@/lib/analytics", () => ({
   trackBookCallClick: vi.fn(),
   trackPhoneClick: vi.fn(),
   trackEmailClick: vi.fn(),
+  trackMessageClick: vi.fn(),
 }));
 
 import {
   trackBookCallClick,
   trackEmailClick,
+  trackMessageClick,
   trackPhoneClick,
 } from "@/lib/analytics";
 import IdxClient from "../IdxClient";
@@ -38,6 +40,16 @@ describe("/idx page", () => {
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) {
       expect(link.getAttribute("href")).toMatch(/^\/contact/);
+    }
+  });
+
+  it("tracks every Send me a message click as message_click from idx", () => {
+    render(<IdxClient />);
+    const links = screen.getAllByRole("link", { name: "Send me a message" });
+    links.forEach((a) => fireEvent.click(a));
+    expect(trackMessageClick).toHaveBeenCalledTimes(links.length);
+    for (const call of vi.mocked(trackMessageClick).mock.calls) {
+      expect(call).toEqual(["idx"]);
     }
   });
 
