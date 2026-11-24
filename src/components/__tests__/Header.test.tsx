@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 const pathname = vi.hoisted(() => ({ current: "/" }));
 
@@ -27,6 +27,47 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("Header mobile menu", () => {
+  it("keeps Tab inside the toggle and the drawer while it is open", () => {
+    render(<Header />);
+    const toggle = openMenu();
+    const links = Array.from(
+      document.getElementById("mobile-menu")!.querySelectorAll("a"),
+    );
+    const last = links[links.length - 1];
+
+    last.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(toggle).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(last).toHaveFocus();
+  });
+
+  it("closes and releases the scroll lock when the desktop layout takes over", () => {
+    let desktop = false;
+    const listeners = new Set<() => void>();
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      get matches() {
+        return query === "(min-width: 768px)" && desktop;
+      },
+      media: query,
+      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
+      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
+      addListener() {},
+      removeListener() {},
+    }));
+    render(<Header />);
+    const toggle = openMenu();
+    expect(document.body.style.position).toBe("fixed");
+
+    desktop = true;
+    act(() => listeners.forEach((cb) => cb()));
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(document.body.style.position).toBe("");
+    vi.unstubAllGlobals();
+  });
+
   it("reflects the drawer state in aria-expanded and points aria-controls at the drawer", () => {
     render(<Header />);
     const toggle = screen.getByRole("button", { name: "Menu" });

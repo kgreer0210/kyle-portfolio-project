@@ -12,6 +12,8 @@ import { useBodyScrollLock } from "../lib/useBodyScrollLock";
 
 const MOBILE_MENU_ID = "mobile-menu";
 const CONTACT_HREF = "/contact";
+// Tailwind's md breakpoint, where the desktop nav replaces the drawer.
+const DESKTOP_QUERY = "(min-width: 768px)";
 // The Contact CTA already links to /contact, so the page links leave it out.
 const pageNavItems = navItems.filter((item) => item.href !== CONTACT_HREF);
 
@@ -41,10 +43,54 @@ export default function Header() {
     wasMenuOpen.current = isMobileMenuOpen;
   }, [isMobileMenuOpen]);
 
+  // Crossing into the desktop layout hides the drawer and its toggle, so
+  // close the menu there and let the scroll lock go.
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const mql = window.matchMedia?.(DESKTOP_QUERY);
+    if (!mql) return;
+    const onChange = () => {
+      if (mql.matches) setIsMobileMenuOpen(false);
+    };
+    onChange();
+    // Safari before 14 only has the deprecated addListener API.
+    if (typeof mql.addEventListener === "function") {
+      mql.addEventListener("change", onChange);
+      return () => mql.removeEventListener("change", onChange);
+    }
+    mql.addListener(onChange);
+    return () => mql.removeListener(onChange);
+  }, [isMobileMenuOpen]);
+
   useEffect(() => {
     if (!isMobileMenuOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMobileMenuOpen(false);
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      // Keep Tab inside the toggle and the drawer while the page behind is
+      // covered and locked.
+      const toggle = toggleRef.current;
+      const links = Array.from(
+        drawerRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? [],
+      );
+      const stops = toggle ? [toggle, ...links] : links;
+      if (stops.length === 0) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const active = document.activeElement;
+      if (!stops.includes(active as HTMLElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
