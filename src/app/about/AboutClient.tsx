@@ -18,8 +18,9 @@ export default function AboutClient() {
           </h1>
         </div>
 
-        {/* Section 1: About Me */}
-        <motion.section className="mb-20" {...section}>
+        {/* Section 1: About Me. Above the fold on load, so it renders
+            visible instead of revealing: it is the mobile LCP. */}
+        <section className="mb-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-text-headings mb-6">
@@ -60,7 +61,7 @@ export default function AboutClient() {
               />
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* Section: Why I Build */}
         <section className="mb-20">

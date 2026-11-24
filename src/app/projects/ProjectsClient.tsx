@@ -42,15 +42,17 @@ function ComingSoonVisual({ title }: { title: string }) {
 
 export default function ProjectsClient() {
   const { section } = useReveal();
-  // Each card reveals on its own as it scrolls in, with no stagger.
-  const renderProjectCard = (project: Project) => {
+  // Each card reveals on its own as it scrolls in, with no stagger. The
+  // first row is on screen at load (the first image is the mobile LCP), so
+  // it renders visible instead.
+  const renderProjectCard = (project: Project, index: number) => {
     const comingSoon = isComingSoonProject(project);
 
     return (
       <motion.div
         key={project.id}
         className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden hover:border-blue-ncs transition-colors duration-500"
-        {...section}
+        {...(index < 2 ? {} : section)}
       >
         <div className="aspect-video relative overflow-hidden">
           {comingSoon ? (
@@ -61,6 +63,9 @@ export default function ProjectsClient() {
                 src={project.image}
                 alt={project.title}
                 fill
+                {...(index === 0
+                  ? { loading: "eager" as const, fetchPriority: "high" as const }
+                  : {})}
                 // Two columns from md; max-w-6xl minus padding and the gap caps a card at 532px.
                 sizes="(min-width: 1152px) 532px, (min-width: 768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
@@ -128,7 +133,7 @@ export default function ProjectsClient() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {projects.map((project) => renderProjectCard(project))}
+          {projects.map((project, index) => renderProjectCard(project, index))}
         </div>
       </div>
     </main>
