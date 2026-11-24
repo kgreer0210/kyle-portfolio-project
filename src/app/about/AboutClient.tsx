@@ -9,7 +9,7 @@ import { useReveal } from "../../lib/motionPresets";
 export default function AboutClient() {
   const { section } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <div>
@@ -188,6 +188,6 @@ export default function AboutClient() {
           <CallAndMessageCtas location="about" className="justify-center" />
         </motion.div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -37,9 +37,9 @@ afterEach(cleanup);
 function renderShell() {
   return render(
     <AppShell>
-      <main>
+      <div>
         <h1>Page</h1>
-      </main>
+      </div>
     </AppShell>,
   );
 }
@@ -51,10 +51,19 @@ describe("AppShell", () => {
     expect(first).toBe(screen.getByRole("link", { name: "Skip to content" }));
 
     const targetId = first!.getAttribute("href")!.replace(/^#/, "");
+    expect(targetId).toBe("main-content");
     const target = document.getElementById(targetId);
     expect(target).not.toBeNull();
-    expect(target!.querySelector("main")).not.toBeNull();
+    // The skip target is the page's one <main> landmark, focusable for Safari.
+    expect(target!.tagName).toBe("MAIN");
     expect(target).toHaveAttribute("tabindex", "-1");
+    expect(target).toBe(screen.getByRole("main"));
+  });
+
+  it("renders exactly one <main>, with no nested <main> elements", () => {
+    const { container } = renderShell();
+    expect(container.querySelectorAll("main")).toHaveLength(1);
+    expect(container.querySelector("main main")).toBeNull();
   });
 
   it("keeps floating controls inside a landmark", () => {
@@ -75,9 +84,9 @@ describe("AppShell", () => {
     }));
     render(
       <AppShell>
-        <main>
+        <div>
           <MotionProbe />
-        </main>
+        </div>
       </AppShell>,
     );
     expect(screen.getByText("reduced motion")).toBeInTheDocument();

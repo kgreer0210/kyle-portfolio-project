@@ -120,7 +120,7 @@ export default function ProjectsClient() {
   };
 
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <div className="mb-16">
@@ -136,7 +136,7 @@ export default function ProjectsClient() {
           {projects.map((project, index) => renderProjectCard(project, index))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

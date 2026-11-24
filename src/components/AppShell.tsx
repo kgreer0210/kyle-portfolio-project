@@ -63,10 +63,12 @@ export default function AppShell({
       <Header />
 
       <div className={`relative z-10 ${FLOATING_CLEARANCE}`}>
-        {/* Each public page renders its own <main> as the first child here. */}
-        <div id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
+        {/* The one <main> landmark for every public page, and the skip link's
+            target. tabIndex={-1} lets Safari move focus here on the skip link;
+            page components render plain containers, never their own <main>. */}
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
           {children}
-        </div>
+        </main>
         <Footer />
       </div>
 

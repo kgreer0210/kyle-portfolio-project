@@ -18,7 +18,7 @@ interface ContactClientProps {
 export default function ContactClient({ initialSubject }: ContactClientProps) {
   const { mount } = useReveal();
   return (
-    <main className="pt-24 pb-20 lg:pt-32">
+    <div className="pt-24 pb-20 lg:pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <div className="text-center mb-6 md:mb-12">
@@ -171,6 +171,6 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
 
         </div>
       </div>
-    </main>
+    </div>
   );
 }

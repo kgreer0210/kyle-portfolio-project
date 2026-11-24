@@ -14,7 +14,7 @@ export default function ServicesClient() {
   const { section } = useReveal();
   const linkPress = useHoverMotion({ scale: 1.03, y: -2 }, { scale: 0.98 });
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <div className="text-center mb-16">
@@ -127,6 +127,6 @@ export default function ServicesClient() {
           </p>
         </motion.div>
       </div>
-    </main>
+    </div>
   );
 }
