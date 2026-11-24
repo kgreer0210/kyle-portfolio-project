@@ -22,7 +22,12 @@ vi.mock("@/components", () => ({
   BackToTop: () => <button type="button">Back to top</button>,
 }));
 
+import { useReducedMotionConfig } from "motion/react";
 import AppShell from "../AppShell";
+
+function MotionProbe() {
+  return <p>{useReducedMotionConfig() ? "reduced" : "full"} motion</p>;
+}
 
 const FOCUSABLE = "a[href], button, input, select, textarea, [tabindex]";
 const LANDMARKS = "header, nav, main, footer, aside, section[aria-label], [role]";
@@ -57,5 +62,25 @@ describe("AppShell", () => {
     for (const name of ["Chat", "Back to top"]) {
       expect(screen.getByRole("button", { name }).closest(LANDMARKS)).not.toBeNull();
     }
+  });
+
+  it("makes public motion follow the visitor's reduced-motion setting", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: query.startsWith("(prefers-reduced-motion"),
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+      addListener() {},
+      removeListener() {},
+    }));
+    render(
+      <AppShell>
+        <main>
+          <MotionProbe />
+        </main>
+      </AppShell>,
+    );
+    expect(screen.getByText("reduced motion")).toBeInTheDocument();
+    vi.unstubAllGlobals();
   });
 });

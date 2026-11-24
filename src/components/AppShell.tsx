@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { MotionConfig } from "motion/react";
 import Particles, { homepageParticleProps } from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 import ChatWidget from "@/components/ChatWidget";
@@ -38,8 +39,9 @@ export default function AppShell({
     return <div className="relative z-10 min-h-screen">{children}</div>;
   }
 
+  // Public motion follows the visitor's reduced-motion setting.
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <a
         href={`#${MAIN_CONTENT_ID}`}
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-blue-ncs-strong focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
@@ -48,7 +50,7 @@ export default function AppShell({
       </a>
 
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
         aria-hidden="true"
       >
         <div className="absolute inset-0 bg-[linear-gradient(148deg,var(--color-penn-blue)_14%,#03203a_54%,var(--color-rich-black)_86%)]" />
@@ -73,6 +75,6 @@ export default function AppShell({
         <BackToTop />
         <ChatWidget turnstileSiteKey={turnstileSiteKey} />
       </aside>
-    </>
+    </MotionConfig>
   );
 }
