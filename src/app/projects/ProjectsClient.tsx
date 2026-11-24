@@ -61,6 +61,8 @@ export default function ProjectsClient() {
                 src={project.image}
                 alt={project.title}
                 fill
+                // Two columns from md; max-w-6xl minus padding and the gap caps a card at 532px.
+                sizes="(min-width: 1152px) 532px, (min-width: 768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />

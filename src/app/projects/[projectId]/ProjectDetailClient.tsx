@@ -3,13 +3,14 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { projects } from "../../../data/projects";
 import { BackendShowcase, Breadcrumb } from "../../../components";
 
+const MotionLink = motion.create(Link);
+
 export default function ProjectDetailClient() {
   const params = useParams();
-  const router = useRouter();
   const projectId = params.projectId as string;
   const project = projects.find((p) => p.id === projectId);
 
@@ -17,12 +18,12 @@ export default function ProjectDetailClient() {
     return (
       <div className="pt-32 pb-20 text-center">
         <h1 className="text-2xl text-text-primary">Project not found</h1>
-        <button 
-          onClick={() => router.push("/projects")}
-          className="mt-4 text-blue-ncs hover:underline"
+        <Link
+          href="/projects"
+          className="mt-4 inline-block text-blue-ncs hover:underline"
         >
           Back to all projects
-        </button>
+        </Link>
       </div>
     );
   }
@@ -62,6 +63,8 @@ export default function ProjectDetailClient() {
             src={project.image}
             alt={project.title}
             fill
+            // Full content width; max-w-6xl minus padding caps it at 1104px.
+            sizes="(min-width: 1152px) 1104px, 100vw"
             className="object-cover"
             priority
           />
@@ -123,14 +126,14 @@ export default function ProjectDetailClient() {
                   </div>
                 )}
               </div>
-              <motion.button
-                onClick={() => router.push("/contact")}
-                className="w-full mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
+              <MotionLink
+                href="/contact"
+                className="flex w-full items-center justify-center mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Inquire About Similar Project
-              </motion.button>
+                Send me a message
+              </MotionLink>
             </div>
           </div>
         </div>
