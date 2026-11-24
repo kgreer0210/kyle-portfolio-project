@@ -6,6 +6,11 @@ import { CONSULT_CALL_URL, PHONE_DISPLAY, PHONE_HREF } from "../data/contact";
 import { IDX_SUBJECT } from "../data/idx";
 import { services } from "../data/services";
 import {
+  trackBookCallClick,
+  trackLead,
+  trackPhoneClick,
+} from "../lib/analytics";
+import {
   GENERAL_INQUIRY_SUBJECT,
   resolveContactSubject,
 } from "../lib/idxContact";
@@ -120,6 +125,9 @@ export default function Contact({ initialSubject }: ContactProps) {
         throw new Error(data.error || "Failed to send message");
       }
 
+      // A Lead counts only once the Message has actually sent.
+      trackLead({ subject: formData.subject, ctaLocation: "contact_page" });
+
       setSubmitStatus({
         type: "success",
         message:
@@ -184,13 +192,15 @@ export default function Contact({ initialSubject }: ContactProps) {
             href={CONSULT_CALL_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackBookCallClick("contact_page")}
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
-            book a quick call
+            book a 30-min call
           </a>
           , call me at{" "}
           <a
             href={PHONE_HREF}
+            onClick={() => trackPhoneClick("contact_page")}
             className="text-blue-ncs hover:text-lapis-lazuli underline underline-offset-4"
           >
             {PHONE_DISPLAY}
@@ -380,7 +390,7 @@ export default function Contact({ initialSubject }: ContactProps) {
               whileTap={!isSubmitting ? { scale: 0.95 } : {}}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              {isSubmitting ? "Sending..." : "Send Message"}
+              {isSubmitting ? "Sending..." : "Send me a message"}
             </motion.button>
           </motion.div>
 
@@ -411,9 +421,10 @@ export default function Contact({ initialSubject }: ContactProps) {
                 href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackBookCallClick("contact_page")}
                 className="inline-block btn-primary px-6 py-3 rounded-lg font-medium hover:bg-lapis-lazuli transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                Book a 30-minute call
+                Book a 30-min call
               </a>
             </motion.div>
           )}
