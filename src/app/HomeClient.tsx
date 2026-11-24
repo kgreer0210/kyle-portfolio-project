@@ -5,9 +5,59 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Hero, HowItWorks, Testimonials } from "../components";
+import { CONSULT_CALL_URL } from "../data/contact";
 import { IDX_PATH, idxOffering } from "../data/idx";
 import { getFeaturedProjects } from "../data/projects";
 import { services } from "../data/services";
+import { trackBookCallClick, type CtaLocation } from "../lib/analytics";
+
+const MotionLink = motion.create(Link);
+
+const linkPress = {
+  whileHover: { scale: 1.05 },
+  whileTap: { scale: 0.95 },
+} as const;
+
+const outlineLinkClass =
+  "inline-flex items-center justify-center px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
+
+const primaryLinkClass =
+  "inline-flex items-center justify-center px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
+/** Primary CTA: opens the Consult call on Calendly and tracks the click. */
+function BookCallLink({
+  ctaLocation,
+  className,
+}: {
+  ctaLocation: CtaLocation;
+  className: string;
+}) {
+  return (
+    <MotionLink
+      href={CONSULT_CALL_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackBookCallClick(ctaLocation)}
+      className={className}
+      {...linkPress}
+    >
+      Book a 30-min call
+      <span className="sr-only"> (opens in a new tab)</span>
+    </MotionLink>
+  );
+}
+
+/** Secondary CTA: a text link to the contact form. */
+function SendMessageLink({ className = "" }: { className?: string }) {
+  return (
+    <Link
+      href="/contact"
+      className={`font-bold text-blue-ncs underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm ${className}`}
+    >
+      Send me a message
+    </Link>
+  );
+}
 
 export default function HomeClient() {
   // Handle page refresh - always start at top and clear hash
@@ -32,11 +82,7 @@ export default function HomeClient() {
   const featuredProjects = getFeaturedProjects();
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
+    <div>
       {/* Hero Section */}
       <div className="relative z-10">
         <Hero />
@@ -58,8 +104,8 @@ export default function HomeClient() {
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
               I build websites, web & mobile apps, and automations that win
-              you more leads and take work off your plate. And I don&apos;t
-              settle for &quot;good enough.&quot; I sweat the details nobody
+              you more leads and take work off your plate. And I don’t
+              settle for “good enough.” I sweat the details nobody
               else would notice, because the work should be right.
             </p>
             <p className="text-lg text-text-secondary max-w-3xl mx-auto leading-relaxed mt-4">
@@ -87,15 +133,13 @@ export default function HomeClient() {
                 bottlenecks.
               </p>
             </div>
-            <Link href="/services">
-              <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                View All Services
-              </motion.button>
-            </Link>
+            <MotionLink
+              href="/services"
+              className={outlineLinkClass}
+              {...linkPress}
+            >
+              View All Services
+            </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, index) => (
@@ -110,11 +154,12 @@ export default function HomeClient() {
                 <h3 className="text-xl font-bold text-blue-ncs mb-3">
                   {service.title}
                 </h3>
-                <p className="text-text-secondary mb-4 line-clamp-2">
+                <p className="text-text-secondary mb-4">
                   {service.description}
                 </p>
+                {/* Bullet 1 restates the description, so show bullets 2–3. */}
                 <ul className="space-y-2 mb-6">
-                  {service.points.slice(0, 2).map((point, idx) => (
+                  {service.points.slice(1, 3).map((point, idx) => (
                     <li
                       key={idx}
                       className="text-sm text-text-primary flex gap-2"
@@ -151,15 +196,13 @@ export default function HomeClient() {
                 gives you a clear picture of where you stand — and exactly what
                 to do next.
               </p>
-              <Link href="/contact">
-                <motion.button
-                  className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Schedule Your Tech Audit
-                </motion.button>
-              </Link>
+              <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-6">
+                <BookCallLink
+                  ctaLocation="home_tech_review"
+                  className={primaryLinkClass}
+                />
+                <SendMessageLink />
+              </div>
             </motion.div>
 
             <motion.div
@@ -170,7 +213,7 @@ export default function HomeClient() {
               viewport={{ once: true }}
             >
               <h3 className="text-xl font-bold text-blue-ncs mb-6">
-                What&apos;s Included
+                What’s Included
               </h3>
               <ul className="space-y-4">
                 {[
@@ -223,15 +266,13 @@ export default function HomeClient() {
               <p className="text-lg text-text-secondary mb-8 leading-relaxed">
                 {idxOffering.body}
               </p>
-              <Link href={IDX_PATH}>
-                <motion.button
-                  className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  See the IDX offering
-                </motion.button>
-              </Link>
+              <MotionLink
+                href={IDX_PATH}
+                className={primaryLinkClass}
+                {...linkPress}
+              >
+                See the IDX offering
+              </MotionLink>
             </motion.div>
 
             <motion.div
@@ -293,12 +334,12 @@ export default function HomeClient() {
               Her weekends back
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-3xl">
-              Lexi runs Lexi&apos;s Fresh Slate Cleanings. She was spending
+              Lexi runs Lexi’s Fresh Slate Cleanings. She was spending
               hours every weekend copying and pasting reminder texts to her
               customers. I built a system tied to her calendar that sends them
               all with one button. The carrier registration paperwork for
               texting was the least fun part of the build, but I pushed
-              through. She&apos;s told me it gave her weekends back. That&apos;s
+              through. She’s told me it gave her weekends back. That’s
               the kind of work I love.
             </p>
             <Link
@@ -323,19 +364,17 @@ export default function HomeClient() {
                 Featured Work
               </h2>
               <p className="text-lg text-text-secondary">
-                Real projects for real people, from a Realtor&apos;s home
+                Real projects for real people, from a Realtor’s home
                 search to a cleaning business owner who got her weekends back.
               </p>
             </div>
-            <Link href="/projects">
-              <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                View All Projects
-              </motion.button>
-            </Link>
+            <MotionLink
+              href="/projects"
+              className={outlineLinkClass}
+              {...linkPress}
+            >
+              View All Projects
+            </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {featuredProjects.map((project, index) => (
@@ -352,6 +391,7 @@ export default function HomeClient() {
                     src={project.image}
                     alt={project.title}
                     fill
+                    sizes="(min-width: 1200px) 532px, (min-width: 768px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />
@@ -410,34 +450,30 @@ export default function HomeClient() {
               <span className="text-blue-ncs">business?</span>
             </h2>
             <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
-              Let&apos;s build the thing you&apos;ve been picturing, and give
+              Let’s build the thing you’ve been picturing, and give
               you your time back. Hard problems welcome.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-              <Link href="/contact">
-                <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors shadow-xl shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Schedule Your Free Consult
-                </motion.button>
-              </Link>
-              <Link href="/about">
-                <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-transparent border border-penn-blue text-text-primary font-bold rounded-full text-lg hover:border-blue-ncs transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Meet Kyle
-                </motion.button>
-              </Link>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 relative z-10">
+              <BookCallLink
+                ctaLocation="home_final"
+                className="inline-flex w-full items-center justify-center rounded-full bg-blue-ncs-strong px-10 py-4 text-lg font-bold text-white shadow-xl shadow-blue-ncs/20 transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
+              />
+              <MotionLink
+                href="/about"
+                className="inline-flex w-full items-center justify-center rounded-full border border-penn-blue bg-transparent px-10 py-4 text-lg font-bold text-text-primary transition-colors hover:border-blue-ncs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs sm:w-auto"
+                {...linkPress}
+              >
+                About me
+              </MotionLink>
             </div>
+            <p className="relative z-10 mt-8 text-lg text-text-secondary">
+              Prefer to write? <SendMessageLink />
+            </p>
           </motion.div>
         </section>
         </div>
       </main>
-    </motion.div>
+    </div>
   );
 }
 
