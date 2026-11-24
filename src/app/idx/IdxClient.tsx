@@ -13,7 +13,6 @@ import {
   IDX_PAGE_H1,
   LISA_LIVE_URL,
   LISA_PROJECT_PATH,
-  WEBSITE_DESIGN_LINK_TOKEN,
   idxBothMls,
   idxBuildExtrasIntro,
   idxBuildIntro,
@@ -35,9 +34,16 @@ import {
   PHONE_DISPLAY,
   PHONE_HREF,
 } from "../../data/contact";
+import { WEBSITE_DESIGN_MG_PATH } from "../../data/websiteDesignMiddleGeorgia";
 import {
-  WEBSITE_DESIGN_MG_PATH,
-} from "../../data/websiteDesignMiddleGeorgia";
+  trackBookCallClick,
+  trackEmailClick,
+  trackPhoneClick,
+} from "@/lib/analytics";
+
+const trackCall = () => trackBookCallClick("idx");
+const trackPhone = () => trackPhoneClick("idx");
+const trackEmail = () => trackEmailClick("idx");
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
@@ -56,10 +62,12 @@ const reveal = {
 function ExternalLink({
   href,
   className = textLink,
+  onClick,
   children,
 }: {
   href: string;
   className?: string;
+  onClick?: () => void;
   children: ReactNode;
 }) {
   return (
@@ -68,6 +76,7 @@ function ExternalLink({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      onClick={onClick}
     >
       {children}
       <span className="sr-only"> (opens in a new tab)</span>
@@ -125,17 +134,24 @@ const cardClass =
   "rounded-2xl border border-penn-blue bg-oxford-blue/40 p-6 md:p-8";
 const bodyText = "max-w-3xl text-lg leading-relaxed text-text-primary";
 
-/** Renders an FAQ answer, turning the Middle Georgia path into a link. */
-function FaqAnswer({ answer }: { answer: string }) {
-  const [before, after] = answer.split(WEBSITE_DESIGN_LINK_TOKEN);
-  if (after === undefined) return <>{answer}</>;
+/** Renders an FAQ answer, turning its `link` text (if any) into a link. */
+function FaqAnswer({
+  answer,
+  link,
+}: {
+  answer: string;
+  link?: { text: string; href: string };
+}) {
+  if (!link) return <>{answer}</>;
+  const at = answer.indexOf(link.text);
+  if (at === -1) return <>{answer}</>;
   return (
     <>
-      {before}
-      <Link href={WEBSITE_DESIGN_MG_PATH} className={textLink}>
-        {WEBSITE_DESIGN_LINK_TOKEN}
+      {answer.slice(0, at)}
+      <Link href={link.href} className={textLink}>
+        {link.text}
       </Link>
-      {after}
+      {answer.slice(at + link.text.length)}
     </>
   );
 }
@@ -163,19 +179,23 @@ export default function IdxClient() {
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href={IDX_CONTACT_HREF} className={primaryButton}>
-              {idxOffering.cta}
+              Send me a message
             </Link>
-            <ExternalLink href={CONSULT_CALL_URL} className={secondaryButton}>
+            <ExternalLink
+              href={CONSULT_CALL_URL}
+              className={secondaryButton}
+              onClick={trackCall}
+            >
               Book a 30-min call
             </ExternalLink>
           </div>
           <p className="mt-4 text-base text-text-secondary">
             Or call{" "}
-            <a href={PHONE_HREF} className={textLink}>
+            <a href={PHONE_HREF} className={textLink} onClick={trackPhone}>
               {PHONE_DISPLAY}
             </a>{" "}
             or email{" "}
-            <a href={EMAIL_HREF} className={textLink}>
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
               {BUSINESS_EMAIL}
             </a>
             .
@@ -400,7 +420,10 @@ export default function IdxClient() {
                   </svg>
                 </summary>
                 <p className="px-5 pb-5 leading-relaxed text-text-secondary md:px-6">
-                  <FaqAnswer answer={faq.answer} />
+                  <FaqAnswer
+                    answer={faq.answer}
+                    link={"link" in faq ? faq.link : undefined}
+                  />
                 </p>
               </details>
             ))}
@@ -426,18 +449,26 @@ export default function IdxClient() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href={IDX_CONTACT_HREF} className={primaryButton}>
-              {idxOffering.cta}
+              Send me a message
             </Link>
-            <ExternalLink href={CONSULT_CALL_URL} className={secondaryButton}>
+            <ExternalLink
+              href={CONSULT_CALL_URL}
+              className={secondaryButton}
+              onClick={trackCall}
+            >
               Book a 30-min call
             </ExternalLink>
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={EMAIL_HREF} className={textLink}>
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
               {BUSINESS_EMAIL}
             </a>
             . Related pages:{" "}
