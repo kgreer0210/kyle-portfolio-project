@@ -2,6 +2,7 @@
 
 import { motion, useScroll } from "motion/react";
 import { useEffect, useState } from "react";
+import { FLOATING_ABOVE_CHAT } from "./floatingControls";
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -34,10 +35,10 @@ export default function BackToTop() {
   return (
     <motion.button
       onClick={scrollToTop}
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl min-w-[44px] min-h-[44px] flex items-center justify-center"
-      initial={{ opacity: 0, scale: 0, y: 100 }}
+      className={`${FLOATING_ABOVE_CHAT} z-40 h-12 w-12 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center`}
+      initial={{ opacity: 0, scale: 0.95, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0, y: 100 }}
+      exit={{ opacity: 0, scale: 0.95, y: 8 }}
       whileHover={{
         scale: 1.1,
         y: -2,
@@ -51,7 +52,8 @@ export default function BackToTop() {
       aria-label="Back to top"
     >
       <svg
-        className="w-5 h-5 sm:w-6 sm:h-6"
+        aria-hidden="true"
+        className="w-6 h-6"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

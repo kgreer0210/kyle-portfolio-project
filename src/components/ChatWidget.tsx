@@ -12,6 +12,7 @@ import {
 } from "@/lib/chatContact";
 import { CONSULT_CALL_URL } from "@/data/contact";
 import { trackBookCallClick, trackPhoneClick } from "@/lib/analytics";
+import { FLOATING_CORNER } from "./floatingControls";
 import { useTurnstile } from "./useTurnstile";
 
 const STORAGE_KEY = "kygr_chat_state_v1";
@@ -552,10 +553,10 @@ export default function ChatWidget({
           <motion.button
             key="chat-trigger"
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-28 md:right-8 z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]"
-            initial={{ opacity: 0, scale: 0, y: 20 }}
+            className={`${FLOATING_CORNER} z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]`}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0, y: 20 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
             whileHover={{
               scale: 1.05,
               transition: { type: "spring", stiffness: 400, damping: 17 },
@@ -586,7 +587,7 @@ export default function ChatWidget({
         {isOpen && (
           <motion.div
             key="chat-panel"
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            className={`${FLOATING_CORNER} z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] supports-[height:100dvh]:max-h-[calc(100dvh-2rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden`}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
