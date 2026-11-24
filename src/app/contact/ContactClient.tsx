@@ -2,6 +2,12 @@
 
 import { motion } from "motion/react";
 import { Breadcrumb, Contact } from "../../components";
+import {
+  BUSINESS_EMAIL,
+  EMAIL_HREF,
+  PHONE_DISPLAY,
+  PHONE_HREF,
+} from "../../data/contact";
 
 interface ContactClientProps {
   initialSubject?: string;
@@ -57,10 +63,10 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   <div>
                     <h3 className="font-semibold text-text-headings">Email</h3>
                     <a
-                      href="mailto:info@kygrsolutions.com"
+                      href={EMAIL_HREF}
                       className="text-text-secondary"
                     >
-                      info@kygrsolutions.com
+                      {BUSINESS_EMAIL}
                     </a>
                   </div>
                 </div>
@@ -83,8 +89,8 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-headings">Phone</h3>
-                    <a href="tel:+14787771266" className="text-text-secondary">
-                      (478) 777-1266
+                    <a href={PHONE_HREF} className="text-text-secondary">
+                      {PHONE_DISPLAY}
                     </a>
                   </div>
                 </div>

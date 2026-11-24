@@ -6,10 +6,13 @@ import type { ReactNode } from "react";
 import { Breadcrumb } from "../../components";
 import { IDX_PATH } from "../../data/idx";
 import {
-  CONSULT_URL,
-  EMAIL,
+  BUSINESS_EMAIL,
+  CONSULT_CALL_URL,
+  EMAIL_HREF,
   PHONE_DISPLAY,
   PHONE_HREF,
+} from "../../data/contact";
+import {
   websiteDesignMgFaqs,
   websiteDesignMgH1,
   websiteDesignMgIntro,
@@ -36,7 +39,7 @@ const reveal = {
 function ConsultButton({ className }: { className: string }) {
   return (
     <a
-      href={CONSULT_URL}
+      href={CONSULT_CALL_URL}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
@@ -429,8 +432,8 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink}>
+              {BUSINESS_EMAIL}
             </a>
             . Want the longer story first? Read{" "}
             <Link href="/about" className={textLink}>

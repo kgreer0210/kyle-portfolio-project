@@ -56,7 +56,7 @@ interface UpsertConversationInput {
   conversationId: string;
   visitorName?: string | null;
   visitorEmail?: string | null;
-  /** E.164, e.g. +14787771266. */
+  /** E.164, e.g. +14045550199. */
   visitorPhone?: string | null;
   turnstileState?: TurnstileState | null;
 }

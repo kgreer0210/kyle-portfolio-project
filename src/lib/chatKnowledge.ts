@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CONSULT_CALL_URL } from "@/data/contact";
 import { buildProjectKnowledge } from "@/lib/chatProjectKnowledge";
 import type { Project } from "@/types";
 
@@ -122,7 +123,7 @@ export function buildSystemPrompt(context: ChatPromptContext): string {
     "",
     "----",
     "# Calendly Link",
-    "When the visitor is ready to book a call, share this exact link: https://calendly.com/kylegreer-kygrsolutions/30min",
+    `When the visitor is ready to book a call, share this exact link: ${CONSULT_CALL_URL}`,
     "",
     "----",
     visitorBlock,

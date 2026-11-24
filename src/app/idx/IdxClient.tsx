@@ -29,10 +29,13 @@ import {
   idxWork,
 } from "../../data/idxPage";
 import {
-  CONSULT_URL,
-  EMAIL,
+  BUSINESS_EMAIL,
+  CONSULT_CALL_URL,
+  EMAIL_HREF,
   PHONE_DISPLAY,
   PHONE_HREF,
+} from "../../data/contact";
+import {
   WEBSITE_DESIGN_MG_PATH,
 } from "../../data/websiteDesignMiddleGeorgia";
 
@@ -162,7 +165,7 @@ export default function IdxClient() {
             <Link href={IDX_CONTACT_HREF} className={primaryButton}>
               {idxOffering.cta}
             </Link>
-            <ExternalLink href={CONSULT_URL} className={secondaryButton}>
+            <ExternalLink href={CONSULT_CALL_URL} className={secondaryButton}>
               Book a 30-min call
             </ExternalLink>
           </div>
@@ -172,8 +175,8 @@ export default function IdxClient() {
               {PHONE_DISPLAY}
             </a>{" "}
             or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink}>
+              {BUSINESS_EMAIL}
             </a>
             .
           </p>
@@ -425,7 +428,7 @@ export default function IdxClient() {
             <Link href={IDX_CONTACT_HREF} className={primaryButton}>
               {idxOffering.cta}
             </Link>
-            <ExternalLink href={CONSULT_URL} className={secondaryButton}>
+            <ExternalLink href={CONSULT_CALL_URL} className={secondaryButton}>
               Book a 30-min call
             </ExternalLink>
             <a href={PHONE_HREF} className={secondaryButton}>
@@ -434,8 +437,8 @@ export default function IdxClient() {
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink}>
+              {BUSINESS_EMAIL}
             </a>
             . Related pages:{" "}
             <Link href={WEBSITE_DESIGN_MG_PATH} className={textLink}>

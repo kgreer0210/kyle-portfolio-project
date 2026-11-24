@@ -1,12 +1,6 @@
 export const WEBSITE_DESIGN_MG_PATH = "/website-design-middle-georgia";
 export const WEBSITE_DESIGN_MG_LABEL = "Website Design in Middle Georgia";
 
-export const CONSULT_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
-export const PHONE_DISPLAY = "(478) 777-1266";
-export const PHONE_HREF = "tel:+14787771266";
-export const PHONE_SCHEMA = "+1-478-777-1266";
-export const EMAIL = "info@kygrsolutions.com";
-
 export const websiteDesignMgTitle = "Web Designer in Warner Robins & Macon, GA";
 export const websiteDesignMgDescription =
   "Custom websites for Warner Robins, Macon, Perry, and Byron businesses. I'm a one-person shop, and I don't stop until the site works the way you expect.";
