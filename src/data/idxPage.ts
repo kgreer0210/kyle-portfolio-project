@@ -1,4 +1,5 @@
 import { IDX_PATH, idxOffering } from "./idx";
+import { WEBSITE_DESIGN_MG_PATH } from "./websiteDesignMiddleGeorgia";
 
 /**
  * Copy and metadata that only the expanded /idx page uses. The short shared
@@ -110,7 +111,7 @@ export const idxWork = {
   },
   lisa: {
     title: "Lisa Dunn Real Estate",
-    body: "A bilingual English and Spanish website for Central Georgia realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with map-based IDX search over Central Georgia MLS only, a page that highlights her own listings, and contact and lead forms. Central Georgia MLS approved the site for IDX, I followed her brokerage's licensing and disclaimer rules, and the site launched on her own domain on November 4, 2026.",
+    body: "A bilingual English and Spanish website for Central Georgia realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with map-based IDX search over Central Georgia MLS only, a page that highlights her own listings, and contact and lead forms. The site is set up for IDX listings under CGMLS rules, I followed her brokerage's licensing and disclaimer rules, and the site launched on her own domain on November 4, 2026.",
   },
   more: "More work lives on the",
 } as const;
@@ -144,7 +145,7 @@ export const idxSteps = [
  * Single source for the visible accordion and the FAQPage JSON-LD. The first
  * three are the answer-ready questions; the rest support them.
  */
-export const WEBSITE_DESIGN_LINK_TOKEN = "/website-design-middle-georgia";
+const WEBSITE_DESIGN_LINK_TEXT = "my website design page for Middle Georgia";
 
 export const idxFaqs = [
   {
@@ -184,7 +185,9 @@ export const idxFaqs = [
   },
   {
     question: "Can you also design the rest of the website, not just the search?",
-    answer: `Yes. For some agents I build the whole site, including the IDX search. For a Middle Georgia realtor I built dual-MLS search on his own domain; for a Central Georgia realtor I rebuilt her site in English and Spanish with Central Georgia MLS search. If you also need a marketing site, see ${WEBSITE_DESIGN_LINK_TOKEN}.`,
+    answer: `Yes. For some agents I build the whole site, including the IDX search. For a Middle Georgia realtor I built dual-MLS search on his own domain; for a Central Georgia realtor I rebuilt her site in English and Spanish with Central Georgia MLS search. If you also need a marketing site, see ${WEBSITE_DESIGN_LINK_TEXT}.`,
+    /** The part of the answer the page renders as a link. */
+    link: { text: WEBSITE_DESIGN_LINK_TEXT, href: WEBSITE_DESIGN_MG_PATH },
   },
 ] as const;
 

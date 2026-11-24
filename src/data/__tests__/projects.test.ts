@@ -76,3 +76,60 @@ describe("coming-soon projects", () => {
     );
   });
 });
+
+/** Every visible string in a project, including its showcase screenshots. */
+function projectCopy(project: Project): string {
+  const showcase = project.backendShowcase;
+  return [
+    project.title,
+    project.description,
+    project.role,
+    project.challenge,
+    project.outcome,
+    project.idxLink?.text,
+    project.idxLink?.linkLabel,
+    showcase?.title,
+    showcase?.subtitle,
+    showcase?.description,
+    ...(showcase?.screenshots.flatMap((shot) => [
+      shot.title,
+      shot.description,
+      ...shot.features,
+    ]) ?? []),
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+describe("project copy", () => {
+  it.each(projects.map((project) => [project.id, project] as const))(
+    "%s makes no sold-data claims",
+    (_id, project) => {
+      expect(projectCopy(project)).not.toMatch(/\bsold\b|recent sales/i);
+    },
+  );
+
+  it.each(projects.map((project) => [project.id, project] as const))(
+    "%s implies no MLS endorsement",
+    (_id, project) => {
+      expect(projectCopy(project)).not.toMatch(/MLS approved|approved the site/i);
+    },
+  );
+
+  it.each(projects.map((project) => [project.id, project] as const))(
+    "%s never says real-time",
+    (_id, project) => {
+      expect(projectCopy(project)).not.toMatch(/real-?time/i);
+    },
+  );
+
+  it("describes Dexter's site with plain listings wording", () => {
+    const dexter = projects.find((p) => p.id === "dexter-gordy-realtor");
+    expect(dexter?.description).toMatch(/featured listings/);
+  });
+
+  it("describes Lisa's IDX setup neutrally under CGMLS rules", () => {
+    const lisa = projects.find((p) => p.id === "lisa-dunn-real-estate");
+    expect(lisa?.outcome).toMatch(/set up for IDX listings under CGMLS rules/);
+  });
+});

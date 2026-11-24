@@ -18,6 +18,14 @@ import {
   websiteDesignMgIntro,
   websiteDesignMgSteps,
 } from "../../data/websiteDesignMiddleGeorgia";
+import {
+  trackBookCallClick,
+  trackEmailClick,
+  trackPhoneClick,
+} from "@/lib/analytics";
+
+const trackPhone = () => trackPhoneClick("local_landing");
+const trackEmail = () => trackEmailClick("local_landing");
 
 const LEXI_PATH = "/projects/lexisFreshSlateCleanings";
 const DEXTER_PATH = "/projects/dexter-gordy-realtor";
@@ -43,6 +51,7 @@ function ConsultButton({ className }: { className: string }) {
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      onClick={() => trackBookCallClick("local_landing")}
     >
       Book a 30-min call
       <span className="sr-only"> (opens in a new tab)</span>
@@ -97,14 +106,18 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           ))}
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <ConsultButton className={primaryButton} />
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
           </div>
           <p className="mt-4 text-base text-text-secondary">
             Prefer to write?{" "}
             <Link href="/contact" className={textLink}>
-              Use the contact form
+              Send me a message
             </Link>
             .
           </p>
@@ -265,8 +278,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
               <p className="mb-4 leading-relaxed text-text-primary">
                 A custom website for a Middle Georgia realtor, with IDX home
                 search across Central Georgia MLS and Georgia MLS, his featured
-                and recently sold listings, and easy ways for buyers to reach
-                him.
+                listings, and easy ways for buyers to reach him.
               </p>
               <p className="leading-relaxed text-text-secondary">
                 I&apos;m an approved IDX vendor with access to both MLSs. If
@@ -423,16 +435,20 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <ConsultButton className={primaryButton} />
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
             <Link href="/contact" className={secondaryButton}>
-              Contact me
+              Send me a message
             </Link>
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={EMAIL_HREF} className={textLink}>
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
               {BUSINESS_EMAIL}
             </a>
             . Want the longer story first? Read{" "}
