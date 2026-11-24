@@ -21,10 +21,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
     <main className="pt-24 pb-20 lg:pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="text-center mb-6 md:mb-12"
-          {...mount}
-        >
+        <div className="text-center mb-6 md:mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-3 md:mb-4">
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
           </h1>
@@ -32,7 +29,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
             Tell me about the idea you&apos;ve been carrying around. The first
             call is free, and we&apos;ll figure out what it would take.
           </p>
-        </motion.div>
+        </div>
 
         {/* The form comes first so phones reach it without scrolling past the
             contact details; on desktop it sits in the right-hand columns. */}

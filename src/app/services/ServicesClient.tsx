@@ -11,16 +11,13 @@ import { useHoverMotion, useReveal } from "../../lib/motionPresets";
 const MotionLink = motion.create(Link);
 
 export default function ServicesClient() {
-  const { section, mount } = useReveal();
+  const { section } = useReveal();
   const linkPress = useHoverMotion({ scale: 1.03, y: -2 }, { scale: 0.98 });
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="text-center mb-16"
-          {...mount}
-        >
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6">
             Strategic <span className="text-blue-ncs">Services</span>
           </h1>
@@ -29,7 +26,7 @@ export default function ServicesClient() {
             an automation that takes the busywork off your plate. Whatever
             you&apos;ve been picturing, here&apos;s how I can help.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 gap-12 mb-20">
           {services.map((service, index) => (

@@ -14,7 +14,7 @@ export default function ProjectDetailClient() {
   const params = useParams();
   const projectId = params.projectId as string;
   const project = projects.find((p) => p.id === projectId);
-  const { section, mount } = useReveal();
+  const { section } = useReveal();
   const linkPress = useHoverMotion({ scale: 1.02 }, { scale: 0.98 });
 
   if (!project) {
@@ -35,10 +35,7 @@ export default function ProjectDetailClient() {
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="mb-12"
-          {...mount}
-        >
+        <div className="mb-12">
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech, idx) => (
               <span key={idx} className="px-3 py-1 bg-blue-ncs/10 text-blue-ncs text-xs font-bold rounded-full">
@@ -52,7 +49,7 @@ export default function ProjectDetailClient() {
           <p className="text-xl text-text-secondary max-w-3xl leading-relaxed">
             {project.description}
           </p>
-        </motion.div>
+        </div>
 
         <div
           className="aspect-video relative rounded-3xl overflow-hidden border border-penn-blue shadow-2xl mb-16"

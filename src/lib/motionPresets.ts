@@ -4,7 +4,8 @@
  * Shared motion for the public site. Every section reveals once, quickly:
  * at most 300ms, 8-12px of travel and a strong ease-out. Hover scale only
  * runs on devices that can hover, and reduced-motion visitors get neither.
- * The hero H1 and the header never use these: they render visible.
+ * Page H1s and the header never use these: they render visible in the
+ * server HTML so they can paint before hydration.
  */
 
 import { useSyncExternalStore } from "react";
@@ -27,8 +28,8 @@ function transitionFor(reduced: boolean) {
 
 /**
  * Props for the one reveal a section gets. Spread `section` on a motion
- * element that reveals on scroll, or `mount` on a page header that reveals
- * on load. Reduced motion keeps the markup but makes the change instant.
+ * element that reveals on scroll, or `mount` on content that reveals
+ * on load (never a page H1). Reduced motion keeps the markup but makes the change instant.
  */
 export function useReveal() {
   const transition = transitionFor(Boolean(useReducedMotion()));

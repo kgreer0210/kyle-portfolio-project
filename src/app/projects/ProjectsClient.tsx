@@ -41,7 +41,7 @@ function ComingSoonVisual({ title }: { title: string }) {
 }
 
 export default function ProjectsClient() {
-  const { section, mount } = useReveal();
+  const { section } = useReveal();
   // Each card reveals on its own as it scrolls in, with no stagger.
   const renderProjectCard = (project: Project) => {
     const comingSoon = isComingSoonProject(project);
@@ -118,17 +118,14 @@ export default function ProjectsClient() {
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="mb-16"
-          {...mount}
-        >
+        <div className="mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6 text-center">
             My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
             A look at what I&apos;ve built for local businesses, ministries, and my own household, from custom websites to the tools that keep a business running.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {projects.map((project) => renderProjectCard(project))}

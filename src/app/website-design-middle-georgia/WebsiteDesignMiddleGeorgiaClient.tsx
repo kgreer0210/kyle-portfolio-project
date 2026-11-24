@@ -77,16 +77,13 @@ function Section({
 }
 
 export default function WebsiteDesignMiddleGeorgiaClient() {
-  const { section: reveal, mount } = useReveal();
+  const { section: reveal } = useReveal();
   return (
     <main className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
-        <motion.div
-          className="mb-16 max-w-3xl"
-          {...mount}
-        >
+        <div className="mb-16 max-w-3xl">
           <h1 className="mb-6 text-4xl font-bold text-text-headings md:text-5xl">
             {websiteDesignMgH1}
           </h1>
@@ -115,7 +112,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
             </Link>
             .
           </p>
-        </motion.div>
+        </div>
 
         <Section id="what-i-build" heading="What I build for local businesses">
           <p className="mb-6 max-w-3xl text-lg leading-relaxed text-text-primary">

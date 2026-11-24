@@ -7,18 +7,16 @@ import CallAndMessageCtas from "../../components/CallAndMessageCtas";
 import { useReveal } from "../../lib/motionPresets";
 
 export default function AboutClient() {
-  const { section, mount } = useReveal();
+  const { section } = useReveal();
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          {...mount}
-        >
+        <div>
           <h1 className="text-4xl md:text-5xl font-bold text-text-headings mb-12">
             About <span className="text-blue-ncs">KYGR Solutions</span>
           </h1>
-        </motion.div>
+        </div>
 
         {/* Section 1: About Me */}
         <motion.section className="mb-20" {...section}>

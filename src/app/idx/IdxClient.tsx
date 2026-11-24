@@ -152,16 +152,13 @@ function FaqAnswer({
 }
 
 export default function IdxClient() {
-  const { section: reveal, mount } = useReveal();
+  const { section: reveal } = useReveal();
   return (
     <main className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
-        <motion.div
-          className="mb-16 max-w-3xl"
-          {...mount}
-        >
+        <div className="mb-16 max-w-3xl">
           <span className="mb-6 inline-block rounded-full border border-blue-ncs/30 bg-blue-ncs/10 px-3 py-1 text-xs font-bold text-blue-ncs">
             IDX for Real Estate
           </span>
@@ -194,7 +191,7 @@ export default function IdxClient() {
             </a>
             .
           </p>
-        </motion.div>
+        </div>
 
         <Section id="idx-what-i-build" heading="What I build">
           <p className={`${bodyText} mb-6`}>{idxBuildIntro}</p>
