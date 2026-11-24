@@ -13,7 +13,7 @@ import {
 } from "../contact";
 
 const SRC = join(__dirname, "..", "..");
-const CONSTANTS_FILE = "data/contact.ts";
+const CONSTANTS_FILE = join("data", "contact.ts");
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
