@@ -23,7 +23,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,padding,backdrop-filter] duration-300 ${
         isScrolled
           ? "border-b border-white/10 bg-rich-black/75! py-3 backdrop-blur-md md:py-4"
           : "bg-transparent! py-4 md:py-6"
@@ -67,7 +67,7 @@ export default function Header() {
           ))}
           <Link href="/login">
             <motion.span
-              className="inline-block whitespace-nowrap rounded-full border border-blue-ncs px-4 py-2 text-sm font-semibold text-blue-ncs transition-colors hover:bg-blue-ncs hover:text-white cursor-pointer xl:px-5"
+              className="inline-block whitespace-nowrap rounded-full border border-blue-ncs px-4 py-2 text-sm font-semibold text-blue-ncs transition-colors hover:bg-blue-ncs-strong hover:text-white cursor-pointer xl:px-5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -76,7 +76,7 @@ export default function Header() {
           </Link>
           <Link href="/contact">
             <motion.button
-              className="whitespace-nowrap rounded-full bg-blue-ncs px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-lapis-lazuli xl:px-5"
+              className="whitespace-nowrap rounded-full bg-blue-ncs-strong px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-lapis-lazuli xl:px-5"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -171,7 +171,7 @@ export default function Header() {
                 </Link>
                 <Link href="/contact" onClick={closeMobileMenu}>
                   <motion.button
-                    className="w-full py-4 rounded-xl bg-blue-ncs text-white font-bold text-lg"
+                    className="w-full py-4 rounded-xl bg-blue-ncs-strong text-white font-bold text-lg"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}

@@ -550,7 +550,7 @@ export default function ChatWidget({
           <motion.button
             key="chat-trigger"
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-28 md:right-8 z-40 bg-blue-ncs hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]"
+            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-28 md:right-8 z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]"
             initial={{ opacity: 0, scale: 0, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0, y: 20 }}
@@ -657,7 +657,7 @@ export default function ChatWidget({
                 href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
+                className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
               >
                 Book 30-min call
               </a>
@@ -723,7 +723,7 @@ export default function ChatWidget({
                       !initialMessage.trim() ||
                       streaming
                     }
-                    className="w-full bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-2 rounded-md transition-colors"
+                    className="w-full bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-2 rounded-md transition-colors"
                   >
                     {streaming ? "Starting…" : "Start the conversation"}
                   </button>
@@ -801,7 +801,7 @@ export default function ChatWidget({
                   <button
                     type="submit"
                     disabled={!isValidEmail(emailDraft)}
-                    className="text-xs font-semibold bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-md transition-colors"
+                    className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-md transition-colors"
                   >
                     Save
                   </button>
@@ -850,7 +850,7 @@ export default function ChatWidget({
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={handleConfirmEnd}
-                        className="bg-blue-ncs hover:bg-lapis-lazuli text-white text-sm font-semibold py-2 rounded-md transition-colors"
+                        className="bg-blue-ncs-strong hover:bg-lapis-lazuli text-white text-sm font-semibold py-2 rounded-md transition-colors"
                       >
                         End conversation
                       </button>
@@ -886,7 +886,7 @@ export default function ChatWidget({
                 <button
                   type="submit"
                   disabled={!draft.trim() || streaming}
-                  className="bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md transition-colors text-sm font-semibold"
+                  className="bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md transition-colors text-sm font-semibold"
                   aria-label="Send message"
                 >
                   Send
@@ -906,7 +906,7 @@ function VerificationFallback({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
+        className="font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
       >
         Try the security check again
       </button>
@@ -941,7 +941,7 @@ function ChatBubble({
       <div
         className={
           isUser
-            ? "max-w-[85%] bg-blue-ncs text-white text-sm rounded-2xl rounded-br-sm px-3 py-2 whitespace-pre-wrap"
+            ? "max-w-[85%] bg-blue-ncs-strong text-white text-sm rounded-2xl rounded-br-sm px-3 py-2 whitespace-pre-wrap"
             : "max-w-[85%] bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-2xl rounded-bl-sm px-3 py-2 whitespace-pre-wrap"
         }
       >
