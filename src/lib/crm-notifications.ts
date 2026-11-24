@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { BUSINESS_EMAIL } from "@/data/contact";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import {
   getAdminNotificationEmails,
@@ -94,7 +95,7 @@ async function sendEmail(args: {
 
   const { error } = await resend.emails.send(
     {
-      from: "KYGR CRM <info@kygrsolutions.com>",
+      from: `KYGR CRM <${BUSINESS_EMAIL}>`,
       to: args.to,
       subject: args.subject,
       html: args.html,
