@@ -170,7 +170,7 @@ export default function Header() {
               id={MOBILE_MENU_ID}
               ref={drawerRef}
               aria-label="Mobile"
-              className="fixed top-0 right-0 h-dvh w-72 max-w-[85vw] overflow-y-auto overscroll-contain bg-oxford-blue/95 backdrop-blur-xl border-l border-penn-blue z-50 md:hidden shadow-2xl pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]"
+              className="fixed top-0 right-0 h-screen supports-[height:100dvh]:h-dvh w-72 max-w-[85vw] overflow-y-auto overscroll-contain bg-oxford-blue/95 backdrop-blur-xl border-l border-penn-blue z-50 md:hidden shadow-2xl pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
