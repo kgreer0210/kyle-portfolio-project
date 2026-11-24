@@ -2,7 +2,6 @@ export { default as Header } from "./Header";
 export { default as BackToTop } from "./BackToTop";
 export { default as Hero } from "./Hero";
 export { default as HowItWorks } from "./HowItWorks";
-export { default as About } from "./About";
 export { default as BackendShowcase } from "./BackendShowcase";
 export { default as Testimonials } from "./Testimonials";
 export { default as Contact } from "./Contact";
