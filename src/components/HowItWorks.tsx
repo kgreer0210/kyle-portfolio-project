@@ -6,7 +6,7 @@ const steps = [
   {
     number: "01",
     title: "Free consult",
-    body: "Book a 30-minute call. Tell me how your business runs today, where it's getting stuck, and the idea you've been carrying around.",
+    body: "Book a 30-minute call. Tell me how your business runs today, where it’s getting stuck, and the idea you’ve been carrying around.",
   },
   {
     number: "02",
@@ -21,7 +21,7 @@ const steps = [
   {
     number: "04",
     title: "Launch & partner",
-    body: "Go live with confidence, then keep improving with a partner who's in it for the long haul.",
+    body: "Go live with confidence, then keep improving with a partner who’s in it for the long haul.",
   },
 ] as const;
 
