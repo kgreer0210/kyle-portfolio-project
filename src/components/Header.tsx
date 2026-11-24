@@ -1,20 +1,59 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { navItems } from "../data/navigation";
+import { PHONE_DISPLAY, PHONE_HREF } from "../data/contact";
+import { trackPhoneClick } from "../lib/analytics";
+import { useBodyScrollLock } from "../lib/useBodyScrollLock";
+
+const MOBILE_MENU_ID = "mobile-menu";
+const CONTACT_HREF = "/contact";
+// The Contact CTA already links to /contact, so the page links leave it out.
+const pageNavItems = navItems.filter((item) => item.href !== CONTACT_HREF);
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const wasMenuOpen = useRef(false);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const menuOpenRef = useRef(false);
+  useEffect(() => {
+    menuOpenRef.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
+
+  useBodyScrollLock(isMobileMenuOpen);
+
+  // Focus follows the drawer: into its first link on open, back to the toggle
+  // on close (Escape, the toggle, the backdrop, or a link).
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      drawerRef.current?.querySelector<HTMLElement>("a[href]")?.focus();
+    } else if (wasMenuOpen.current) {
+      toggleRef.current?.focus();
+    }
+    wasMenuOpen.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
+      // While the scroll lock pins the body, scrollY reads 0. Ignore that.
+      if (menuOpenRef.current) return;
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
@@ -32,71 +71,71 @@ export default function Header() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center">
-        <Link href="/" className="flex shrink-0 items-center">
-          <motion.div
-            className="cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Image
-              src="/logo.svg"
-              alt="KYGR Solutions Logo"
-              width={282}
-              height={120}
-              className="w-auto h-12 md:h-[60px] brightness-0 invert"
-              priority
-            />
-          </motion.div>
+      <nav
+        aria-label="Main"
+        className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center"
+      >
+        <Link
+          href="/"
+          aria-label="KYGR Solutions home"
+          className="flex shrink-0 items-center rounded-md transition-transform duration-200 motion-safe:hover:scale-105 motion-safe:active:scale-95"
+        >
+          <Image
+            src="/logo.svg"
+            alt=""
+            width={282}
+            height={120}
+            className="w-auto h-12 md:h-[60px] brightness-0 invert"
+            priority
+          />
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden shrink-0 items-center gap-3 md:flex lg:gap-6 xl:gap-8">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} prefetch={true}>
-              <motion.span
-                className={`text-sm font-medium transition-colors hover:text-blue-ncs cursor-pointer ${
-                  pathname === item.href ? "text-blue-ncs" : "text-text-primary"
-                }`}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {item.label}
-              </motion.span>
+          {pageNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              prefetch={true}
+              aria-current={pathname === item.href ? "page" : undefined}
+              className={`text-sm font-medium transition-[color,transform] duration-200 hover:text-blue-ncs motion-safe:hover:-translate-y-0.5 ${
+                pathname === item.href ? "text-blue-ncs" : "text-text-primary"
+              }`}
+            >
+              {item.label}
             </Link>
           ))}
-          <Link href="/login">
-            <motion.span
-              className="inline-block whitespace-nowrap rounded-full border border-blue-ncs px-4 py-2 text-sm font-semibold text-blue-ncs transition-colors hover:bg-blue-ncs-strong hover:text-white cursor-pointer xl:px-5"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Client Login
-            </motion.span>
+          <Link
+            href="/login"
+            className="inline-block whitespace-nowrap rounded-full border border-blue-ncs px-4 py-2 text-sm font-semibold text-blue-ncs transition-[background-color,color,transform] duration-200 hover:bg-blue-ncs-strong hover:text-white motion-safe:hover:scale-105 motion-safe:active:scale-95 xl:px-5"
+          >
+            Client Login
           </Link>
-          <Link href="/contact">
-            <motion.button
-              className="whitespace-nowrap rounded-full bg-blue-ncs-strong px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-lapis-lazuli xl:px-5"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.button>
+          <Link
+            href={CONTACT_HREF}
+            aria-current={pathname === CONTACT_HREF ? "page" : undefined}
+            className="inline-block whitespace-nowrap rounded-full bg-blue-ncs-strong px-4 py-2 text-sm font-semibold text-white transition-[background-color,transform] duration-200 hover:bg-lapis-lazuli motion-safe:hover:scale-105 motion-safe:active:scale-95 xl:px-5"
+          >
+            Contact
           </Link>
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <motion.button
-          className="md:hidden p-2 text-text-primary hover:text-blue-ncs transition-colors z-50"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Toggle mobile menu"
+        {/* Mobile menu toggle. Sits above the drawer so it can also close it. */}
+        <button
+          ref={toggleRef}
+          type="button"
+          className="relative z-[60] md:hidden p-2 text-text-primary hover:text-blue-ncs transition-colors"
+          onClick={() => setIsMobileMenuOpen((open) => !open)}
+          aria-label="Menu"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls={MOBILE_MENU_ID}
         >
           <svg
             className="w-6 h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             {isMobileMenuOpen ? (
               <path
@@ -114,7 +153,7 @@ export default function Header() {
               />
             )}
           </svg>
-        </motion.button>
+        </button>
       </nav>
 
       {/* Mobile Menu Drawer */}
@@ -126,62 +165,60 @@ export default function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={closeMobileMenu}
+              aria-hidden="true"
             />
 
-            <motion.div
-              className="fixed top-0 right-0 h-full w-72 bg-oxford-blue/95 backdrop-blur-xl border-l border-penn-blue z-50 md:hidden shadow-2xl"
+            <motion.nav
+              id={MOBILE_MENU_ID}
+              ref={drawerRef}
+              aria-label="Mobile"
+              className="fixed top-0 right-0 h-dvh w-72 max-w-[85vw] overflow-y-auto overscroll-contain bg-oxford-blue/95 backdrop-blur-xl border-l border-penn-blue z-50 md:hidden shadow-2xl pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
-              <div className="flex flex-col h-full pt-24 px-8 gap-6">
-                {navItems.map((item, index) => (
+              <div className="flex min-h-full flex-col pt-24 px-8 pb-8 gap-6">
+                {pageNavItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={closeMobileMenu}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    className={`text-xl font-semibold block py-2 ${
+                      pathname === item.href
+                        ? "text-blue-ncs"
+                        : "text-text-primary"
+                    }`}
                   >
-                    <motion.span
-                      className={`text-xl font-semibold block py-2 ${
-                        pathname === item.href
-                          ? "text-blue-ncs"
-                          : "text-text-primary"
-                      }`}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 + index * 0.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {item.label}
-                    </motion.span>
+                    {item.label}
                   </Link>
                 ))}
-                <Link href="/login" className="mt-4" onClick={closeMobileMenu}>
-                  <motion.span
-                    className="block w-full py-4 rounded-xl border border-blue-ncs text-blue-ncs font-bold text-lg text-center cursor-pointer"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Client Login
-                  </motion.span>
+                <Link
+                  href="/login"
+                  onClick={closeMobileMenu}
+                  className="mt-4 block w-full py-4 rounded-xl border border-blue-ncs text-blue-ncs font-bold text-lg text-center"
+                >
+                  Client Login
                 </Link>
-                <Link href="/contact" onClick={closeMobileMenu}>
-                  <motion.button
-                    className="w-full py-4 rounded-xl bg-blue-ncs-strong text-white font-bold text-lg"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Get Started
-                  </motion.button>
+                <Link
+                  href={CONTACT_HREF}
+                  onClick={closeMobileMenu}
+                  aria-current={pathname === CONTACT_HREF ? "page" : undefined}
+                  className="block w-full py-4 rounded-xl bg-blue-ncs-strong text-white font-bold text-lg text-center"
+                >
+                  Contact
                 </Link>
+                <a
+                  href={PHONE_HREF}
+                  onClick={() => trackPhoneClick("mobile_menu")}
+                  className="block py-2 text-center text-base font-semibold text-text-primary hover:text-blue-ncs"
+                >
+                  Call {PHONE_DISPLAY}
+                </a>
               </div>
-            </motion.div>
+            </motion.nav>
           </>
         )}
       </AnimatePresence>

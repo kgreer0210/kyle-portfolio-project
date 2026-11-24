@@ -15,6 +15,8 @@ const appPrefixes = [
   "/auth",
 ];
 
+const MAIN_CONTENT_ID = "main-content";
+
 function isAppRoute(pathname: string): boolean {
   return appPrefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
@@ -38,6 +40,13 @@ export default function AppShell({
 
   return (
     <>
+      <a
+        href={`#${MAIN_CONTENT_ID}`}
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-blue-ncs-strong focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
+      >
+        Skip to content
+      </a>
+
       <div
         className="pointer-events-none fixed inset-0 z-0"
         aria-hidden="true"
@@ -52,12 +61,18 @@ export default function AppShell({
       <Header />
 
       <div className={`relative z-10 ${FLOATING_CLEARANCE}`}>
-        {children}
+        {/* Each public page renders its own <main> as the first child here. */}
+        <div id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
+          {children}
+        </div>
         <Footer />
       </div>
 
-      <BackToTop />
-      <ChatWidget turnstileSiteKey={turnstileSiteKey} />
+      {/* Floating controls sit in a landmark so no content is outside one. */}
+      <aside aria-label="Quick actions">
+        <BackToTop />
+        <ChatWidget turnstileSiteKey={turnstileSiteKey} />
+      </aside>
     </>
   );
 }

@@ -37,12 +37,10 @@ export default function HomeClient() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Hero Section */}
-      <div className="relative z-10">
-        <Hero />
-      </div>
-
       <main className="relative z-10">
+        {/* Hero Section */}
+        <Hero />
+
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Value Proposition / Intro */}
         <section className="py-20 text-center">
