@@ -11,6 +11,7 @@ import {
   KYLE_PHONE_E164,
 } from "@/lib/chatContact";
 import { CONSULT_CALL_URL } from "@/data/contact";
+import { trackBookCallClick, trackPhoneClick } from "@/lib/analytics";
 import { useTurnstile } from "./useTurnstile";
 
 const STORAGE_KEY = "kygr_chat_state_v1";
@@ -658,9 +659,10 @@ export default function ChatWidget({
                 href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackBookCallClick("chat")}
                 className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
               >
-                Book 30-min call
+                Book a 30-min call
               </a>
             </div>
 
@@ -927,6 +929,7 @@ function VerificationFallback({ onRetry }: { onRetry: () => void }) {
         Or reach me directly: call{" "}
         <a
           href={`tel:${KYLE_PHONE_E164}`}
+          onClick={() => trackPhoneClick("chat")}
           className="text-(--color-text-primary) underline"
         >
           {formatUsPhone(KYLE_PHONE_E164)}
