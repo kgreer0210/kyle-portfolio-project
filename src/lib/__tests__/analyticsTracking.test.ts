@@ -82,3 +82,14 @@ describe("excluded paths", () => {
     expect(sendGAEvent).not.toHaveBeenCalled();
   });
 });
+
+describe("a broken gtag", () => {
+  it("never throws into the action being tracked", () => {
+    sendGAEvent.mockImplementationOnce(() => {
+      throw new Error("gtag blocked");
+    });
+    expect(() =>
+      trackLead({ subject: "New website", ctaLocation: "contact_page" }),
+    ).not.toThrow();
+  });
+});

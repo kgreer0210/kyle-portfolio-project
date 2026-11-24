@@ -54,7 +54,13 @@ export type CtaLocation = (typeof CTA_LOCATIONS)[number];
 function trackEvent(name: string, params: Record<string, string>): void {
   if (typeof window === "undefined") return;
   if (isAnalyticsExcludedPath(window.location.pathname)) return;
-  sendGAEvent("event", name, params);
+  // Analytics must never break the action it reports on, such as a sent
+  // contact form.
+  try {
+    sendGAEvent("event", name, params);
+  } catch {
+    // Ignore: a blocked or broken gtag is not the visitor's problem.
+  }
 }
 
 /**
