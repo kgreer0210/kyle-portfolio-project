@@ -160,7 +160,7 @@ export default function Contact({ initialSubject }: ContactProps) {
   return (
     <motion.section
       id="contact"
-      className="py-12 md:py-20"
+      className="pb-12 md:py-20"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}

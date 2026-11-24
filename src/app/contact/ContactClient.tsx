@@ -8,6 +8,7 @@ import {
   PHONE_DISPLAY,
   PHONE_HREF,
 } from "../../data/contact";
+import { trackEmailClick, trackPhoneClick } from "../../lib/analytics";
 
 interface ContactClientProps {
   initialSubject?: string;
@@ -15,26 +16,38 @@ interface ContactClientProps {
 
 export default function ContactClient({ initialSubject }: ContactClientProps) {
   return (
-    <main className="pt-32 pb-20">
+    <main className="pt-24 pb-20 lg:pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-6 md:mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-3 md:mb-4">
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
           </h1>
-          <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-text-secondary max-w-2xl mx-auto">
             Tell me about the idea you&apos;ve been carrying around. The first
             call is free, and we&apos;ll figure out what it would take.
           </p>
         </motion.div>
 
+        {/* The form comes first so phones reach it without scrolling past the
+            contact details; on desktop it sits in the right-hand columns. */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-1 space-y-8">
+          <div className="lg:col-span-2 lg:order-2">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <Contact initialSubject={initialSubject} />
+            </motion.div>
+          </div>
+
+          <div className="lg:col-span-1 lg:order-1 space-y-8">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -64,6 +77,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                     <h3 className="font-semibold text-text-headings">Email</h3>
                     <a
                       href={EMAIL_HREF}
+                      onClick={() => trackEmailClick("contact_page")}
                       className="text-text-secondary"
                     >
                       {BUSINESS_EMAIL}
@@ -89,7 +103,11 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-headings">Phone</h3>
-                    <a href={PHONE_HREF} className="text-text-secondary">
+                    <a
+                      href={PHONE_HREF}
+                      onClick={() => trackPhoneClick("contact_page")}
+                      className="text-text-secondary"
+                    >
                       {PHONE_DISPLAY}
                     </a>
                   </div>
@@ -165,15 +183,6 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
             </motion.div>
           </div>
 
-          <div className="lg:col-span-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <Contact initialSubject={initialSubject} />
-            </motion.div>
-          </div>
         </div>
       </div>
     </main>
