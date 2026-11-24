@@ -8,7 +8,11 @@
  */
 
 import { useSyncExternalStore } from "react";
-import { useReducedMotion, type TargetAndTransition } from "motion/react";
+import {
+  useReducedMotion,
+  type TargetAndTransition,
+  type Transition,
+} from "motion/react";
 
 export const REVEAL_EASE = [0.23, 1, 0.32, 1] as const;
 export const REVEAL_DURATION = 0.28;
@@ -37,6 +41,15 @@ export function useReveal() {
     },
     mount: { initial: HIDDEN, animate: SHOWN, transition },
   };
+}
+
+/**
+ * The transition for a floating control that appears on its own (back to
+ * top, the chat button): its own tuning, or instant for reduced motion, since
+ * MotionConfig only removes the movement and would still fade it in.
+ */
+export function useEntranceTransition(transition: Transition): Transition {
+  return useReducedMotion() ? { duration: 0 } : transition;
 }
 
 const HOVER_QUERY = "(hover: hover)";

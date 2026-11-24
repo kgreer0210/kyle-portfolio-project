@@ -2,12 +2,17 @@
 
 import { motion, useScroll } from "motion/react";
 import { useEffect, useState } from "react";
-import { useHoverMotion } from "../lib/motionPresets";
+import { useEntranceTransition, useHoverMotion } from "../lib/motionPresets";
 import { FLOATING_ABOVE_CHAT } from "./floatingControls";
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
   const { scrollY } = useScroll();
+  const entrance = useEntranceTransition({
+    type: "spring",
+    stiffness: 400,
+    damping: 17,
+  });
   const press = useHoverMotion(
     {
       scale: 1.1,
@@ -52,7 +57,7 @@ export default function BackToTop() {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 8 }}
       {...press}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      transition={entrance}
       aria-label="Back to top"
     >
       <svg

@@ -5,7 +5,11 @@ import { act, renderHook } from "@testing-library/react";
 const reduced = vi.hoisted(() => ({ value: false }));
 vi.mock("motion/react", () => ({ useReducedMotion: () => reduced.value }));
 
-import { useHoverMotion, useReveal } from "../motionPresets";
+import {
+  useEntranceTransition,
+  useHoverMotion,
+  useReveal,
+} from "../motionPresets";
 
 type Listener = () => void;
 
@@ -95,5 +99,20 @@ describe("useHoverMotion", () => {
     expect(result.current.whileHover).toBeUndefined();
     act(() => media.set(true));
     expect(result.current.whileHover).toEqual(hover);
+  });
+});
+
+describe("useEntranceTransition", () => {
+  const spring = { type: "spring", stiffness: 400, damping: 17 } as const;
+
+  it("keeps a control's own entrance transition", () => {
+    const { result } = renderHook(() => useEntranceTransition(spring));
+    expect(result.current).toEqual(spring);
+  });
+
+  it("makes the entrance instant for reduced-motion visitors", () => {
+    reduced.value = true;
+    const { result } = renderHook(() => useEntranceTransition(spring));
+    expect(result.current).toEqual({ duration: 0 });
   });
 });
