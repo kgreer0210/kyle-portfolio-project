@@ -58,7 +58,7 @@ describe("/idx page copy", () => {
       /MLS member/i,
       /\$\s?\d/,
       /opts in/i,
-      /\bwe\b|\bwe're\b|\bwe'll\b|\bwe've\b|\bour\b/i,
+      /\bwe\b|\bwe['’]re\b|\bwe['’]ll\b|\bwe['’]ve\b|\bour\b/i,
       /\bhome base\b/i,
       /https:\/\/kygrsolutions\.com/,
     ];
@@ -76,7 +76,7 @@ describe("/idx page copy", () => {
   it("never describes Kyle or KYGR as a broker", () => {
     const sentences = copy.split(/\n|(?<=[.!?])\s+/);
     for (const sentence of sentences.filter((s) => /broker/i.test(s))) {
-      expect(sentence).not.toMatch(/KYGR|I am a broker|I'm a broker/i);
+      expect(sentence).not.toMatch(/KYGR|I am a broker|I['’]m a broker/i);
     }
   });
 

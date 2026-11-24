@@ -30,7 +30,7 @@ export const GAMLS_LISTING_DATA_URL =
 export const GAMLS_RETS_FAQ_URL = "https://www.gamls.com/vendors/retsfaq";
 
 export const idxPageIntro =
-  "I'm Kyle Greer, an approved IDX vendor for Georgia MLS and Central Georgia MLS. I build branded property search into your own website, on your domain — not a clunky third-party page. If you belong to both MLSs, buyers can search them in one place, and a home listed on both shows up once. I handle the paperwork with your broker, and I don't stop until the search works the way you expect.";
+  "I’m Kyle Greer, an approved IDX vendor for Georgia MLS and Central Georgia MLS. I build branded property search into your own website, on your domain — not a clunky third-party page. If you belong to both MLSs, buyers can search them in one place, and a home listed on both shows up once. I handle the paperwork with your broker, and I don’t stop until the search works the way you expect.";
 
 /**
  * Extras that appear only on /idx. Each is already live on the Dexter Gordy
@@ -43,7 +43,7 @@ export const idxPageExtraFeatures = [
 ] as const;
 
 export const idxBuildIntro =
-  "This is what goes into the search I build for an agent's site.";
+  "This is what goes into the search I build for an agent’s site.";
 export const idxBuildExtrasIntro =
   "Two more things I have built into agent sites, both on the project pages below:";
 
@@ -58,7 +58,7 @@ export const idxWhyCustom = {
   reasons: [
     "Search on your own domain, matching the rest of your site.",
     "One search across both Georgia MLS and Central Georgia MLS, if you participate in both.",
-    "Something the included site does not give you, such as a bilingual site (Lisa Dunn's is in English and Spanish), a map that starts in Middle Georgia (Dexter Gordy's does), or a lead flow built around how you work (the Dream Home request on Dexter's listings).",
+    "Something the included site does not give you, such as a bilingual site (Lisa Dunn’s is in English and Spanish), a map that starts in Middle Georgia (Dexter Gordy’s does), or a lead flow built around how you work (the Dream Home request on Dexter’s listings).",
     "To work directly with the person building it, until the search works the way you expect.",
   ],
 } as const;
@@ -68,17 +68,17 @@ export const idxBothMls = {
   intro:
     "Many Middle Georgia agents participate in both MLSs. Buyers should not have to search twice, and a home listed on both should not appear twice.",
   dexter:
-    "On Dexter Gordy's site I built a map-based search that starts in Middle Georgia, with a one-click “Search all of Georgia” option. It merges both feeds, and a home listed on both MLSs shows up once.",
+    "On Dexter Gordy’s site I built a map-based search that starts in Middle Georgia, with a one-click “Search all of Georgia” option. It merges both feeds, and a home listed on both MLSs shows up once.",
   cgmlsOnly:
-    "If you are only on Central Georgia MLS, that is enough for a custom search on that feed. Lisa Dunn's site is the example: it searches Central Georgia MLS only, not both MLSs.",
+    "If you are only on Central Georgia MLS, that is enough for a custom search on that feed. Lisa Dunn’s site is the example: it searches Central Georgia MLS only, not both MLSs.",
 } as const;
 
 export const idxWhatIs = {
   heading: "What IDX is — and what this page is not",
-  body: "IDX, or Internet Data Exchange, is a mutual agreement between brokers that allows them to advertise each other's listings on their websites, and brokers must follow the display rules.",
+  body: "IDX, or Internet Data Exchange, is a mutual agreement between brokers that allows them to advertise each other’s listings on their websites, and brokers must follow the display rules.",
   linkLabel: "Georgia MLS explains listing data",
   after:
-    "IDX on an agent's website is not the same as listing syndication to consumer portals such as Zillow. This page is a short introduction, not a full explainer.",
+    "IDX on an agent’s website is not the same as listing syndication to consumer portals such as Zillow. This page is a short introduction, not a full explainer.",
 } as const;
 
 export const idxDifferent = {
@@ -97,21 +97,21 @@ export const idxDifferent = {
       body: "Your broker signs a form approving your website, I keep it on file for MLS audits, and I handle that paperwork.",
     },
     {
-      title: "I don't stop until it works the way you expect",
-      body: "I check each MLS's display rules, fix what feels off, and stay with the site after launch.",
+      title: "I don’t stop until it works the way you expect",
+      body: "I check each MLS’s display rules, fix what feels off, and stay with the site after launch.",
     },
   ],
 } as const;
 
 export const idxWork = {
-  heading: "Work I've done for Georgia agents",
+  heading: "Work I’ve done for Georgia agents",
   dexter: {
     title: "Dexter Gordy Realtor",
     body: "A custom website for a Middle Georgia realtor, with IDX home search across Central Georgia MLS and Georgia MLS, featured listings, and quick ways for buyers to reach him: call, text, or a Dream Home request from a listing. The map search starts in Middle Georgia, with a one-click “Search all of Georgia” option, and a home listed on both MLSs shows up once.",
   },
   lisa: {
     title: "Lisa Dunn Real Estate",
-    body: "A bilingual English and Spanish website for Central Georgia realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with map-based IDX search over Central Georgia MLS only, a page that highlights her own listings, and contact and lead forms. The site is set up for IDX listings under CGMLS rules, I followed her brokerage's licensing and disclaimer rules, and the site launched on her own domain on November 4, 2026.",
+    body: "A bilingual English and Spanish website for Central Georgia realtor Lisa Rodriguez Dunn of CENTURY 21 Homes & Investments, with map-based IDX search over Central Georgia MLS only, a page that highlights her own listings, and contact and lead forms. The site is set up for IDX listings under CGMLS rules, I followed her brokerage’s licensing and disclaimer rules, and the site launched on her own domain on November 4, 2026.",
   },
   more: "More work lives on the",
 } as const;
@@ -132,7 +132,7 @@ export const idxSteps = [
   {
     number: "03",
     title: "I build the search",
-    body: "I build the search into your site and build in each MLS's display requirements.",
+    body: "I build the search into your site and build in each MLS’s display requirements.",
   },
   {
     number: "04",
@@ -161,7 +161,7 @@ export const idxFaqs = [
   {
     question: "What is IDX for realtors?",
     answer:
-      "IDX, or Internet Data Exchange, is a mutual agreement between brokers that allows them to advertise each other's listings on their own websites, following each MLS's display rules. On your site, that means buyers can search for-sale listings on your domain, with the listing firm and the MLS credited as required. It is not the same thing as syndicating listings to consumer portals such as Zillow.",
+      "IDX, or Internet Data Exchange, is a mutual agreement between brokers that allows them to advertise each other’s listings on their own websites, following each MLS’s display rules. On your site, that means buyers can search for-sale listings on your domain, with the listing firm and the MLS credited as required. It is not the same thing as syndicating listings to consumer portals such as Zillow.",
   },
   {
     question:
@@ -181,7 +181,7 @@ export const idxFaqs = [
   {
     question: "How much does a custom IDX website cost?",
     answer:
-      "Contact me for pricing. It depends on the site and on whether I am building search into an existing website or building the site as well. I don't publish a one-size price.",
+      "Contact me for pricing. It depends on the site and on whether I am building search into an existing website or building the site as well. I don’t publish a one-size price.",
   },
   {
     question: "Can you also design the rest of the website, not just the search?",
@@ -195,7 +195,7 @@ export const idxFaqHeading = "Questions agents usually ask";
 
 export const idxFinalCta = {
   heading: idxOffering.cta,
-  body: "I'm an approved IDX vendor for Georgia MLS and Central Georgia MLS. Hard problems welcome. Tell me about your site and which MLSs you belong to, and I'll tell you honestly whether a custom build makes sense. Contact for pricing.",
+  body: "I’m an approved IDX vendor for Georgia MLS and Central Georgia MLS. Hard problems welcome. Tell me about your site and which MLSs you belong to, and I’ll tell you honestly whether a custom build makes sense. Contact for pricing.",
 } as const;
 
 /** Every sentence of page-only copy, for the public-copy tests. */
