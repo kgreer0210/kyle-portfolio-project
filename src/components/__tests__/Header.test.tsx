@@ -118,3 +118,25 @@ describe("Header navigation", () => {
     expect(home.querySelectorAll("[tabindex], button, a")).toHaveLength(0);
   });
 });
+
+describe("Header scroll lock", () => {
+  it("pins the page at its scroll offset while the drawer is open and restores it on close", () => {
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 640 });
+    try {
+      render(<Header />);
+      const toggle = openMenu();
+      expect(document.body.style.position).toBe("fixed");
+      expect(document.body.style.top).toBe("-640px");
+      expect(document.body.style.width).toBe("100%");
+
+      fireEvent.click(toggle);
+      expect(document.body.style.position).toBe("");
+      expect(document.body.style.top).toBe("");
+      expect(scrollTo).toHaveBeenCalledWith({ top: 640, left: 0, behavior: "instant" });
+    } finally {
+      scrollTo.mockRestore();
+      Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    }
+  });
+});

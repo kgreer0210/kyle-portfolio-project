@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { navItems } from "../data/navigation";
 import { PHONE_DISPLAY, PHONE_HREF } from "../data/contact";
 import { trackPhoneClick } from "../lib/analytics";
+import { useBodyScrollLock } from "../lib/useBodyScrollLock";
 
 const MOBILE_MENU_ID = "mobile-menu";
 const CONTACT_HREF = "/contact";
@@ -22,6 +23,12 @@ export default function Header() {
   const drawerRef = useRef<HTMLElement>(null);
   const wasMenuOpen = useRef(false);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const menuOpenRef = useRef(false);
+  useEffect(() => {
+    menuOpenRef.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
+
+  useBodyScrollLock(isMobileMenuOpen);
 
   // Focus follows the drawer: into its first link on open, back to the toggle
   // on close (Escape, the toggle, the backdrop, or a link).
@@ -45,6 +52,8 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
+      // While the scroll lock pins the body, scrollY reads 0. Ignore that.
+      if (menuOpenRef.current) return;
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
