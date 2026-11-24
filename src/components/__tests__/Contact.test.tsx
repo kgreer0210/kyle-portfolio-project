@@ -6,15 +6,7 @@ const sendGAEvent = vi.hoisted(() => vi.fn());
 
 vi.mock("@next/third-parties/google", () => ({ sendGAEvent }));
 
-vi.mock("motion/react", () => ({
-  motion: {
-    section: "section",
-    div: "div",
-    h2: "h2",
-    p: "p",
-    button: "button",
-  },
-}));
+vi.mock("motion/react", () => import("@/test/motionMock"));
 
 import Contact from "../Contact";
 

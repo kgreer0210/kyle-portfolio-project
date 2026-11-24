@@ -9,21 +9,21 @@ import {
   PHONE_HREF,
 } from "../../data/contact";
 import { trackEmailClick, trackPhoneClick } from "../../lib/analytics";
+import { useReveal } from "../../lib/motionPresets";
 
 interface ContactClientProps {
   initialSubject?: string;
 }
 
 export default function ContactClient({ initialSubject }: ContactClientProps) {
+  const { mount } = useReveal();
   return (
     <main className="pt-24 pb-20 lg:pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <motion.div
           className="text-center mb-6 md:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          {...mount}
         >
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-3 md:mb-4">
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
@@ -38,21 +38,13 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
             contact details; on desktop it sits in the right-hand columns. */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 lg:order-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
+            <div>
               <Contact initialSubject={initialSubject} />
-            </motion.div>
+            </div>
           </div>
 
-          <div className="lg:col-span-1 lg:order-1 space-y-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+          <motion.div className="lg:col-span-1 lg:order-1 space-y-8" {...mount}>
+            <div>
               <h2 className="text-2xl font-bold text-text-headings mb-6">
                 Contact Information
               </h2>
@@ -143,13 +135,10 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/50 border border-penn-blue"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
             >
               <h3 className="text-xl font-bold text-text-headings mb-4">
                 What happens next?
@@ -180,8 +169,8 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
               </ul>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
         </div>
       </div>

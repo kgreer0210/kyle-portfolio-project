@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
+import { useHoverMotion } from "../lib/motionPresets";
 
 interface Screenshot {
   id: string;
@@ -21,6 +22,9 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
     useState<Screenshot | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
+  // The section around the showcase does the one reveal; cards only lift on
+  // hover-capable devices.
+  const cardHover = useHoverMotion({ scale: 1.05, y: -10 });
 
   const openImageModal = (imageSrc: string) => {
     setSelectedImage(imageSrc);
@@ -33,22 +37,16 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
   };
 
   return (
-    <motion.div
+    <div
       className="min-h-screen py-20"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          {screenshots.map((screenshot, index) => (
+          {screenshots.map((screenshot) => (
             <motion.div
               key={screenshot.id}
               className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue rounded-2xl overflow-hidden shadow-xl cursor-pointer"
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -10 }}
+              {...cardHover}
               onClick={() => setSelectedScreenshot(screenshot)}
             >
               <div className="h-40 sm:h-48 bg-penn-blue/50 relative overflow-hidden">
@@ -200,6 +198,6 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
           </motion.div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

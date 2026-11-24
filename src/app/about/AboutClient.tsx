@@ -4,16 +4,16 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { Breadcrumb } from "../../components";
 import CallAndMessageCtas from "../../components/CallAndMessageCtas";
+import { useReveal } from "../../lib/motionPresets";
 
 export default function AboutClient() {
+  const { section, mount } = useReveal();
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          {...mount}
         >
           <h1 className="text-4xl md:text-5xl font-bold text-text-headings mb-12">
             About <span className="text-blue-ncs">KYGR Solutions</span>
@@ -21,14 +21,9 @@ export default function AboutClient() {
         </motion.div>
 
         {/* Section 1: About Me */}
-        <section className="mb-20">
+        <motion.section className="mb-20" {...section}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <h2 className="text-3xl font-bold text-text-headings mb-6">
                 Who I am
               </h2>
@@ -51,14 +46,10 @@ export default function AboutClient() {
                   life just got easier.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Family Photo Section */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
+            <div
               className="w-full"
             >
               <Image
@@ -69,17 +60,14 @@ export default function AboutClient() {
                 className="w-full h-auto rounded-3xl shadow-xl"
                 priority
               />
-            </motion.div>
+            </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Section: Why I Build */}
         <section className="mb-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <h2 className="text-3xl font-bold text-text-headings mb-6">
               Why I build
@@ -99,14 +87,10 @@ export default function AboutClient() {
                   title: "The page nobody complained about",
                   desc: "While showing a new client a site I’d built for Lexi’s Fresh Slate Cleanings, I noticed the admin calendar page loading slowly. A loading animation covered it, so nobody else would have noticed, but it wasn’t up to my standard. I fixed the slow queries without anyone asking. I could do better, so I did.",
                 },
-              ].map((story, idx) => (
-                <motion.div
+              ].map((story) => (
+                <div
                   key={story.title}
                   className="p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  viewport={{ once: true }}
                 >
                   <h3 className="text-xl font-bold text-blue-ncs mb-3">
                     {story.title}
@@ -114,20 +98,16 @@ export default function AboutClient() {
                   <p className="text-text-primary text-lg leading-relaxed">
                     {story.desc}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.div>
         </section>
 
         {/* Section 2: Mission */}
-        <section className="mb-20">
-          <motion.div
+        <motion.section className="mb-20" {...section}>
+          <div
             className="bg-blue-ncs/5 p-8 md:p-12 rounded-3xl border border-blue-ncs/10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold text-blue-ncs mb-6">Mission</h2>
             <p className="text-2xl text-text-primary leading-relaxed font-medium">
@@ -135,13 +115,9 @@ export default function AboutClient() {
               not a burden — by delivering honest, high-quality software
               solutions that improve efficiency, clarity, and trust.
             </p>
-          </motion.div>
-          <motion.div
+          </div>
+          <div
             className="mt-8 bg-blue-ncs/5 p-8 md:p-12 rounded-3xl border border-blue-ncs/10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold text-blue-ncs mb-6">
               Where I’m headed
@@ -153,16 +129,13 @@ export default function AboutClient() {
               mediocre, keeps pushing the envelope, holds firm to its values,
               and honors the Lord in everything it does.
             </p>
-          </motion.div>
-        </section>
+          </div>
+        </motion.section>
 
         {/* Section 3: Values */}
         <section className="mb-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <h2 className="text-3xl font-bold text-text-headings mb-10">
               Values
@@ -186,13 +159,9 @@ export default function AboutClient() {
                   desc: "I want more than a project. I want a lasting relationship, built by serving you well long after launch.",
                 },
               ].map((value, idx) => (
-                <motion.div
+                <div
                   key={idx}
                   className="p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  viewport={{ once: true }}
                 >
                   <h3 className="text-xl font-bold text-blue-ncs mb-3">
                     {value.title}
@@ -200,7 +169,7 @@ export default function AboutClient() {
                   <p className="text-text-primary text-lg leading-relaxed">
                     {value.desc}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.div>
@@ -208,10 +177,7 @@ export default function AboutClient() {
 
         <motion.div
           className="text-center bg-blue-ncs/10 p-12 rounded-3xl border border-blue-ncs/20"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...section}
         >
           <h2 className="text-3xl font-bold text-text-headings mb-6">
             Got an idea you’ve been carrying around?

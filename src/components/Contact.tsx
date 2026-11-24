@@ -5,6 +5,7 @@ import { useState, FormEvent } from "react";
 import { CONSULT_CALL_URL, PHONE_DISPLAY, PHONE_HREF } from "../data/contact";
 import { IDX_SUBJECT } from "../data/idx";
 import { services } from "../data/services";
+import { useHoverMotion, useReveal } from "../lib/motionPresets";
 import {
   trackBookCallClick,
   trackLead,
@@ -35,6 +36,9 @@ interface ContactProps {
 }
 
 export default function Contact({ initialSubject }: ContactProps) {
+  const { section, mount } = useReveal();
+  const cardHover = useHoverMotion({ scale: 1.01 });
+  const submitPress = useHoverMotion({ scale: 1.05, y: -3 }, { scale: 0.95 });
   const serviceTitles = services.map((service) => service.title);
   const resolvedSubject = resolveContactSubject(initialSubject, serviceTitles);
   const [formData, setFormData] = useState<FormData>({
@@ -161,31 +165,20 @@ export default function Contact({ initialSubject }: ContactProps) {
     <motion.section
       id="contact"
       className="pb-12 md:py-20"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      viewport={{ once: true, margin: "-100px" }}
+      {...section}
     >
       <motion.div
         className="card bg-oxford-blue/90 backdrop-blur-sm border border-penn-blue p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl max-w-3xl mx-auto"
-        whileHover={{ scale: 1.01 }}
+        {...cardHover}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <motion.h2
+        <h2
           className="text-2xl sm:text-3xl font-bold text-text-headings mb-4 md:mb-6 drop-shadow-lg text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
         >
           Let&apos;s Work Together
-        </motion.h2>
-        <motion.p
+        </h2>
+        <p
           className="text-text-secondary text-base sm:text-lg mb-6 md:mb-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
         >
           Have an idea you keep coming back to? You can{" "}
           <a
@@ -207,14 +200,10 @@ export default function Contact({ initialSubject }: ContactProps) {
           </a>
           , or send details through this form, whatever&apos;s easiest. Hard
           problems welcome, wherever you&apos;re located.
-        </motion.p>
+        </p>
 
-        <motion.div
+        <div
           className="bg-rich-black/30 border border-blue-ncs/20 rounded-xl p-4 sm:p-5 mb-6 md:mb-8 text-text-primary text-sm sm:text-base"
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          viewport={{ once: true }}
         >
           <p className="font-semibold text-blue-ncs mb-2">What to include:</p>
           <ul className="list-disc list-inside space-y-2 text-text-secondary">
@@ -222,7 +211,7 @@ export default function Contact({ initialSubject }: ContactProps) {
             <li>Timeline or launch window</li>
             <li>Budget range and any must-have tools</li>
           </ul>
-        </motion.div>
+        </div>
 
         <form
           onSubmit={handleSubmit}
@@ -232,12 +221,7 @@ export default function Contact({ initialSubject }: ContactProps) {
           autoComplete="off"
         >
           {/* Name Field */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <label
               htmlFor="name"
               className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
@@ -257,15 +241,10 @@ export default function Contact({ initialSubject }: ContactProps) {
             {errors.name && (
               <p className="mt-1 text-sm text-red-400">{errors.name}</p>
             )}
-          </motion.div>
+          </div>
 
           {/* Email Field */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <label
               htmlFor="email"
               className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
@@ -285,15 +264,10 @@ export default function Contact({ initialSubject }: ContactProps) {
             {errors.email && (
               <p className="mt-1 text-sm text-red-400">{errors.email}</p>
             )}
-          </motion.div>
+          </div>
 
           {/* Service / Subject Field */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <label
               htmlFor="subject"
               className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
@@ -322,15 +296,10 @@ export default function Contact({ initialSubject }: ContactProps) {
             {errors.subject && (
               <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
             )}
-          </motion.div>
+          </div>
 
           {/* Message Field */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <label
               htmlFor="message"
               className="block text-text-primary mb-2 font-medium text-sm sm:text-base"
@@ -350,7 +319,7 @@ export default function Contact({ initialSubject }: ContactProps) {
             {errors.message && (
               <p className="mt-1 text-sm text-red-400">{errors.message}</p>
             )}
-          </motion.div>
+          </div>
 
           {/* Honeypot Field - Hidden from users, visible to bots */}
           <div
@@ -375,40 +344,33 @@ export default function Contact({ initialSubject }: ContactProps) {
           </div>
 
           {/* Submit Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-            viewport={{ once: true }}
+          <div
             className="flex justify-center"
           >
             <motion.button
               type="submit"
               disabled={isSubmitting}
               className="btn-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-lapis-lazuli transition-[background-color,box-shadow] duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto min-h-11"
-              whileHover={!isSubmitting ? { scale: 1.05, y: -3 } : {}}
-              whileTap={!isSubmitting ? { scale: 0.95 } : {}}
+              {...(isSubmitting ? {} : submitPress)}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               {isSubmitting ? "Sending..." : "Send me a message"}
             </motion.button>
-          </motion.div>
+          </div>
 
           {/* Status Messages */}
           {submitStatus.type === "error" && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
               className="p-4 rounded-lg bg-red-900/30 border border-red-500 text-red-200"
+              {...mount}
             >
               <p className="text-center">{submitStatus.message}</p>
             </motion.div>
           )}
           {submitStatus.type === "success" && submitStatus.tier === "high" && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
               className="p-5 rounded-lg bg-green-900/30 border border-green-500 text-green-100 text-center"
+              {...mount}
             >
               <p className="font-semibold text-lg mb-2">
                 Thanks — this sounds like a great fit.
@@ -430,9 +392,8 @@ export default function Contact({ initialSubject }: ContactProps) {
           )}
           {submitStatus.type === "success" && submitStatus.tier !== "high" && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
               className="p-4 rounded-lg bg-green-900/30 border border-green-500 text-green-200"
+              {...mount}
             >
               <p className="text-center">{submitStatus.message}</p>
             </motion.div>

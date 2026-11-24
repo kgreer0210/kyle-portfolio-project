@@ -10,13 +10,12 @@ import { IDX_PATH, idxOffering } from "../data/idx";
 import { getFeaturedProjects } from "../data/projects";
 import { services } from "../data/services";
 import { trackBookCallClick, type CtaLocation } from "../lib/analytics";
+import { useHoverMotion, useReveal } from "../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
 
-const linkPress = {
-  whileHover: { scale: 1.05 },
-  whileTap: { scale: 0.95 },
-} as const;
+const LINK_HOVER = { scale: 1.05 };
+const LINK_TAP = { scale: 0.95 };
 
 const outlineLinkClass =
   "inline-flex items-center justify-center px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
@@ -32,6 +31,7 @@ function BookCallLink({
   ctaLocation: CtaLocation;
   className: string;
 }) {
+  const linkPress = useHoverMotion(LINK_HOVER, LINK_TAP);
   return (
     <MotionLink
       href={CONSULT_CALL_URL}
@@ -80,6 +80,8 @@ export default function HomeClient() {
   }, []);
 
   const featuredProjects = getFeaturedProjects();
+  const { section } = useReveal();
+  const linkPress = useHoverMotion(LINK_HOVER, LINK_TAP);
 
   return (
     <div>
@@ -91,10 +93,7 @@ export default function HomeClient() {
         {/* Value Proposition / Intro */}
         <section className="py-20 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-6">
               Digital Tools That{" "}
@@ -120,7 +119,7 @@ export default function HomeClient() {
         </section>
 
         {/* Services Summary */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
@@ -140,14 +139,10 @@ export default function HomeClient() {
             </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-              <motion.div
+            {services.map((service) => (
+              <div
                 key={service.title}
                 className="p-8 rounded-2xl bg-oxford-blue/40 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
               >
                 <h3 className="text-xl font-bold text-blue-ncs mb-3">
                   {service.title}
@@ -166,20 +161,15 @@ export default function HomeClient() {
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Tech Stack Review Spotlight */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
                 New Service
               </span>
@@ -201,14 +191,10 @@ export default function HomeClient() {
                 />
                 <SendMessageLink />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
             >
               <h3 className="text-xl font-bold text-blue-ncs mb-6">
                 What’s Included
@@ -220,13 +206,9 @@ export default function HomeClient() {
                   "Get a prioritized action plan you can act on immediately",
                   "No jargon — just clear, honest recommendations",
                 ].map((point, idx) => (
-                  <motion.li
+                  <li
                     key={idx}
                     className="flex gap-3 text-text-primary"
-                    initial={{ opacity: 0, x: 10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 + idx * 0.08 }}
-                    viewport={{ once: true }}
                   >
                     <span className="mt-1 w-5 h-5 rounded-full bg-blue-ncs/10 border border-blue-ncs/40 flex items-center justify-center flex-shrink-0">
                       <svg className="w-3 h-3 text-blue-ncs" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,21 +216,16 @@ export default function HomeClient() {
                       </svg>
                     </span>
                     {point}
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="py-20" aria-labelledby="idx-home-heading">
+        <motion.section className="py-20" aria-labelledby="idx-home-heading" {...section}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
                 IDX for Real Estate
               </span>
@@ -271,14 +248,10 @@ export default function HomeClient() {
               >
                 See the IDX offering
               </MotionLink>
-            </motion.div>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
             >
               <h3 className="text-xl font-bold text-blue-ncs mb-6">
                 Built into your site
@@ -309,18 +282,14 @@ export default function HomeClient() {
               <p className="mt-6 text-sm font-semibold text-blue-ncs">
                 {idxOffering.pricing}
               </p>
-            </motion.div>
+            </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Story: first client */}
-        <section className="py-20" aria-labelledby="weekends-story-heading">
-          <motion.div
+        <motion.section className="py-20" aria-labelledby="weekends-story-heading" {...section}>
+          <div
             className="rounded-3xl border border-blue-ncs/10 bg-blue-ncs/5 p-8 md:p-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
           >
             <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
               A story from my first client
@@ -347,15 +316,15 @@ export default function HomeClient() {
               See the project
               <span aria-hidden="true">&rarr;</span>
             </Link>
-          </motion.div>
-        </section>
+          </div>
+        </motion.section>
         </div>
 
         <HowItWorks />
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Featured Projects */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
@@ -375,14 +344,10 @@ export default function HomeClient() {
             </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {featuredProjects.map((project, index) => (
-              <motion.div
+            {featuredProjects.map((project) => (
+              <div
                 key={project.id}
                 className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden"
-                initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
               >
                 <div className="aspect-video relative overflow-hidden">
                   <Image
@@ -390,7 +355,7 @@ export default function HomeClient() {
                     alt={project.title}
                     fill
                     sizes="(min-width: 1200px) 532px, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />
                 </div>
@@ -421,10 +386,10 @@ export default function HomeClient() {
                     </svg>
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Testimonials */}
         <section className="py-20">
@@ -435,10 +400,7 @@ export default function HomeClient() {
         <section className="py-20 text-center">
           <motion.div
             className="relative overflow-hidden rounded-[3rem] border border-blue-ncs/20 bg-oxford-blue/70 p-12 shadow-2xl backdrop-blur-sm md:p-20"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-ncs/10 blur-[100px] rounded-full -mr-32 -mt-32" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-lapis-lazuli/10 blur-[100px] rounded-full -ml-32 -mb-32" />

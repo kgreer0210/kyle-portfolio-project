@@ -6,19 +6,20 @@ import { Breadcrumb, ServiceIllustration } from "../../components";
 import CallAndMessageCtas from "../../components/CallAndMessageCtas";
 import { IDX_PATH, idxOffering } from "../../data/idx";
 import { services } from "../../data/services";
+import { useHoverMotion, useReveal } from "../../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
 
 export default function ServicesClient() {
+  const { section, mount } = useReveal();
+  const linkPress = useHoverMotion({ scale: 1.03, y: -2 }, { scale: 0.98 });
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
         <motion.div
           className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          {...mount}
         >
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6">
             Strategic <span className="text-blue-ncs">Services</span>
@@ -37,10 +38,7 @@ export default function ServicesClient() {
               className={`flex flex-col md:flex-row gap-8 items-center p-8 md:p-12 rounded-3xl bg-oxford-blue/40 border border-penn-blue shadow-2xl ${
                 index % 2 === 1 ? "md:flex-row-reverse" : ""
               }`}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
+              {...section}
             >
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-text-headings mb-4">
@@ -89,10 +87,7 @@ export default function ServicesClient() {
 
         <motion.section
           className="mb-20 p-8 md:p-12 rounded-3xl bg-oxford-blue/40 border border-blue-ncs/30"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...section}
         >
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
             IDX for Real Estate
@@ -109,8 +104,7 @@ export default function ServicesClient() {
           <MotionLink
             href={IDX_PATH}
             className="inline-flex items-center justify-center px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.98 }}
+            {...linkPress}
           >
             See the IDX offering
           </MotionLink>
@@ -118,10 +112,7 @@ export default function ServicesClient() {
 
         <motion.div
           className="text-center py-16"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+          {...section}
         >
           <h2 className="text-3xl font-bold text-text-headings mb-8">
             Not sure which service you need?

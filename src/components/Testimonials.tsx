@@ -4,6 +4,7 @@ import { useId, useRef, useState, type TouchEvent } from "react";
 import { motion } from "motion/react";
 import { GOOGLE_REVIEWS_URL } from "../data/contact";
 import { testimonials } from "../data/testimonials";
+import { useReveal } from "../lib/motionPresets";
 import TestimonialAuthor from "./TestimonialAuthor";
 
 // Horizontal distance (px) a touch must travel to count as a swipe.
@@ -14,10 +15,9 @@ const focusRing =
 
 const arrowButtonClass = `p-2 md:p-3 rounded-full bg-oxford-blue/80 border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-colors duration-300 shadow-lg min-w-[44px] min-h-[44px] flex items-center justify-center ${focusRing}`;
 
-// One reveal for the whole section: short travel, strong ease-out.
-const REVEAL_EASE = [0.23, 1, 0.32, 1] as const;
-
 export default function Testimonials() {
+  // One reveal for the whole section: short travel, strong ease-out.
+  const { section } = useReveal();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<number>>(
     () => new Set(),
@@ -75,10 +75,7 @@ export default function Testimonials() {
     <motion.section
       id="testimonials"
       className="mb-20"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: REVEAL_EASE }}
-      viewport={{ once: true, margin: "-100px" }}
+      {...section}
     >
       <div className="mb-12 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4 drop-shadow-lg">

@@ -2,11 +2,23 @@
 
 import { motion, useScroll } from "motion/react";
 import { useEffect, useState } from "react";
+import { useHoverMotion } from "../lib/motionPresets";
 import { FLOATING_ABOVE_CHAT } from "./floatingControls";
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
   const { scrollY } = useScroll();
+  const press = useHoverMotion(
+    {
+      scale: 1.1,
+      y: -2,
+      transition: { type: "spring", stiffness: 400, damping: 17 },
+    },
+    {
+      scale: 0.9,
+      transition: { type: "spring", stiffness: 400, damping: 17 },
+    },
+  );
 
   useEffect(() => {
     const unsubscribe = scrollY.on("change", (latest) => {
@@ -39,15 +51,7 @@ export default function BackToTop() {
       initial={{ opacity: 0, scale: 0.95, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 8 }}
-      whileHover={{
-        scale: 1.1,
-        y: -2,
-        transition: { type: "spring", stiffness: 400, damping: 17 },
-      }}
-      whileTap={{
-        scale: 0.9,
-        transition: { type: "spring", stiffness: 400, damping: 17 },
-      }}
+      {...press}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       aria-label="Back to top"
     >

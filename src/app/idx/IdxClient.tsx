@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Breadcrumb } from "../../components";
+import { useReveal } from "../../lib/motionPresets";
 import { IDX_CONTACT_HREF, idxOffering } from "../../data/idx";
 import {
   DEXTER_LIVE_URL,
@@ -52,13 +53,6 @@ const textLink = `text-blue-ncs underline underline-offset-4 hover:text-lapis-la
 const primaryButton = `inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs-strong px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
 const secondaryButton = `inline-flex w-full items-center justify-center rounded-[10px] border border-white/25 bg-transparent px-7 py-4 text-center text-base font-semibold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
 
-const reveal = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-  viewport: { once: true },
-} as const;
-
 function ExternalLink({
   href,
   className = textLink,
@@ -93,6 +87,7 @@ function Section({
   heading: string;
   children: ReactNode;
 }) {
+  const { section: reveal } = useReveal();
   return (
     <motion.section className="mb-16" aria-labelledby={id} {...reveal}>
       <h2
@@ -157,6 +152,7 @@ function FaqAnswer({
 }
 
 export default function IdxClient() {
+  const { section: reveal, mount } = useReveal();
   return (
     <main className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -164,9 +160,7 @@ export default function IdxClient() {
 
         <motion.div
           className="mb-16 max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          {...mount}
         >
           <span className="mb-6 inline-block rounded-full border border-blue-ncs/30 bg-blue-ncs/10 px-3 py-1 text-xs font-bold text-blue-ncs">
             IDX for Real Estate
@@ -433,10 +427,7 @@ export default function IdxClient() {
         <motion.section
           className="rounded-3xl border border-blue-ncs/20 bg-blue-ncs/10 p-8 text-center md:p-14"
           aria-labelledby="idx-talk-to-me"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...reveal}
         >
           <h2
             id="idx-talk-to-me"

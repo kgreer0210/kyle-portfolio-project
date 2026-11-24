@@ -5,14 +5,7 @@ import axe from "axe-core";
 import Testimonials from "../Testimonials";
 import { GOOGLE_REVIEWS_URL } from "../../data/contact";
 
-vi.mock("motion/react", () => ({
-  motion: {
-    section: "section",
-    div: "div",
-    h2: "h2",
-    p: "p",
-  },
-}));
+vi.mock("motion/react", () => import("@/test/motionMock"));
 
 afterEach(cleanup);
 

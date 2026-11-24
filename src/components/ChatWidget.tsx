@@ -12,6 +12,7 @@ import {
 } from "@/lib/chatContact";
 import { CONSULT_CALL_URL } from "@/data/contact";
 import { trackBookCallClick, trackPhoneClick } from "@/lib/analytics";
+import { useHoverMotion } from "@/lib/motionPresets";
 import { FLOATING_CORNER } from "./floatingControls";
 import { useTurnstile } from "./useTurnstile";
 
@@ -116,6 +117,10 @@ export default function ChatWidget({
   const [persisted] = useState(loadPersistedState);
   const fieldId = useId();
   const [isOpen, setIsOpen] = useState(false);
+  const triggerPress = useHoverMotion(
+    { scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 17 } },
+    { scale: 0.95 },
+  );
   const [conversationId, setConversationId] = useState<string | null>(
     persisted.conversationId,
   );
@@ -557,11 +562,7 @@ export default function ChatWidget({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            whileHover={{
-              scale: 1.05,
-              transition: { type: "spring", stiffness: 400, damping: 17 },
-            }}
-            whileTap={{ scale: 0.95 }}
+            {...triggerPress}
           >
             <svg
               aria-hidden="true"

@@ -36,7 +36,7 @@ vi.mock("motion/react", () => {
           ),
     },
   );
-  return { motion };
+  return { motion, useReducedMotion: () => false };
 });
 
 import ContactClient from "@/app/contact/ContactClient";

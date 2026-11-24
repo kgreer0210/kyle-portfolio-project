@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useReveal } from "../lib/motionPresets";
 
 const steps = [
   {
@@ -26,19 +27,17 @@ const steps = [
 ] as const;
 
 export default function HowItWorks() {
+  const { section } = useReveal();
   return (
-    <section
+    <motion.section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
       className="scroll-mt-24 py-20 md:py-28"
+      {...section}
     >
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
-        <motion.div
+        <div
           className="max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          viewport={{ once: true }}
         >
           <p className="font-mono text-[13px] font-medium tracking-[0.1em] text-blue-ncs! uppercase">
             How it works
@@ -53,17 +52,13 @@ export default function HowItWorks() {
             A simple, collaborative process built around how your business
             actually works.
           </p>
-        </motion.div>
+        </div>
 
         <ol className="grid list-none grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {steps.map((step, index) => (
-            <motion.li
+          {steps.map((step) => (
+            <li
               key={step.number}
               className="relative flex flex-col gap-3.5 rounded-2xl border border-white/10 bg-[#0c1830] p-7"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-              viewport={{ once: true }}
             >
               <span
                 className="h-[3px] w-10 rounded-full bg-blue-ncs"
@@ -81,10 +76,10 @@ export default function HowItWorks() {
               <p className="text-[15px] leading-relaxed text-text-secondary!">
                 {step.body}
               </p>
-            </motion.li>
+            </li>
           ))}
         </ol>
       </div>
-    </section>
+    </motion.section>
   );
 }

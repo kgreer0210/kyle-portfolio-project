@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { projects } from "../../../data/projects";
 import { BackendShowcase, Breadcrumb } from "../../../components";
+import { useHoverMotion, useReveal } from "../../../lib/motionPresets";
 
 const MotionLink = motion.create(Link);
 
@@ -13,6 +14,8 @@ export default function ProjectDetailClient() {
   const params = useParams();
   const projectId = params.projectId as string;
   const project = projects.find((p) => p.id === projectId);
+  const { section, mount } = useReveal();
+  const linkPress = useHoverMotion({ scale: 1.02 }, { scale: 0.98 });
 
   if (!project) {
     return (
@@ -34,9 +37,7 @@ export default function ProjectDetailClient() {
         <Breadcrumb />
         <motion.div
           className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          {...mount}
         >
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech, idx) => (
@@ -53,11 +54,8 @@ export default function ProjectDetailClient() {
           </p>
         </motion.div>
 
-        <motion.div
+        <div
           className="aspect-video relative rounded-3xl overflow-hidden border border-penn-blue shadow-2xl mb-16"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
         >
           <Image
             src={project.image}
@@ -68,7 +66,7 @@ export default function ProjectDetailClient() {
             className="object-cover"
             priority
           />
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
           <div className="md:col-span-2 space-y-12">
@@ -129,8 +127,7 @@ export default function ProjectDetailClient() {
               <MotionLink
                 href="/contact"
                 className="flex w-full items-center justify-center mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                {...linkPress}
               >
                 Send me a message
               </MotionLink>
@@ -140,11 +137,8 @@ export default function ProjectDetailClient() {
 
         {project.backendShowcase?.available && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
             className="mb-20"
+            {...section}
           >
             <div className="mb-12 text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-4">
