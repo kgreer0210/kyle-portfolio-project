@@ -105,7 +105,7 @@ export default function ServicesClient() {
           </p>
           <Link href={IDX_PATH}>
             <motion.button
-              className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
+              className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -127,7 +127,7 @@ export default function ServicesClient() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/contact">
               <motion.button
-                className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
+                className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
