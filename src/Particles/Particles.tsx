@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useSyncExternalStore } from "react";
 import { Renderer, Camera, Geometry, Program, Mesh } from "ogl";
 import { readParticleEnvironment, selectParticleConfig } from "./particleConfig";
 
@@ -110,6 +110,24 @@ const fragment = /* glsl */ `
   }
 `;
 
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const mql = window.matchMedia?.(REDUCED_MOTION_QUERY);
+  if (!mql) return () => {};
+  // Safari before 14 only has the deprecated addListener API.
+  if (typeof mql.addEventListener === "function") {
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }
+  mql.addListener(onChange);
+  return () => mql.removeListener(onChange);
+}
+
+function prefersReducedMotionNow() {
+  return Boolean(window.matchMedia?.(REDUCED_MOTION_QUERY).matches);
+}
+
 const Particles: React.FC<ParticlesProps> = ({
   particleCount = 200,
   particleSpread = 10,
@@ -126,6 +144,13 @@ const Particles: React.FC<ParticlesProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  // Changing the setting rebuilds the scene below, so turning on reduced
+  // motion mid-visit stops the loop and leaves a still frame.
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    prefersReducedMotionNow,
+    () => false,
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -320,6 +345,7 @@ const Particles: React.FC<ParticlesProps> = ({
     cameraDistance,
     disableRotation,
     particleColors,
+    reducedMotion,
   ]);
 
   return (

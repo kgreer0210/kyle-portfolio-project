@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 
 const ogl = vi.hoisted(() => ({
   renderer: null as null | {
@@ -139,5 +139,33 @@ describe("Particles", () => {
     document.dispatchEvent(new Event("visibilitychange"));
     expect(cancelAnimationFrame).toHaveBeenCalled();
     Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
+  });
+
+  it("stops animating when reduced motion turns on mid-visit", () => {
+    const matching: string[] = [];
+    const listeners = new Set<() => void>();
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      get matches() {
+        return matching.includes(query);
+      },
+      media: query,
+      addEventListener: (_: string, cb: () => void) => listeners.add(cb),
+      removeEventListener: (_: string, cb: () => void) => listeners.delete(cb),
+      addListener() {},
+      removeListener() {},
+    }));
+    render(<Particles particleCount={1000} />);
+    expect(raf).toHaveBeenCalled();
+
+    raf.mockClear();
+    const renders = vi.mocked(ogl.renderer!.render);
+    matching.push("(prefers-reduced-motion: reduce)");
+    act(() => listeners.forEach((cb) => cb()));
+
+    expect(cancelAnimationFrame).toHaveBeenCalled();
+    expect(raf).not.toHaveBeenCalled();
+    // The rebuilt scene draws one still frame.
+    expect(ogl.renderer!.render).not.toBe(renders);
+    expect(ogl.renderer!.render).toHaveBeenCalledTimes(1);
   });
 });
