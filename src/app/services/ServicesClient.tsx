@@ -3,8 +3,11 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Breadcrumb, ServiceIllustration } from "../../components";
+import CallAndMessageCtas from "../../components/CallAndMessageCtas";
 import { IDX_PATH, idxOffering } from "../../data/idx";
 import { services } from "../../data/services";
+
+const MotionLink = motion.create(Link);
 
 export default function ServicesClient() {
   return (
@@ -103,15 +106,14 @@ export default function ServicesClient() {
           <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-3xl">
             {idxOffering.body}
           </p>
-          <Link href={IDX_PATH}>
-            <motion.button
-              className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              See the IDX offering
-            </motion.button>
-          </Link>
+          <MotionLink
+            href={IDX_PATH}
+            className="inline-flex items-center justify-center px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            See the IDX offering
+          </MotionLink>
         </motion.section>
 
         <motion.div
@@ -124,26 +126,17 @@ export default function ServicesClient() {
           <h2 className="text-3xl font-bold text-text-headings mb-8">
             Not sure which service you need?
           </h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact">
-              <motion.button
-                className="px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Request a Free Consult
-              </motion.button>
+          <CallAndMessageCtas location="services" className="justify-center" />
+          <p className="mt-6 text-lg text-text-secondary">
+            Want to see what I&apos;ve built first?{" "}
+            <Link
+              href="/projects"
+              className="text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm"
+            >
+              See my work
             </Link>
-            <Link href="/projects">
-              <motion.button
-                className="px-8 py-4 bg-rich-black border border-penn-blue text-text-primary font-bold rounded-full text-lg hover:border-blue-ncs transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                See My Work
-              </motion.button>
-            </Link>
-          </div>
+            .
+          </p>
         </motion.div>
       </div>
     </main>
