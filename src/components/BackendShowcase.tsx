@@ -4,14 +4,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import { useHoverMotion } from "../lib/motionPresets";
-
-interface Screenshot {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  features: string[];
-}
+import type { Screenshot } from "../types";
 
 interface BackendShowcaseProps {
   screenshots: Screenshot[];
@@ -50,13 +43,27 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
               onClick={() => setSelectedScreenshot(screenshot)}
             >
               <div className="h-40 sm:h-48 bg-penn-blue/50 relative overflow-hidden">
-                <Image
-                  src={screenshot.image}
-                  alt={screenshot.title}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                />
+                {screenshot.orientation === "portrait" ? (
+                  // A phone shot: show its top in a narrow column instead of
+                  // center-cropping it across the landscape frame.
+                  <div className="relative h-full w-1/2 mx-auto overflow-hidden">
+                    <Image
+                      src={screenshot.image}
+                      alt={screenshot.title}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    />
+                  </div>
+                ) : (
+                  <Image
+                    src={screenshot.image}
+                    alt={screenshot.title}
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
+                )}
               </div>
               <div className="p-4 sm:p-6">
                 <h3 className="text-lg sm:text-xl font-semibold text-text-headings mb-2">
@@ -118,16 +125,30 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <div
-                      className="relative cursor-pointer hover:opacity-90 transition-opacity"
+                      className={`relative cursor-pointer hover:opacity-90 transition-opacity${
+                        selectedScreenshot.orientation === "portrait"
+                          ? " w-fit mx-auto"
+                          : ""
+                      }`}
                       onClick={() => openImageModal(selectedScreenshot.image)}
                     >
-                      <Image
-                        src={selectedScreenshot.image}
-                        alt={selectedScreenshot.title}
-                        width={600}
-                        height={400}
-                        className="rounded-lg w-full h-auto"
-                      />
+                      {selectedScreenshot.orientation === "portrait" ? (
+                        <Image
+                          src={selectedScreenshot.image}
+                          alt={selectedScreenshot.title}
+                          width={390}
+                          height={844}
+                          className="rounded-lg w-auto h-auto max-h-[60vh] supports-[height:100dvh]:max-h-[60dvh]"
+                        />
+                      ) : (
+                        <Image
+                          src={selectedScreenshot.image}
+                          alt={selectedScreenshot.title}
+                          width={600}
+                          height={400}
+                          className="rounded-lg w-full h-auto"
+                        />
+                      )}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20 rounded-lg">
                         <span className="text-white bg-black/50 px-3 py-1 rounded text-xs sm:text-sm">
                           Click to enlarge

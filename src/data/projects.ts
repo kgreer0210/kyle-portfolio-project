@@ -51,6 +51,7 @@ export const projects: Project[] = [
           description:
             "The home page on a phone, with Find Your Photos and Request Photography buttons at the top.",
           image: "/projects/level-up-media-outlet/mobile-home.png",
+          orientation: "portrait",
           features: [
             "Phone-sized layout of the home page",
             "Quick path to buy photos",
