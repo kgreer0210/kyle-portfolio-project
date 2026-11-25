@@ -36,7 +36,7 @@ export const projects: Project[] = [
     challenge:
       "A sports photographer's site has to do more than show off photos. I needed one place where families could find the shots they want, request a shoot and book a time, sign a parent permission form, and pay for their gallery, while the owner could run requests, bookings, galleries, and refunds from a phone. Every uploaded photo also had to be watermarked automatically and have its location data stripped before anyone sees it.",
     outcome:
-      "The site launched to production on November 24, 2026. Families can browse a 49-photo sports portfolio, book a shoot, sign the permission form, and check out their photo gallery through Stripe, and the owner manages it all from an admin dashboard.",
+      "The site launched to production on November 24, 2026. Families can browse a collection of sports photos, book a shoot, sign the permission form, and check out their photo gallery through Stripe, and the owner manages it all from an admin dashboard.",
     backendShowcase: {
       available: true,
       title: "Inside the Site",
@@ -47,7 +47,7 @@ export const projects: Project[] = [
       screenshots: [
         {
           id: "mobile-home",
-          title: "Phone view",
+          title: "Mobile friendly",
           description:
             "The home page on a phone, with Find Your Photos and Request Photography buttons at the top.",
           image: "/projects/level-up-media-outlet/mobile-home.png",
@@ -74,10 +74,10 @@ export const projects: Project[] = [
           id: "portfolio",
           title: "Sports portfolio",
           description:
-            "The public portfolio gallery holds 49 sports photos from football, softball, basketball, and baseball.",
+            "The public portfolio gallery holds a collection of sports photos from football, softball, basketball, and baseball.",
           image: "/projects/level-up-media-outlet/portfolio.png",
           features: [
-            "49 sports photos",
+            "Collection of sports photos",
             "Photos stored on Cloudflare R2",
             "Location data stripped from every upload",
           ],

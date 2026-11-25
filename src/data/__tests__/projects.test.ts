@@ -174,6 +174,28 @@ describe("project copy", () => {
     );
   });
 
+  it("labels the Level Up phone screenshot Mobile friendly", () => {
+    const levelUp = projects.find((p) => p.id === "level-up-media-outlet");
+    const titles = levelUp?.backendShowcase?.screenshots.map((s) => s.title);
+    expect(titles).toContain("Mobile friendly");
+    expect(projectCopy(levelUp!)).not.toMatch(/phone view/i);
+  });
+
+  it("keeps photo counts out of Level Up copy", () => {
+    const levelUp = projects.find((p) => p.id === "level-up-media-outlet");
+    const copy = projectCopy(levelUp!);
+    expect(copy).not.toContain("49");
+    expect(copy).not.toMatch(/\d+[\s-]+(sports\s+)?photos?\b/i);
+    expect(copy).toContain("browse a collection of sports photos");
+    const portfolio = levelUp?.backendShowcase?.screenshots.find(
+      (s) => s.id === "portfolio",
+    );
+    expect(portfolio?.description).toBe(
+      "The public portfolio gallery holds a collection of sports photos from football, softball, basketball, and baseball.",
+    );
+    expect(portfolio?.features).toContain("Collection of sports photos");
+  });
+
   it("describes Dexter's site with plain listings wording", () => {
     const dexter = projects.find((p) => p.id === "dexter-gordy-realtor");
     expect(dexter?.description).toMatch(/featured listings/);
