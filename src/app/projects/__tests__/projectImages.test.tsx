@@ -111,6 +111,30 @@ describe("/projects/[projectId] page", () => {
     }
   });
 
+  it.each(["dexter-gordy-realtor", "level-up-media-outlet"])(
+    "sizes the %s gallery to its cards, not the viewport",
+    (projectId) => {
+      params.projectId = projectId;
+      try {
+        render(<ProjectDetailClient />);
+        const showcase = screen.getByTestId("backend-showcase");
+        // A min-h-screen wrapper leaves a blank band above the footer when
+        // the gallery is shorter than the viewport.
+        expect(showcase.className).not.toMatch(/\bmin-h-(screen|\[)/);
+        expect(showcase).not.toHaveClass("py-20");
+        expect(showcase).not.toHaveClass("pb-20");
+        const project = getPublishedProjects().find((p) => p.id === projectId);
+        const titles = project?.backendShowcase?.screenshots.map((s) => s.title) ?? [];
+        expect(titles.length).toBeGreaterThan(0);
+        for (const title of titles) {
+          expect(screen.getByRole("img", { name: title })).toBeInTheDocument();
+        }
+      } finally {
+        params.projectId = "dexter-gordy-realtor";
+      }
+    },
+  );
+
   it("asks for a message with a link, not a button", () => {
     const { container } = render(<ProjectDetailClient />);
     expect(

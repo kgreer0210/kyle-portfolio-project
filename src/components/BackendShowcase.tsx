@@ -30,9 +30,9 @@ export default function BackendShowcase({ screenshots }: BackendShowcaseProps) {
   };
 
   return (
-    <div
-      className="min-h-screen py-20"
-    >
+    // Only as tall as its cards: the project page's own bottom margin and
+    // padding already separate the gallery from the footer.
+    <div className="pt-20" data-testid="backend-showcase">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {screenshots.map((screenshot) => (
