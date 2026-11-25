@@ -22,6 +22,7 @@ describe("project knowledge from the portfolio", () => {
     const text = buildProjectKnowledge();
 
     for (const title of [
+      "Level Up Media Outlet",
       "Dexter Gordy Realtor",
       "Lisa Dunn Real Estate",
       "Lexi's Fresh Slate Cleanings",

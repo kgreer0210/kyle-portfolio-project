@@ -64,6 +64,53 @@ describe("/projects/[projectId] page", () => {
     );
   });
 
+  it("keeps landscape showcase thumbnails center-cropped in the landscape frame", () => {
+    render(<ProjectDetailClient />);
+    const thumb = screen.getByRole("img", { name: "Home search" });
+    expect(thumb).toHaveClass("object-cover");
+    expect(thumb).not.toHaveClass("object-top");
+    expect(thumb.parentElement).toHaveClass("h-40", "sm:h-48");
+  });
+
+  it("frames the Level Up phone view from the top in a narrow column", () => {
+    params.projectId = "level-up-media-outlet";
+    try {
+      render(<ProjectDetailClient />);
+      const thumb = screen.getByRole("img", { name: "Phone view" });
+      expect(thumb).toHaveClass("object-cover", "object-top");
+      expect(thumb).toHaveAttribute(
+        "sizes",
+        "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
+      );
+      const column = thumb.parentElement;
+      expect(column).toHaveClass("w-1/2", "mx-auto");
+      expect(column?.parentElement).toHaveClass("h-40", "sm:h-48");
+
+      // Other Level Up shots stay landscape.
+      const landscape = screen.getByRole("img", { name: "Sports portfolio" });
+      expect(landscape).toHaveClass("object-cover");
+      expect(landscape).not.toHaveClass("object-top");
+    } finally {
+      params.projectId = "dexter-gordy-realtor";
+    }
+  });
+
+  it("shows the whole phone view, not a crop, in the detail modal", () => {
+    params.projectId = "level-up-media-outlet";
+    try {
+      render(<ProjectDetailClient />);
+      fireEvent.click(screen.getByRole("img", { name: "Phone view" }));
+      const images = screen.getAllByRole("img", { name: "Phone view" });
+      const modalImage = images[images.length - 1];
+      expect(modalImage).toHaveAttribute("width", "390");
+      expect(modalImage).toHaveAttribute("height", "844");
+      expect(modalImage).toHaveClass("w-auto", "h-auto");
+      expect(modalImage).not.toHaveClass("object-cover");
+    } finally {
+      params.projectId = "dexter-gordy-realtor";
+    }
+  });
+
   it("asks for a message with a link, not a button", () => {
     const { container } = render(<ProjectDetailClient />);
     expect(

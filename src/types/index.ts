@@ -4,6 +4,12 @@ export interface Screenshot {
   description: string;
   image: string;
   features: string[];
+  /**
+   * Shape of the screenshot. Defaults to landscape (desktop shots). A
+   * portrait shot, such as a phone view, is framed from the top instead of
+   * being center-cropped into the landscape thumbnail.
+   */
+  orientation?: "landscape" | "portrait";
 }
 
 export interface Project {
