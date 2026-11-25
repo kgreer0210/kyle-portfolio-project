@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Breadcrumb } from "../../components";
+import { useReveal } from "../../lib/motionPresets";
 import { IDX_CONTACT_HREF, idxOffering } from "../../data/idx";
 import {
   DEXTER_LIVE_URL,
@@ -13,7 +14,6 @@ import {
   IDX_PAGE_H1,
   LISA_LIVE_URL,
   LISA_PROJECT_PATH,
-  WEBSITE_DESIGN_LINK_TOKEN,
   idxBothMls,
   idxBuildExtrasIntro,
   idxBuildIntro,
@@ -29,34 +29,41 @@ import {
   idxWork,
 } from "../../data/idxPage";
 import {
-  CONSULT_URL,
-  EMAIL,
+  BUSINESS_EMAIL,
+  CONSULT_CALL_URL,
+  EMAIL_HREF,
   PHONE_DISPLAY,
   PHONE_HREF,
-  WEBSITE_DESIGN_MG_PATH,
-} from "../../data/websiteDesignMiddleGeorgia";
+} from "../../data/contact";
+import { WEBSITE_DESIGN_MG_PATH } from "../../data/websiteDesignMiddleGeorgia";
+import {
+  trackBookCallClick,
+  trackEmailClick,
+  trackMessageClick,
+  trackPhoneClick,
+} from "@/lib/analytics";
+
+const trackCall = () => trackBookCallClick("idx");
+const trackMessage = () => trackMessageClick("idx");
+const trackPhone = () => trackPhoneClick("idx");
+const trackEmail = () => trackEmailClick("idx");
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
 const textLink = `text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli ${focusRing} rounded-sm`;
 
-const primaryButton = `inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
+const primaryButton = `inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs-strong px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
 const secondaryButton = `inline-flex w-full items-center justify-center rounded-[10px] border border-white/25 bg-transparent px-7 py-4 text-center text-base font-semibold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
-
-const reveal = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-  viewport: { once: true },
-} as const;
 
 function ExternalLink({
   href,
   className = textLink,
+  onClick,
   children,
 }: {
   href: string;
   className?: string;
+  onClick?: () => void;
   children: ReactNode;
 }) {
   return (
@@ -65,6 +72,7 @@ function ExternalLink({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      onClick={onClick}
     >
       {children}
       <span className="sr-only"> (opens in a new tab)</span>
@@ -81,6 +89,7 @@ function Section({
   heading: string;
   children: ReactNode;
 }) {
+  const { section: reveal } = useReveal();
   return (
     <motion.section className="mb-16" aria-labelledby={id} {...reveal}>
       <h2
@@ -122,33 +131,36 @@ const cardClass =
   "rounded-2xl border border-penn-blue bg-oxford-blue/40 p-6 md:p-8";
 const bodyText = "max-w-3xl text-lg leading-relaxed text-text-primary";
 
-/** Renders an FAQ answer, turning the Middle Georgia path into a link. */
-function FaqAnswer({ answer }: { answer: string }) {
-  const [before, after] = answer.split(WEBSITE_DESIGN_LINK_TOKEN);
-  if (after === undefined) return <>{answer}</>;
+/** Renders an FAQ answer, turning its `link` text (if any) into a link. */
+function FaqAnswer({
+  answer,
+  link,
+}: {
+  answer: string;
+  link?: { text: string; href: string };
+}) {
+  if (!link) return <>{answer}</>;
+  const at = answer.indexOf(link.text);
+  if (at === -1) return <>{answer}</>;
   return (
     <>
-      {before}
-      <Link href={WEBSITE_DESIGN_MG_PATH} className={textLink}>
-        {WEBSITE_DESIGN_LINK_TOKEN}
+      {answer.slice(0, at)}
+      <Link href={link.href} className={textLink}>
+        {link.text}
       </Link>
-      {after}
+      {answer.slice(at + link.text.length)}
     </>
   );
 }
 
 export default function IdxClient() {
+  const { section: reveal } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
-        <motion.div
-          className="mb-16 max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="mb-16 max-w-3xl">
           <span className="mb-6 inline-block rounded-full border border-blue-ncs/30 bg-blue-ncs/10 px-3 py-1 text-xs font-bold text-blue-ncs">
             IDX for Real Estate
           </span>
@@ -159,25 +171,33 @@ export default function IdxClient() {
             {idxPageIntro}
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href={IDX_CONTACT_HREF} className={primaryButton}>
-              {idxOffering.cta}
+            <Link
+              href={IDX_CONTACT_HREF}
+              className={primaryButton}
+              onClick={trackMessage}
+            >
+              Send me a message
             </Link>
-            <ExternalLink href={CONSULT_URL} className={secondaryButton}>
+            <ExternalLink
+              href={CONSULT_CALL_URL}
+              className={secondaryButton}
+              onClick={trackCall}
+            >
               Book a 30-min call
             </ExternalLink>
           </div>
           <p className="mt-4 text-base text-text-secondary">
             Or call{" "}
-            <a href={PHONE_HREF} className={textLink}>
+            <a href={PHONE_HREF} className={textLink} onClick={trackPhone}>
               {PHONE_DISPLAY}
             </a>{" "}
             or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
+              {BUSINESS_EMAIL}
             </a>
             .
           </p>
-        </motion.div>
+        </div>
 
         <Section id="idx-what-i-build" heading="What I build">
           <p className={`${bodyText} mb-6`}>{idxBuildIntro}</p>
@@ -397,7 +417,10 @@ export default function IdxClient() {
                   </svg>
                 </summary>
                 <p className="px-5 pb-5 leading-relaxed text-text-secondary md:px-6">
-                  <FaqAnswer answer={faq.answer} />
+                  <FaqAnswer
+                    answer={faq.answer}
+                    link={"link" in faq ? faq.link : undefined}
+                  />
                 </p>
               </details>
             ))}
@@ -407,10 +430,7 @@ export default function IdxClient() {
         <motion.section
           className="rounded-3xl border border-blue-ncs/20 bg-blue-ncs/10 p-8 text-center md:p-14"
           aria-labelledby="idx-talk-to-me"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...reveal}
         >
           <h2
             id="idx-talk-to-me"
@@ -422,20 +442,32 @@ export default function IdxClient() {
             {idxFinalCta.body}
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href={IDX_CONTACT_HREF} className={primaryButton}>
-              {idxOffering.cta}
+            <Link
+              href={IDX_CONTACT_HREF}
+              className={primaryButton}
+              onClick={trackMessage}
+            >
+              Send me a message
             </Link>
-            <ExternalLink href={CONSULT_URL} className={secondaryButton}>
+            <ExternalLink
+              href={CONSULT_CALL_URL}
+              className={secondaryButton}
+              onClick={trackCall}
+            >
               Book a 30-min call
             </ExternalLink>
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
+              {BUSINESS_EMAIL}
             </a>
             . Related pages:{" "}
             <Link href={WEBSITE_DESIGN_MG_PATH} className={textLink}>
@@ -457,6 +489,6 @@ export default function IdxClient() {
           </p>
         </motion.section>
       </div>
-    </main>
+    </div>
   );
 }

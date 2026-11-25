@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   extractEmails,
   extractPhones,
@@ -10,9 +11,12 @@ import {
   formatUsPhone,
   KYLE_PHONE_E164,
 } from "@/lib/chatContact";
+import { CONSULT_CALL_URL } from "@/data/contact";
+import { trackBookCallClick, trackPhoneClick } from "@/lib/analytics";
+import { useEntranceTransition, useHoverMotion } from "@/lib/motionPresets";
+import { FLOATING_CORNER } from "./floatingControls";
 import { useTurnstile } from "./useTurnstile";
 
-const CALENDLY_URL = "https://calendly.com/kylegreer-kygrsolutions/30min";
 const STORAGE_KEY = "kygr_chat_state_v1";
 const EMAIL_PROMPT_AFTER_TURNS = 3;
 type SendOutcome = "ok" | "rejected" | "failed";
@@ -112,7 +116,18 @@ export default function ChatWidget({
   // the initial closed-widget DOM doesn't depend on any of these values, so
   // lazy initialization can't cause a hydration mismatch.
   const [persisted] = useState(loadPersistedState);
+  const fieldId = useId();
+  // On /contact the full pill would sit over the form fields on phones, so
+  // the trigger shrinks to its icon there below sm. The text stays as the
+  // accessible name.
+  const compactTrigger = usePathname() === "/contact";
   const [isOpen, setIsOpen] = useState(false);
+  // An empty transition keeps motion's default tuning for the trigger.
+  const triggerEntrance = useEntranceTransition({});
+  const triggerPress = useHoverMotion(
+    { scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 17 } },
+    { scale: 0.95 },
+  );
   const [conversationId, setConversationId] = useState<string | null>(
     persisted.conversationId,
   );
@@ -550,18 +565,15 @@ export default function ChatWidget({
           <motion.button
             key="chat-trigger"
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-28 md:right-8 z-40 bg-blue-ncs hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center gap-2 px-4 py-3 min-h-[48px]"
-            initial={{ opacity: 0, scale: 0, y: 20 }}
+            className={`${FLOATING_CORNER} z-40 bg-blue-ncs-strong hover:bg-lapis-lazuli text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center gap-2 min-h-[48px] ${compactTrigger ? "min-w-[48px] p-3 sm:px-4 sm:py-3" : "px-4 py-3"}`}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0, y: 20 }}
-            whileHover={{
-              scale: 1.05,
-              transition: { type: "spring", stiffness: 400, damping: 17 },
-            }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Open chat with Kyle's AI assistant"
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={triggerEntrance}
+            {...triggerPress}
           >
             <svg
+              aria-hidden="true"
               className="w-5 h-5"
               fill="none"
               stroke="currentColor"
@@ -574,7 +586,11 @@ export default function ChatWidget({
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
-            <span className="text-sm font-semibold">Chat with my AI</span>
+            <span
+              className={`text-sm font-semibold${compactTrigger ? " sr-only sm:not-sr-only" : ""}`}
+            >
+              Chat with my AI
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -584,7 +600,7 @@ export default function ChatWidget({
         {isOpen && (
           <motion.div
             key="chat-panel"
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem)] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            className={`${FLOATING_CORNER} z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[600px] max-h-[calc(100vh-2rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] supports-[height:100dvh]:max-h-[calc(100dvh-2rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] bg-(--color-oxford-blue) border border-(--color-penn-blue) rounded-xl shadow-2xl flex flex-col overflow-hidden`}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -654,12 +670,13 @@ export default function ChatWidget({
                 Ready to talk to Kyle directly?
               </span>
               <a
-                href={CALENDLY_URL}
+                href={CONSULT_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
+                onClick={() => trackBookCallClick("chat")}
+                className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
               >
-                Book 30-min call
+                Book a 30-min call
               </a>
             </div>
 
@@ -691,30 +708,39 @@ export default function ChatWidget({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
+                    <label
+                      htmlFor={`${fieldId}-name`}
+                      className="block text-xs font-semibold text-(--color-text-secondary) mb-1"
+                    >
                       First name
                     </label>
                     <input
+                      id={`${fieldId}-name`}
                       type="text"
+                      autoComplete="given-name"
                       value={initialName}
                       onChange={(e) => setInitialName(e.target.value)}
                       placeholder="What should I call you? (optional)"
                       maxLength={100}
-                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs"
+                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
+                    <label
+                      htmlFor={`${fieldId}-message`}
+                      className="block text-xs font-semibold text-(--color-text-secondary) mb-1"
+                    >
                       What brought you here?
                     </label>
                     <textarea
+                      id={`${fieldId}-message`}
                       value={initialMessage}
                       onChange={(e) => setInitialMessage(e.target.value)}
                       placeholder="A short note about what you're trying to figure out — even a rough idea is fine."
                       maxLength={2000}
                       required
                       rows={4}
-                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs resize-none"
+                      className="w-full bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs resize-none"
                     />
                   </div>
                   <button
@@ -723,7 +749,7 @@ export default function ChatWidget({
                       !initialMessage.trim() ||
                       streaming
                     }
-                    className="w-full bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-2 rounded-md transition-colors"
+                    className="w-full bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-2 rounded-md transition-colors"
                   >
                     {streaming ? "Starting…" : "Start the conversation"}
                   </button>
@@ -792,16 +818,18 @@ export default function ChatWidget({
                 <form onSubmit={handleSaveEmail} className="flex gap-2">
                   <input
                     type="email"
+                    aria-label="Your email"
+                    autoComplete="email"
                     value={emailDraft}
                     onChange={(e) => setEmailDraft(e.target.value)}
                     placeholder="you@example.com"
                     maxLength={255}
-                    className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-xs rounded-md px-2 py-1.5 focus:outline-none focus:border-blue-ncs"
+                    className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-2 py-1.5 min-w-0 focus:outline-none focus:border-blue-ncs"
                   />
                   <button
                     type="submit"
                     disabled={!isValidEmail(emailDraft)}
-                    className="text-xs font-semibold bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-md transition-colors"
+                    className="text-xs font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-md transition-colors"
                   >
                     Save
                   </button>
@@ -850,7 +878,7 @@ export default function ChatWidget({
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={handleConfirmEnd}
-                        className="bg-blue-ncs hover:bg-lapis-lazuli text-white text-sm font-semibold py-2 rounded-md transition-colors"
+                        className="bg-blue-ncs-strong hover:bg-lapis-lazuli text-white text-sm font-semibold py-2 rounded-md transition-colors"
                       >
                         End conversation
                       </button>
@@ -874,6 +902,7 @@ export default function ChatWidget({
               >
                 <input
                   type="text"
+                  aria-label="Your message"
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder={
@@ -881,12 +910,12 @@ export default function ChatWidget({
                   }
                   disabled={streaming}
                   maxLength={4000}
-                  className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-md px-3 py-2 focus:outline-none focus:border-blue-ncs disabled:opacity-60"
+                  className="flex-1 bg-(--color-oxford-blue) border border-(--color-penn-blue) text-(--color-text-primary) text-base rounded-md px-3 py-2 min-w-0 focus:outline-none focus:border-blue-ncs disabled:opacity-60"
                 />
                 <button
                   type="submit"
                   disabled={!draft.trim() || streaming}
-                  className="bg-blue-ncs hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md transition-colors text-sm font-semibold"
+                  className="bg-blue-ncs-strong hover:bg-lapis-lazuli disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md transition-colors text-sm font-semibold"
                   aria-label="Send message"
                 >
                   Send
@@ -906,7 +935,7 @@ function VerificationFallback({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="font-semibold bg-blue-ncs hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
+        className="font-semibold bg-blue-ncs-strong hover:bg-lapis-lazuli text-white px-3 py-1.5 rounded-md transition-colors"
       >
         Try the security check again
       </button>
@@ -914,6 +943,7 @@ function VerificationFallback({ onRetry }: { onRetry: () => void }) {
         Or reach me directly: call{" "}
         <a
           href={`tel:${KYLE_PHONE_E164}`}
+          onClick={() => trackPhoneClick("chat")}
           className="text-(--color-text-primary) underline"
         >
           {formatUsPhone(KYLE_PHONE_E164)}
@@ -941,7 +971,7 @@ function ChatBubble({
       <div
         className={
           isUser
-            ? "max-w-[85%] bg-blue-ncs text-white text-sm rounded-2xl rounded-br-sm px-3 py-2 whitespace-pre-wrap"
+            ? "max-w-[85%] bg-blue-ncs-strong text-white text-sm rounded-2xl rounded-br-sm px-3 py-2 whitespace-pre-wrap"
             : "max-w-[85%] bg-(--color-rich-black) border border-(--color-penn-blue) text-(--color-text-primary) text-sm rounded-2xl rounded-bl-sm px-3 py-2 whitespace-pre-wrap"
         }
       >

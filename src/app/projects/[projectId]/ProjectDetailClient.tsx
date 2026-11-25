@@ -3,40 +3,40 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { projects } from "../../../data/projects";
 import { BackendShowcase, Breadcrumb } from "../../../components";
+import { trackMessageClick } from "../../../lib/analytics";
+import { useHoverMotion, useReveal } from "../../../lib/motionPresets";
+
+const MotionLink = motion.create(Link);
 
 export default function ProjectDetailClient() {
   const params = useParams();
-  const router = useRouter();
   const projectId = params.projectId as string;
   const project = projects.find((p) => p.id === projectId);
+  const { section } = useReveal();
+  const linkPress = useHoverMotion({ scale: 1.02 }, { scale: 0.98 });
 
   if (!project) {
     return (
       <div className="pt-32 pb-20 text-center">
         <h1 className="text-2xl text-text-primary">Project not found</h1>
-        <button 
-          onClick={() => router.push("/projects")}
-          className="mt-4 text-blue-ncs hover:underline"
+        <Link
+          href="/projects"
+          className="mt-4 inline-block text-blue-ncs hover:underline"
         >
           Back to all projects
-        </button>
+        </Link>
       </div>
     );
   }
 
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="mb-12">
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech, idx) => (
               <span key={idx} className="px-3 py-1 bg-blue-ncs/10 text-blue-ncs text-xs font-bold rounded-full">
@@ -50,22 +50,21 @@ export default function ProjectDetailClient() {
           <p className="text-xl text-text-secondary max-w-3xl leading-relaxed">
             {project.description}
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
+        <div
           className="aspect-video relative rounded-3xl overflow-hidden border border-penn-blue shadow-2xl mb-16"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
         >
           <Image
             src={project.image}
             alt={project.title}
             fill
+            // Full content width; max-w-6xl minus padding caps it at 1104px.
+            sizes="(min-width: 1152px) 1104px, 100vw"
             className="object-cover"
             priority
           />
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
           <div className="md:col-span-2 space-y-12">
@@ -123,25 +122,22 @@ export default function ProjectDetailClient() {
                   </div>
                 )}
               </div>
-              <motion.button
-                onClick={() => router.push("/contact")}
-                className="w-full mt-8 py-4 rounded-xl bg-blue-ncs text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <MotionLink
+                href="/contact"
+                onClick={() => trackMessageClick("project_detail")}
+                className="flex w-full items-center justify-center mt-8 py-4 rounded-xl bg-blue-ncs-strong text-white font-bold hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                {...linkPress}
               >
-                Inquire About Similar Project
-              </motion.button>
+                Send me a message
+              </MotionLink>
             </div>
           </div>
         </div>
 
         {project.backendShowcase?.available && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
             className="mb-20"
+            {...section}
           >
             <div className="mb-12 text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-4">
@@ -156,7 +152,7 @@ export default function ProjectDetailClient() {
           </motion.div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -4,17 +4,31 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Breadcrumb } from "../../components";
+import { useReveal } from "../../lib/motionPresets";
 import { IDX_PATH } from "../../data/idx";
 import {
-  CONSULT_URL,
-  EMAIL,
+  BUSINESS_EMAIL,
+  CONSULT_CALL_URL,
+  EMAIL_HREF,
   PHONE_DISPLAY,
   PHONE_HREF,
+} from "../../data/contact";
+import {
   websiteDesignMgFaqs,
   websiteDesignMgH1,
   websiteDesignMgIntro,
   websiteDesignMgSteps,
 } from "../../data/websiteDesignMiddleGeorgia";
+import {
+  trackBookCallClick,
+  trackEmailClick,
+  trackMessageClick,
+  trackPhoneClick,
+} from "@/lib/analytics";
+
+const trackPhone = () => trackPhoneClick("local_landing");
+const trackMessage = () => trackMessageClick("local_landing");
+const trackEmail = () => trackEmailClick("local_landing");
 
 const LEXI_PATH = "/projects/lexisFreshSlateCleanings";
 const DEXTER_PATH = "/projects/dexter-gordy-realtor";
@@ -23,23 +37,17 @@ const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
 const textLink = `text-blue-ncs underline underline-offset-4 hover:text-lapis-lazuli ${focusRing} rounded-sm`;
 
-const primaryButton = `inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
+const primaryButton = `inline-flex w-full items-center justify-center rounded-[10px] bg-blue-ncs-strong px-7 py-4 text-center text-base font-semibold text-white shadow-lg transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
 const secondaryButton = `inline-flex w-full items-center justify-center rounded-[10px] border border-white/25 bg-transparent px-7 py-4 text-center text-base font-semibold text-text-headings transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto`;
-
-const reveal = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-  viewport: { once: true },
-} as const;
 
 function ConsultButton({ className }: { className: string }) {
   return (
     <a
-      href={CONSULT_URL}
+      href={CONSULT_CALL_URL}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      onClick={() => trackBookCallClick("local_landing")}
     >
       Book a 30-min call
       <span className="sr-only"> (opens in a new tab)</span>
@@ -56,6 +64,7 @@ function Section({
   heading: string;
   children: ReactNode;
 }) {
+  const { section: reveal } = useReveal();
   return (
     <motion.section className="mb-16" aria-labelledby={id} {...reveal}>
       <h2
@@ -70,17 +79,13 @@ function Section({
 }
 
 export default function WebsiteDesignMiddleGeorgiaClient() {
+  const { section: reveal } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Breadcrumb />
 
-        <motion.div
-          className="mb-16 max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="mb-16 max-w-3xl">
           <h1 className="mb-6 text-4xl font-bold text-text-headings md:text-5xl">
             {websiteDesignMgH1}
           </h1>
@@ -94,18 +99,22 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           ))}
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <ConsultButton className={primaryButton} />
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
           </div>
           <p className="mt-4 text-base text-text-secondary">
             Prefer to write?{" "}
-            <Link href="/contact" className={textLink}>
-              Use the contact form
+            <Link href="/contact" className={textLink} onClick={trackMessage}>
+              Send me a message
             </Link>
             .
           </p>
-        </motion.div>
+        </div>
 
         <Section id="what-i-build" heading="What I build for local businesses">
           <p className="mb-6 max-w-3xl text-lg leading-relaxed text-text-primary">
@@ -262,8 +271,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
               <p className="mb-4 leading-relaxed text-text-primary">
                 A custom website for a Middle Georgia realtor, with IDX home
                 search across Central Georgia MLS and Georgia MLS, his featured
-                and recently sold listings, and easy ways for buyers to reach
-                him.
+                listings, and easy ways for buyers to reach him.
               </p>
               <p className="leading-relaxed text-text-secondary">
                 I&apos;m an approved IDX vendor with access to both MLSs. If
@@ -402,10 +410,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
         <motion.section
           className="rounded-3xl border border-blue-ncs/20 bg-blue-ncs/10 p-8 text-center md:p-14"
           aria-labelledby="lets-talk"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          {...reveal}
         >
           <h2
             id="lets-talk"
@@ -420,17 +425,25 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <ConsultButton className={primaryButton} />
-            <a href={PHONE_HREF} className={secondaryButton}>
+            <a
+              href={PHONE_HREF}
+              className={secondaryButton}
+              onClick={trackPhone}
+            >
               Call {PHONE_DISPLAY}
             </a>
-            <Link href="/contact" className={secondaryButton}>
-              Contact me
+            <Link
+              href="/contact"
+              className={secondaryButton}
+              onClick={trackMessage}
+            >
+              Send me a message
             </Link>
           </div>
           <p className="mt-6 text-text-secondary">
             Or email{" "}
-            <a href={`mailto:${EMAIL}`} className={textLink}>
-              {EMAIL}
+            <a href={EMAIL_HREF} className={textLink} onClick={trackEmail}>
+              {BUSINESS_EMAIL}
             </a>
             . Want the longer story first? Read{" "}
             <Link href="/about" className={textLink}>
@@ -440,6 +453,6 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
           </p>
         </motion.section>
       </div>
-    </main>
+    </div>
   );
 }

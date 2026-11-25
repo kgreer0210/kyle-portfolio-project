@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useSyncExternalStore } from "react";
 import { Renderer, Camera, Geometry, Program, Mesh } from "ogl";
+import { readParticleEnvironment, selectParticleConfig } from "./particleConfig";
 
 interface ParticlesProps {
   particleCount?: number;
@@ -109,6 +110,24 @@ const fragment = /* glsl */ `
   }
 `;
 
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const mql = window.matchMedia?.(REDUCED_MOTION_QUERY);
+  if (!mql) return () => {};
+  // Safari before 14 only has the deprecated addListener API.
+  if (typeof mql.addEventListener === "function") {
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }
+  mql.addListener(onChange);
+  return () => mql.removeListener(onChange);
+}
+
+function prefersReducedMotionNow() {
+  return Boolean(window.matchMedia?.(REDUCED_MOTION_QUERY).matches);
+}
+
 const Particles: React.FC<ParticlesProps> = ({
   particleCount = 200,
   particleSpread = 10,
@@ -125,25 +144,43 @@ const Particles: React.FC<ParticlesProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  // Changing the setting rebuilds the scene below, so turning on reduced
+  // motion mid-visit stops the loop and leaves a still frame.
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    prefersReducedMotionNow,
+    () => false,
+  );
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const renderer = new Renderer({ depth: false, alpha: true });
+    // Lighter on touch and small screens, DPR capped, and a single still
+    // frame for reduced-motion users.
+    const config = selectParticleConfig(readParticleEnvironment(), {
+      followPointer: moveParticlesOnHover,
+      desktopCount: particleCount,
+    });
+
+    const renderer = new Renderer({ depth: false, alpha: true, dpr: config.dpr });
     const gl = renderer.gl;
     gl.canvas.style.pointerEvents = "none";
+    gl.canvas.style.display = "block";
     container.appendChild(gl.canvas);
     gl.clearColor(0, 0, 0, 0);
 
     const camera = new Camera(gl, { fov: 15 });
     camera.position.set(0, 0, cameraDistance);
 
+    // Resizing clears the canvas, so a still (reduced-motion) frame is redrawn.
+    let drawStill: (() => void) | null = null;
     const resize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
       renderer.setSize(width, height);
       camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+      drawStill?.();
     };
     window.addEventListener("resize", resize, false);
     resize();
@@ -154,11 +191,11 @@ const Particles: React.FC<ParticlesProps> = ({
       mouseRef.current = { x, y };
     };
 
-    if (moveParticlesOnHover) {
+    if (config.followPointer) {
       document.addEventListener("mousemove", handleMouseMove);
     }
 
-    const count = particleCount;
+    const count = config.particleCount;
     const positions = new Float32Array(count * 3);
     const randoms = new Float32Array(count * 4);
     const colors = new Float32Array(count * 3);
@@ -209,6 +246,7 @@ const Particles: React.FC<ParticlesProps> = ({
 
     let animationFrameId = 0;
     let running = false;
+    let contextLost = false;
     let visible = true;
     let lastTime = performance.now();
     let elapsed = 0;
@@ -222,7 +260,7 @@ const Particles: React.FC<ParticlesProps> = ({
 
       program.uniforms.uTime.value = elapsed * 0.001;
 
-      if (moveParticlesOnHover) {
+      if (config.followPointer) {
         particles.position.x = -mouseRef.current.x * particleHoverFactor;
         particles.position.y = -mouseRef.current.y * particleHoverFactor;
       } else {
@@ -240,7 +278,7 @@ const Particles: React.FC<ParticlesProps> = ({
     };
 
     const start = () => {
-      if (running) return;
+      if (running || contextLost || !config.animate) return;
       running = true;
       lastTime = performance.now();
       animationFrameId = requestAnimationFrame(renderFrame);
@@ -256,19 +294,38 @@ const Particles: React.FC<ParticlesProps> = ({
       else stop();
     };
 
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = entry?.isIntersecting ?? false;
+    // Losing the context stops the loop for good and removes the canvas, so
+    // the gradient behind it shows through instead of a blank layer.
+    const handleContextLost = () => {
+      contextLost = true;
+      stop();
+      if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
+    };
+    gl.canvas.addEventListener("webglcontextlost", handleContextLost, false);
+
+    let observer: IntersectionObserver | null = null;
+    if (config.animate) {
+      observer = new IntersectionObserver(([entry]) => {
+        visible = entry?.isIntersecting ?? false;
+        syncPlayback();
+      });
+      observer.observe(container);
+      document.addEventListener("visibilitychange", syncPlayback);
       syncPlayback();
-    });
-    observer.observe(container);
-    document.addEventListener("visibilitychange", syncPlayback);
-    syncPlayback();
+    } else {
+      // Reduced motion: one still frame, no loop.
+      drawStill = () => {
+        if (!contextLost) renderer.render({ scene: particles, camera });
+      };
+      drawStill();
+    }
 
     return () => {
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", syncPlayback);
-      observer.disconnect();
-      if (moveParticlesOnHover) {
+      gl.canvas.removeEventListener("webglcontextlost", handleContextLost);
+      observer?.disconnect();
+      if (config.followPointer) {
         document.removeEventListener("mousemove", handleMouseMove);
       }
       stop();
@@ -288,6 +345,7 @@ const Particles: React.FC<ParticlesProps> = ({
     cameraDistance,
     disableRotation,
     particleColors,
+    reducedMotion,
   ]);
 
   return (

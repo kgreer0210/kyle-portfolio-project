@@ -5,9 +5,70 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Hero, HowItWorks, Testimonials } from "../components";
+import { CONSULT_CALL_URL } from "../data/contact";
 import { IDX_PATH, idxOffering } from "../data/idx";
 import { getFeaturedProjects } from "../data/projects";
 import { services } from "../data/services";
+import {
+  trackBookCallClick,
+  trackMessageClick,
+  type CtaLocation,
+} from "../lib/analytics";
+import { useHoverMotion, useReveal } from "../lib/motionPresets";
+
+const MotionLink = motion.create(Link);
+
+const LINK_HOVER = { scale: 1.05 };
+const LINK_TAP = { scale: 0.95 };
+
+const outlineLinkClass =
+  "inline-flex items-center justify-center px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs-strong hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs";
+
+const primaryLinkClass =
+  "inline-flex items-center justify-center px-8 py-4 bg-blue-ncs-strong text-white font-bold rounded-full hover:bg-lapis-lazuli transition-colors shadow-lg shadow-blue-ncs/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
+/** Primary CTA: opens the Consult call on Calendly and tracks the click. */
+function BookCallLink({
+  ctaLocation,
+  className,
+}: {
+  ctaLocation: CtaLocation;
+  className: string;
+}) {
+  const linkPress = useHoverMotion(LINK_HOVER, LINK_TAP);
+  return (
+    <MotionLink
+      href={CONSULT_CALL_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackBookCallClick(ctaLocation)}
+      className={className}
+      {...linkPress}
+    >
+      Book a 30-min call
+      <span className="sr-only"> (opens in a new tab)</span>
+    </MotionLink>
+  );
+}
+
+/** Secondary CTA: a text link to the contact form. */
+function SendMessageLink({
+  location,
+  className = "",
+}: {
+  location: CtaLocation;
+  className?: string;
+}) {
+  return (
+    <Link
+      href="/contact"
+      onClick={() => trackMessageClick(location)}
+      className={`font-bold text-blue-ncs underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs rounded-sm ${className}`}
+    >
+      Send me a message
+    </Link>
+  );
+}
 
 export default function HomeClient() {
   // Handle page refresh - always start at top and clear hash
@@ -30,27 +91,20 @@ export default function HomeClient() {
   }, []);
 
   const featuredProjects = getFeaturedProjects();
+  const { section } = useReveal();
+  const linkPress = useHoverMotion(LINK_HOVER, LINK_TAP);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      {/* Hero Section */}
+    <div>
       <div className="relative z-10">
+        {/* Hero Section */}
         <Hero />
-      </div>
 
-      <main className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Value Proposition / Intro */}
         <section className="py-20 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <h2 className="text-3xl md:text-5xl font-bold text-text-headings mb-6">
               Digital Tools That{" "}
@@ -58,8 +112,8 @@ export default function HomeClient() {
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
               I build websites, web & mobile apps, and automations that win
-              you more leads and take work off your plate. And I don&apos;t
-              settle for &quot;good enough.&quot; I sweat the details nobody
+              you more leads and take work off your plate. And I don’t
+              settle for “good enough.” I sweat the details nobody
               else would notice, because the work should be right.
             </p>
             <p className="text-lg text-text-secondary max-w-3xl mx-auto leading-relaxed mt-4">
@@ -76,7 +130,7 @@ export default function HomeClient() {
         </section>
 
         {/* Services Summary */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
@@ -87,34 +141,29 @@ export default function HomeClient() {
                 bottlenecks.
               </p>
             </div>
-            <Link href="/services">
-              <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs hover:text-white transition-all"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                View All Services
-              </motion.button>
-            </Link>
+            <MotionLink
+              href="/services"
+              className={outlineLinkClass}
+              {...linkPress}
+            >
+              View All Services
+            </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-              <motion.div
+            {services.map((service) => (
+              <div
                 key={service.title}
                 className="p-8 rounded-2xl bg-oxford-blue/40 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
               >
                 <h3 className="text-xl font-bold text-blue-ncs mb-3">
                   {service.title}
                 </h3>
-                <p className="text-text-secondary mb-4 line-clamp-2">
+                <p className="text-text-secondary mb-4">
                   {service.description}
                 </p>
+                {/* Bullet 1 restates the description, so show bullets 2–3. */}
                 <ul className="space-y-2 mb-6">
-                  {service.points.slice(0, 2).map((point, idx) => (
+                  {service.points.slice(1, 3).map((point, idx) => (
                     <li
                       key={idx}
                       className="text-sm text-text-primary flex gap-2"
@@ -123,20 +172,15 @@ export default function HomeClient() {
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Tech Stack Review Spotlight */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
                 New Service
               </span>
@@ -151,26 +195,20 @@ export default function HomeClient() {
                 gives you a clear picture of where you stand — and exactly what
                 to do next.
               </p>
-              <Link href="/contact">
-                <motion.button
-                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Schedule Your Tech Audit
-                </motion.button>
-              </Link>
-            </motion.div>
+              <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-6">
+                <BookCallLink
+                  ctaLocation="home_tech_review"
+                  className={primaryLinkClass}
+                />
+                <SendMessageLink location="home_tech_review" />
+              </div>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
             >
               <h3 className="text-xl font-bold text-blue-ncs mb-6">
-                What&apos;s Included
+                What’s Included
               </h3>
               <ul className="space-y-4">
                 {[
@@ -179,13 +217,9 @@ export default function HomeClient() {
                   "Get a prioritized action plan you can act on immediately",
                   "No jargon — just clear, honest recommendations",
                 ].map((point, idx) => (
-                  <motion.li
+                  <li
                     key={idx}
                     className="flex gap-3 text-text-primary"
-                    initial={{ opacity: 0, x: 10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 + idx * 0.08 }}
-                    viewport={{ once: true }}
                   >
                     <span className="mt-1 w-5 h-5 rounded-full bg-blue-ncs/10 border border-blue-ncs/40 flex items-center justify-center flex-shrink-0">
                       <svg className="w-3 h-3 text-blue-ncs" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,21 +227,16 @@ export default function HomeClient() {
                       </svg>
                     </span>
                     {point}
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="py-20" aria-labelledby="idx-home-heading">
+        <motion.section className="py-20" aria-labelledby="idx-home-heading" {...section}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
                 IDX for Real Estate
               </span>
@@ -223,23 +252,17 @@ export default function HomeClient() {
               <p className="text-lg text-text-secondary mb-8 leading-relaxed">
                 {idxOffering.body}
               </p>
-              <Link href={IDX_PATH}>
-                <motion.button
-                  className="px-8 py-4 bg-blue-ncs text-white font-bold rounded-full hover:bg-lapis-lazuli transition-all shadow-lg shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  See the IDX offering
-                </motion.button>
-              </Link>
-            </motion.div>
+              <MotionLink
+                href={IDX_PATH}
+                className={primaryLinkClass}
+                {...linkPress}
+              >
+                See the IDX offering
+              </MotionLink>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/60 border border-blue-ncs/30"
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
             >
               <h3 className="text-xl font-bold text-blue-ncs mb-6">
                 Built into your site
@@ -270,18 +293,14 @@ export default function HomeClient() {
               <p className="mt-6 text-sm font-semibold text-blue-ncs">
                 {idxOffering.pricing}
               </p>
-            </motion.div>
+            </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Story: first client */}
-        <section className="py-20" aria-labelledby="weekends-story-heading">
-          <motion.div
+        <motion.section className="py-20" aria-labelledby="weekends-story-heading" {...section}>
+          <div
             className="rounded-3xl border border-blue-ncs/10 bg-blue-ncs/5 p-8 md:p-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
           >
             <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-ncs/10 text-blue-ncs border border-blue-ncs/30 mb-6">
               A story from my first client
@@ -293,12 +312,12 @@ export default function HomeClient() {
               Her weekends back
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-3xl">
-              Lexi runs Lexi&apos;s Fresh Slate Cleanings. She was spending
+              Lexi runs Lexi’s Fresh Slate Cleanings. She was spending
               hours every weekend copying and pasting reminder texts to her
               customers. I built a system tied to her calendar that sends them
               all with one button. The carrier registration paperwork for
               texting was the least fun part of the build, but I pushed
-              through. She&apos;s told me it gave her weekends back. That&apos;s
+              through. She’s told me it gave her weekends back. That’s
               the kind of work I love.
             </p>
             <Link
@@ -308,51 +327,46 @@ export default function HomeClient() {
               See the project
               <span aria-hidden="true">&rarr;</span>
             </Link>
-          </motion.div>
-        </section>
+          </div>
+        </motion.section>
         </div>
 
         <HowItWorks />
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Featured Projects */}
-        <section className="py-20">
+        <motion.section className="py-20" {...section}>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4">
                 Featured Work
               </h2>
               <p className="text-lg text-text-secondary">
-                Real projects for real people, from a Realtor&apos;s home
+                Real projects for real people, from a Realtor’s home
                 search to a cleaning business owner who got her weekends back.
               </p>
             </div>
-            <Link href="/projects">
-              <motion.button
-                className="px-6 py-3 rounded-xl border border-blue-ncs text-blue-ncs font-bold hover:bg-blue-ncs hover:text-white transition-all"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                View All Projects
-              </motion.button>
-            </Link>
+            <MotionLink
+              href="/projects"
+              className={outlineLinkClass}
+              {...linkPress}
+            >
+              View All Projects
+            </MotionLink>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {featuredProjects.map((project, index) => (
-              <motion.div
+            {featuredProjects.map((project) => (
+              <div
                 key={project.id}
                 className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden"
-                initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
               >
                 <div className="aspect-video relative overflow-hidden">
                   <Image
                     src={project.image}
                     alt={project.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(min-width: 1200px) 532px, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />
                 </div>
@@ -383,10 +397,10 @@ export default function HomeClient() {
                     </svg>
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Testimonials */}
         <section className="py-20">
@@ -397,10 +411,7 @@ export default function HomeClient() {
         <section className="py-20 text-center">
           <motion.div
             className="relative overflow-hidden rounded-[3rem] border border-blue-ncs/20 bg-oxford-blue/70 p-12 shadow-2xl backdrop-blur-sm md:p-20"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            {...section}
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-ncs/10 blur-[100px] rounded-full -mr-32 -mt-32" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-lapis-lazuli/10 blur-[100px] rounded-full -ml-32 -mb-32" />
@@ -410,34 +421,30 @@ export default function HomeClient() {
               <span className="text-blue-ncs">business?</span>
             </h2>
             <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
-              Let&apos;s build the thing you&apos;ve been picturing, and give
+              Let’s build the thing you’ve been picturing, and give
               you your time back. Hard problems welcome.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-              <Link href="/contact">
-                <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-blue-ncs text-white font-bold rounded-full text-lg hover:bg-lapis-lazuli transition-all shadow-xl shadow-blue-ncs/20"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Schedule Your Free Consult
-                </motion.button>
-              </Link>
-              <Link href="/about">
-                <motion.button
-                  className="w-full sm:w-auto px-10 py-4 bg-transparent border border-penn-blue text-text-primary font-bold rounded-full text-lg hover:border-blue-ncs transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Meet Kyle
-                </motion.button>
-              </Link>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 relative z-10">
+              <BookCallLink
+                ctaLocation="home_final"
+                className="inline-flex w-full items-center justify-center rounded-full bg-blue-ncs-strong px-10 py-4 text-lg font-bold text-white shadow-xl shadow-blue-ncs/20 transition-colors hover:bg-lapis-lazuli focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
+              />
+              <MotionLink
+                href="/about"
+                className="inline-flex w-full items-center justify-center rounded-full border border-penn-blue bg-transparent px-10 py-4 text-lg font-bold text-text-primary transition-colors hover:border-blue-ncs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-ncs sm:w-auto"
+                {...linkPress}
+              >
+                About me
+              </MotionLink>
             </div>
+            <p className="relative z-10 mt-8 text-lg text-text-secondary">
+              Prefer to write? <SendMessageLink location="home_final" />
+            </p>
           </motion.div>
         </section>
         </div>
-      </main>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

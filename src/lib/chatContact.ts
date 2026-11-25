@@ -1,3 +1,5 @@
+import { PHONE_E164 } from "@/data/contact";
+
 /**
  * Pure helpers for capturing a visitor's email or phone from chat text and for
  * deciding when the assistant may ask for one. No I/O, so everything here is
@@ -15,7 +17,7 @@ const MAX_EMAIL_LENGTH = 254;
 
 // Kyle's published direct line (faq.md). A visitor repeating it back is not
 // giving us their own number.
-export const KYLE_PHONE_E164 = "+14787771266";
+export const KYLE_PHONE_E164 = PHONE_E164;
 
 // File extensions that look like a TLD ("icon@2x.png").
 const NOT_A_TLD = new Set([
@@ -103,7 +105,7 @@ export function extractPhones(text: string): string[] {
   return [...found];
 }
 
-/** "+14787771266" -> "(478) 777-1266". Anything else is returned unchanged. */
+/** "+14045550199" -> "(404) 555-0199". Anything else is returned unchanged. */
 export function formatUsPhone(e164: string): string {
   const match = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(e164);
   return match ? `(${match[1]}) ${match[2]}-${match[3]}` : e164;

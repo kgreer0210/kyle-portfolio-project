@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Breadcrumb } from "../../components";
 import { isComingSoonProject, projects } from "../../data/projects";
 import { Project } from "../../types";
+import { useReveal } from "../../lib/motionPresets";
 
 function ComingSoonVisual({ title }: { title: string }) {
   return (
@@ -40,6 +41,10 @@ function ComingSoonVisual({ title }: { title: string }) {
 }
 
 export default function ProjectsClient() {
+  const { section } = useReveal();
+  // Each card reveals on its own as it scrolls in, with no stagger. The
+  // first row is on screen at load (the first image is the mobile LCP), so
+  // it renders visible instead.
   const renderProjectCard = (project: Project, index: number) => {
     const comingSoon = isComingSoonProject(project);
 
@@ -47,10 +52,7 @@ export default function ProjectsClient() {
       <motion.div
         key={project.id}
         className="group relative bg-oxford-blue/30 border border-penn-blue rounded-3xl overflow-hidden hover:border-blue-ncs transition-colors duration-500"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: index * 0.1 }}
-        viewport={{ once: true }}
+        {...(index < 2 ? {} : section)}
       >
         <div className="aspect-video relative overflow-hidden">
           {comingSoon ? (
@@ -61,7 +63,12 @@ export default function ProjectsClient() {
                 src={project.image}
                 alt={project.title}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                {...(index === 0
+                  ? { loading: "eager" as const, fetchPriority: "high" as const }
+                  : {})}
+                // Two columns from md; max-w-6xl minus padding and the gap caps a card at 532px.
+                sizes="(min-width: 1152px) 532px, (min-width: 768px) 50vw, 100vw"
+                className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-linear-to-t from-rich-black via-transparent to-transparent opacity-60" />
             </>
@@ -113,28 +120,23 @@ export default function ProjectsClient() {
   };
 
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-32 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6 text-center">
             My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
             A look at what I&apos;ve built for local businesses, ministries, and my own household, from custom websites to the tools that keep a business running.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {projects.map((project, index) => renderProjectCard(project, index))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

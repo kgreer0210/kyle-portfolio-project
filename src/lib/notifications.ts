@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { BUSINESS_EMAIL } from "@/data/contact";
 import { formatUsPhone } from "./chatContact";
 import type { Qualification } from "./leadQualification";
 
@@ -28,7 +29,7 @@ export async function sendEmailNotification(data: CallNotificationData) {
 
     const resend = new Resend(apiKey);
     const notificationEmail =
-      process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
+      process.env.CONTACT_EMAIL || BUSINESS_EMAIL;
     const durationSec = data.duration ? Math.round(data.duration / 1000) : 0;
     const caller = data.callerName || data.fromNumber || "Unknown";
     const urgencyColor =
@@ -39,7 +40,7 @@ export async function sendEmailNotification(data: CallNotificationData) {
           : "#00cc66";
 
     await resend.emails.send({
-      from: "KYGR Call Alerts <info@kygrsolutions.com>",
+      from: `KYGR Call Alerts <${BUSINESS_EMAIL}>`,
       to: notificationEmail,
       subject: `📞 Missed Call from ${caller}${data.urgency === "high" ? " [URGENT]" : ""}`,
       html: `
@@ -196,7 +197,7 @@ export async function sendContactLeadEmail(
     }
 
     const resend = new Resend(apiKey);
-    const to = process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
+    const to = process.env.CONTACT_EMAIL || BUSINESS_EMAIL;
     const q = data.qualification;
     const tier = q?.score_tier ?? null;
     const tierLabel = tier ? tier.toUpperCase() : "UNQUALIFIED";
@@ -227,7 +228,7 @@ export async function sendContactLeadEmail(
       : "";
 
     await resend.emails.send({
-      from: "KYGR Lead Alerts <info@kygrsolutions.com>",
+      from: `KYGR Lead Alerts <${BUSINESS_EMAIL}>`,
       to,
       replyTo: data.email,
       subject: subjectLine,
@@ -370,7 +371,7 @@ export interface ChatDigestEmailData {
   conversationId: string;
   visitorName: string | null;
   visitorEmail: string | null;
-  /** E.164, e.g. +14787771266. */
+  /** E.164, e.g. +14045550199. */
   visitorPhone?: string | null;
   startedAt: string;
   endedAt: string;
@@ -531,11 +532,11 @@ export async function sendChatDigestEmail(
     }
 
     const resend = new Resend(apiKey);
-    const to = process.env.CONTACT_EMAIL || "info@kygrsolutions.com";
+    const to = process.env.CONTACT_EMAIL || BUSINESS_EMAIL;
     const { subject, html, text } = buildChatDigestEmail(data);
 
     await resend.emails.send({
-      from: "KYGR Chat Alerts <info@kygrsolutions.com>",
+      from: `KYGR Chat Alerts <${BUSINESS_EMAIL}>`,
       to,
       replyTo: data.visitorEmail || undefined,
       subject,

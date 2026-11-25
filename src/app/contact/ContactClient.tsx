@@ -2,38 +2,46 @@
 
 import { motion } from "motion/react";
 import { Breadcrumb, Contact } from "../../components";
+import {
+  BUSINESS_EMAIL,
+  EMAIL_HREF,
+  PHONE_DISPLAY,
+  PHONE_HREF,
+} from "../../data/contact";
+import { trackEmailClick, trackPhoneClick } from "../../lib/analytics";
+import { useReveal } from "../../lib/motionPresets";
 
 interface ContactClientProps {
   initialSubject?: string;
 }
 
 export default function ContactClient({ initialSubject }: ContactClientProps) {
+  const { mount } = useReveal();
   return (
-    <main className="pt-32 pb-20">
+    <div className="pt-24 pb-20 lg:pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <Breadcrumb />
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-4">
+        <div className="text-center mb-6 md:mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-3 md:mb-4">
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
           </h1>
-          <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-text-secondary max-w-2xl mx-auto">
             Tell me about the idea you&apos;ve been carrying around. The first
             call is free, and we&apos;ll figure out what it would take.
           </p>
-        </motion.div>
+        </div>
 
+        {/* The form comes first so phones reach it without scrolling past the
+            contact details; on desktop it sits in the right-hand columns. */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-1 space-y-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+          <div className="lg:col-span-2 lg:order-2">
+            <div>
+              <Contact initialSubject={initialSubject} />
+            </div>
+          </div>
+
+          <motion.div className="lg:col-span-1 lg:order-1 space-y-8" {...mount}>
+            <div>
               <h2 className="text-2xl font-bold text-text-headings mb-6">
                 Contact Information
               </h2>
@@ -57,10 +65,11 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   <div>
                     <h3 className="font-semibold text-text-headings">Email</h3>
                     <a
-                      href="mailto:info@kygrsolutions.com"
+                      href={EMAIL_HREF}
+                      onClick={() => trackEmailClick("contact_page")}
                       className="text-text-secondary"
                     >
-                      info@kygrsolutions.com
+                      {BUSINESS_EMAIL}
                     </a>
                   </div>
                 </div>
@@ -83,8 +92,12 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-headings">Phone</h3>
-                    <a href="tel:+14787771266" className="text-text-secondary">
-                      (478) 777-1266
+                    <a
+                      href={PHONE_HREF}
+                      onClick={() => trackPhoneClick("contact_page")}
+                      className="text-text-secondary"
+                    >
+                      {PHONE_DISPLAY}
                     </a>
                   </div>
                 </div>
@@ -119,20 +132,17 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
+            <div
               className="p-8 rounded-2xl bg-oxford-blue/50 border border-penn-blue"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
             >
               <h3 className="text-xl font-bold text-text-headings mb-4">
                 What happens next?
               </h3>
               <ul className="space-y-4">
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     1
                   </span>
                   <p className="text-sm text-text-secondary">
@@ -140,7 +150,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     2
                   </span>
                   <p className="text-sm text-text-secondary">
@@ -148,7 +158,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-ncs text-white flex items-center justify-center text-xs shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-ncs-strong text-white flex items-center justify-center text-xs shrink-0">
                     3
                   </span>
                   <p className="text-sm text-text-secondary">
@@ -156,20 +166,11 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
                   </p>
                 </li>
               </ul>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
-          <div className="lg:col-span-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <Contact initialSubject={initialSubject} />
-            </motion.div>
-          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

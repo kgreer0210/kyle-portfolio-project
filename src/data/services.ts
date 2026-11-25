@@ -33,7 +33,7 @@ export const services: Service[] = [
   },
   {
     title: "Tech Stack Review",
-    description: "A focused session to identify what's costing you time, money, and momentum in your current tech setup.",
+    description: "A focused session to identify what’s costing you time, money, and momentum in your current tech setup.",
     points: [
       "Audit your current tools, software, and workflows",
       "Identify redundancies, gaps, and hidden costs",

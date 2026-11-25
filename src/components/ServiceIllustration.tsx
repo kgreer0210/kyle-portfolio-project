@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, Variants } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 
 interface ServiceIllustrationProps {
   type: "web" | "app" | "automation";
@@ -8,26 +8,9 @@ interface ServiceIllustrationProps {
 export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
   type,
 }) => {
-  const containerVariants: Variants = {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    initial: { opacity: 0, y: 10 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  // The section around the illustration does the one reveal; the ambient
+  // loops stop for reduced-motion visitors.
+  const loop = useReducedMotion() ? undefined : "animate";
 
   const floatingVariants: Variants = {
     animate: {
@@ -47,15 +30,11 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
-        variants={containerVariants}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
       >
         {/* Browser Illustration Group */}
-        <motion.g variants={floatingVariants} animate="animate">
+        <motion.g variants={floatingVariants} animate={loop}>
           {/* Browser Frame */}
-          <motion.rect
+          <rect
             x="40"
             y="80"
             width="320"
@@ -63,16 +42,14 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
             rx="12"
             className="fill-oxford-blue/20 stroke-blue-ncs/30"
             strokeWidth="2"
-            variants={itemVariants}
           />
-          <motion.rect
+          <rect
             x="40"
             y="80"
             width="320"
             height="30"
             rx="12"
             className="fill-blue-ncs/20"
-            variants={itemVariants}
           />
           {/* Browser Dots */}
           <circle cx="65" cy="95" r="5" className="fill-blue-ncs/40" />
@@ -80,41 +57,37 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
           <circle cx="105" cy="95" r="5" className="fill-blue-ncs/40" />
 
           {/* Content Blocks */}
-          <motion.rect
+          <rect
             x="70"
             y="130"
             width="120"
             height="100"
             rx="8"
             className="fill-blue-ncs/10 stroke-blue-ncs/20"
-            variants={itemVariants}
           />
-          <motion.rect
+          <rect
             x="210"
             y="130"
             width="120"
             height="15"
             rx="4"
             className="fill-blue-ncs/30"
-            variants={itemVariants}
           />
-          <motion.rect
+          <rect
             x="210"
             y="155"
             width="100"
             height="10"
             rx="4"
             className="fill-blue-ncs/20"
-            variants={itemVariants}
           />
-          <motion.rect
+          <rect
             x="210"
             y="175"
             width="120"
             height="10"
             rx="4"
             className="fill-blue-ncs/20"
-            variants={itemVariants}
           />
         </motion.g>
       </motion.svg>
@@ -128,13 +101,9 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
-        variants={containerVariants}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
       >
         {/* Mobile Phone Frame */}
-        <motion.rect
+        <rect
           x="120"
           y="40"
           width="160"
@@ -142,48 +111,43 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
           rx="24"
           className="fill-oxford-blue/20 stroke-blue-ncs/30"
           strokeWidth="4"
-          variants={itemVariants}
         />
         {/* Screen */}
-        <motion.rect
+        <rect
           x="135"
           y="70"
           width="130"
           height="260"
           rx="12"
           className="fill-blue-ncs/5"
-          variants={itemVariants}
         />
 
         {/* UI Elements */}
-        <motion.rect
+        <rect
           x="150"
           y="100"
           width="100"
           height="40"
           rx="8"
           className="fill-blue-ncs/20 stroke-blue-ncs/30"
-          variants={itemVariants}
         />
-        <motion.circle
+        <circle
           cx="165"
           cy="170"
           r="15"
           className="fill-blue-ncs/30"
-          variants={itemVariants}
         />
-        <motion.rect
+        <rect
           x="190"
           y="165"
           width="60"
           height="10"
           rx="4"
           className="fill-blue-ncs/20"
-          variants={itemVariants}
         />
 
         {/* Floating Abstract Elements */}
-        <motion.g variants={floatingVariants} animate="animate">
+        <motion.g variants={floatingVariants} animate={loop}>
           <rect
             x="60"
             y="120"
@@ -212,7 +176,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
               },
             },
           }}
-          animate="animate"
+          animate={loop}
         >
           <rect
             x="260"
@@ -239,7 +203,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
               transition: { duration: 2, repeat: Infinity },
             },
           }}
-          animate="animate"
+          animate={loop}
         />
       </motion.svg>
     );
@@ -252,26 +216,20 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
-        variants={containerVariants}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
       >
         {/* Central Hub */}
-        <motion.circle
+        <circle
           cx="200"
           cy="200"
           r="40"
           className="fill-blue-ncs/20 stroke-blue-ncs/40"
           strokeWidth="2"
-          variants={itemVariants}
         />
-        <motion.path
+        <path
           d="M185 200 L215 200 M200 185 L200 215"
           className="stroke-blue-ncs"
           strokeWidth="3"
           strokeLinecap="round"
-          variants={itemVariants}
         />
 
         {/* Connected Nodes */}
@@ -283,7 +241,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
 
           return (
             <React.Fragment key={i}>
-              <motion.line
+              <line
                 x1={xLine}
                 y1={yLine}
                 x2={x}
@@ -291,17 +249,13 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
                 className="stroke-blue-ncs/30"
                 strokeWidth="2"
                 strokeDasharray="4 4"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                transition={{ duration: 1, delay: i * 0.1 }}
               />
-              <motion.circle
+              <circle
                 cx={x}
                 cy={y}
                 r="15"
                 className="fill-oxford-blue/40 stroke-blue-ncs/30"
                 strokeWidth="2"
-                variants={itemVariants}
               />
               <motion.circle
                 cx={x}
@@ -319,7 +273,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
                     },
                   },
                 }}
-                animate="animate"
+                animate={loop}
               />
             </React.Fragment>
           );
@@ -332,7 +286,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
           strokeWidth="2"
           fill="none"
           variants={floatingVariants}
-          animate="animate"
+          animate={loop}
         />
         <motion.path
           d="M50 350 Q 200 380 350 350"
@@ -340,7 +294,7 @@ export const ServiceIllustration: React.FC<ServiceIllustrationProps> = ({
           strokeWidth="2"
           fill="none"
           variants={floatingVariants}
-          animate="animate"
+          animate={loop}
         />
       </motion.svg>
     );

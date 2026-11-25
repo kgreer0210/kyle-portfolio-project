@@ -62,3 +62,9 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+
+      # Unit and component tests (Vitest). They need no env or secrets. The
+      # Playwright layout suite (npm run test:layout) stays out of CI: it
+      # needs installed browsers and a running production server.
+      - name: Test
+        run: npm test

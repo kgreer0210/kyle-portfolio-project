@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState, type TouchEvent } from "react";
+import { useId, useRef, useState, type TouchEvent } from "react";
 import { motion } from "motion/react";
+import { GOOGLE_REVIEWS_URL } from "../data/contact";
 import { testimonials } from "../data/testimonials";
+import { useReveal } from "../lib/motionPresets";
 import TestimonialAuthor from "./TestimonialAuthor";
 
 // Horizontal distance (px) a touch must travel to count as a swipe.
@@ -13,26 +15,31 @@ const focusRing =
 
 const arrowButtonClass = `p-2 md:p-3 rounded-full bg-oxford-blue/80 border border-penn-blue text-blue-ncs hover:bg-oxford-blue hover:border-blue-ncs transition-colors duration-300 shadow-lg min-w-[44px] min-h-[44px] flex items-center justify-center ${focusRing}`;
 
-function QuoteMark({ side }: { side: "open" | "close" }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`text-blue-ncs text-2xl md:text-3xl font-serif leading-none align-top ${
-        side === "open" ? "mr-2" : "ml-2"
-      }`}
-    >
-      {side === "open" ? "\u201C" : "\u201D"}
-    </span>
-  );
-}
-
 export default function Testimonials() {
+  // One reveal for the whole section: short travel, strong ease-out.
+  const { section } = useReveal();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
+  const idPrefix = useId();
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const total = testimonials.length;
 
   const goToSlide = (index: number) => {
     setCurrentIndex(((index % total) + total) % total);
+  };
+
+  const toggleExpanded = (id: number) => {
+    setExpandedIds((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const nextSlide = () => goToSlide(currentIndex + 1);
@@ -68,51 +75,24 @@ export default function Testimonials() {
     <motion.section
       id="testimonials"
       className="mb-20"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      viewport={{ once: true, margin: "-100px" }}
+      {...section}
     >
-      <motion.div
-        className="mb-12 text-center"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-      >
-        <motion.h2
-          className="text-3xl md:text-4xl font-bold text-text-headings mb-4 drop-shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          What Clients Say
-        </motion.h2>
-        <motion.p
-          className="text-text-secondary text-lg max-w-2xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
-        >
-          Here&apos;s what my clients have to say. I&apos;m happy to share more on a
-          call.
-        </motion.p>
-      </motion.div>
+      <div className="mb-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-text-headings mb-4 drop-shadow-lg">
+          Reviews from Google
+        </h2>
+        <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+          These are reviews my clients left on Google, in their own words.
+          I&apos;m happy to share more on a call.
+        </p>
+      </div>
 
-      <motion.div
-        className="flex justify-center"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        viewport={{ once: true }}
-      >
+      <div className="flex justify-center">
         <div
           className="relative w-full max-w-3xl mx-auto"
           role="region"
           aria-roledescription="carousel"
-          aria-label="Client testimonials"
+          aria-label="Google reviews"
         >
           {/*
             Controls sit above the card so their position never depends on
@@ -156,7 +136,7 @@ export default function Testimonials() {
                     >
                       <span
                         aria-hidden="true"
-                        className={`block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                        className={`block h-2 rounded-full transition-[width,background-color] duration-300 motion-reduce:transition-none ${
                           isActive
                             ? "w-6 bg-blue-ncs"
                             : "w-2 bg-penn-blue group-hover:bg-blue-ncs/50"
@@ -211,12 +191,15 @@ export default function Testimonials() {
               const paragraphs = Array.isArray(testimonial.quote)
                 ? testimonial.quote
                 : [testimonial.quote];
-              const lastIndex = paragraphs.length - 1;
+              const { excerpt } = testimonial;
+              const isExpanded = expandedIds.has(testimonial.id);
+              const shownParagraphs =
+                excerpt && !isExpanded ? [excerpt] : paragraphs;
+              const quoteId = `${idPrefix}-review-${testimonial.id}`;
 
               return (
                 <figure
                   key={testimonial.id}
-                  role="group"
                   aria-roledescription="slide"
                   aria-label={`${index + 1} of ${total}`}
                   aria-hidden={!isActive}
@@ -232,18 +215,33 @@ export default function Testimonials() {
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.984zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h3.983v10h-9.984z" />
                   </svg>
 
-                  <blockquote className="text-text-primary text-base leading-relaxed md:leading-loose mb-6">
-                    {paragraphs.map((paragraph, pIndex) => (
-                      <p
-                        key={pIndex}
-                        className={pIndex > 0 ? "mt-3 md:mt-4" : undefined}
+                  <div className="mb-6 flex flex-col">
+                    <blockquote
+                      id={quoteId}
+                      className="text-text-primary text-base leading-relaxed md:leading-loose"
+                    >
+                      {shownParagraphs.map((paragraph, pIndex) => (
+                        <p
+                          key={pIndex}
+                          className={pIndex > 0 ? "mt-3 md:mt-4" : undefined}
+                        >
+                          {paragraph}
+                        </p>
+                      ))}
+                    </blockquote>
+
+                    {excerpt ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(testimonial.id)}
+                        aria-expanded={isExpanded}
+                        aria-controls={quoteId}
+                        className={`self-start mt-4 min-h-[44px] py-2 text-blue-ncs font-semibold underline underline-offset-4 decoration-blue-ncs/50 hover:decoration-blue-ncs rounded ${focusRing}`}
                       >
-                        {pIndex === 0 && <QuoteMark side="open" />}
-                        {paragraph}
-                        {pIndex === lastIndex && <QuoteMark side="close" />}
-                      </p>
-                    ))}
-                  </blockquote>
+                        {isExpanded ? "Show less" : "Read the full review"}
+                      </button>
+                    ) : null}
+                  </div>
 
                   <figcaption className="pt-5 md:pt-6 border-t border-penn-blue">
                     <TestimonialAuthor
@@ -257,8 +255,19 @@ export default function Testimonials() {
             })}
           </div>
 
+          <p className="mt-6 text-center">
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 min-h-[44px] text-blue-ncs font-semibold underline underline-offset-4 decoration-blue-ncs/50 hover:decoration-blue-ncs rounded ${focusRing}`}
+            >
+              See all reviews on Google
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </p>
         </div>
-      </motion.div>
+      </div>
     </motion.section>
   );
 }

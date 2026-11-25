@@ -31,6 +31,16 @@ npm run lint
 npm run build
 ```
 
+Browser layout checks (Playwright, Chromium and WebKit) cover the floating
+chat and Back to top buttons against the footer. They run against the
+production build from `npm run build` and are not part of `npm test` or CI,
+which have no browsers installed:
+
+```bash
+npx playwright install chromium webkit   # once per machine
+npm run test:layout
+```
+
 ## Configuration
 
 Create `.env.local` and configure only the integrations needed for the flow you

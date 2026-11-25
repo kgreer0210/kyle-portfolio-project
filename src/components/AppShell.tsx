@@ -2,9 +2,11 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { MotionConfig } from "motion/react";
 import Particles, { homepageParticleProps } from "@/Particles/Particles";
 import { BackToTop, Footer, Header } from "@/components";
 import ChatWidget from "@/components/ChatWidget";
+import { FLOATING_CLEARANCE } from "@/components/floatingControls";
 
 const appPrefixes = [
   "/login",
@@ -13,6 +15,8 @@ const appPrefixes = [
   "/admin",
   "/auth",
 ];
+
+const MAIN_CONTENT_ID = "main-content";
 
 function isAppRoute(pathname: string): boolean {
   return appPrefixes.some(
@@ -35,10 +39,18 @@ export default function AppShell({
     return <div className="relative z-10 min-h-screen">{children}</div>;
   }
 
+  // Public motion follows the visitor's reduced-motion setting.
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      <a
+        href={`#${MAIN_CONTENT_ID}`}
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-blue-ncs-strong focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
+      >
+        Skip to content
+      </a>
+
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
         aria-hidden="true"
       >
         <div className="absolute inset-0 bg-[linear-gradient(148deg,var(--color-penn-blue)_14%,#03203a_54%,var(--color-rich-black)_86%)]" />
@@ -50,13 +62,21 @@ export default function AppShell({
 
       <Header />
 
-      <div className="relative z-10">
-        {children}
+      <div className={`relative z-10 ${FLOATING_CLEARANCE}`}>
+        {/* The one <main> landmark for every public page, and the skip link's
+            target. tabIndex={-1} lets Safari move focus here on the skip link;
+            page components render plain containers, never their own <main>. */}
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
+          {children}
+        </main>
         <Footer />
       </div>
 
-      <BackToTop />
-      <ChatWidget turnstileSiteKey={turnstileSiteKey} />
-    </>
+      {/* Floating controls sit in a landmark so no content is outside one. */}
+      <aside aria-label="Quick actions">
+        <BackToTop />
+        <ChatWidget turnstileSiteKey={turnstileSiteKey} />
+      </aside>
+    </MotionConfig>
   );
 }
