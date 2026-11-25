@@ -18,8 +18,45 @@ const comingSoon: Project = {
 };
 
 describe("projects data", () => {
-  it("keeps Dexter Gordy Realtor first", () => {
-    expect(projects[0].id).toBe("dexter-gordy-realtor");
+  it("lists Level Up Media Outlet first and Dexter Gordy Realtor second", () => {
+    expect(projects[0].id).toBe("level-up-media-outlet");
+    expect(projects[1].id).toBe("dexter-gordy-realtor");
+  });
+
+  it("keeps the existing projects in their original order", () => {
+    expect(projects.map((project) => project.id)).toEqual([
+      "level-up-media-outlet",
+      "dexter-gordy-realtor",
+      "mise-ai",
+      "lisa-dunn-real-estate",
+      "lexisFreshSlateCleanings",
+      "f3-warner-robins",
+      "mid-state-baptist-association",
+    ]);
+  });
+
+  it("lists Level Up Media Outlet as a completed project", () => {
+    const levelUp = projects.find(
+      (project) => project.id === "level-up-media-outlet",
+    );
+    expect(levelUp?.status).toBe("completed");
+    expect(levelUp?.liveUrl).toBe("https://levelupmediaoutlet.com");
+  });
+
+  it("points every Level Up Media Outlet image at an existing file", () => {
+    const levelUp = projects.find(
+      (project) => project.id === "level-up-media-outlet",
+    );
+    const images = [
+      levelUp?.image,
+      ...(levelUp?.backendShowcase?.screenshots.map((shot) => shot.image) ??
+        []),
+    ];
+    expect(images).toHaveLength(4);
+    for (const image of images) {
+      expect(image).toMatch(/^\/projects\/level-up-media-outlet\/[a-z0-9-]+\.png$/);
+      expect(existsSync(join(process.cwd(), "public", image ?? ""))).toBe(true);
+    }
   });
 
   it("has unique ids", () => {
@@ -122,6 +159,20 @@ describe("project copy", () => {
       expect(projectCopy(project)).not.toMatch(/real-?time/i);
     },
   );
+
+  it("keeps prices, the owner's name, and contact details out of Level Up copy", () => {
+    const levelUp = projects.find((p) => p.id === "level-up-media-outlet");
+    expect(levelUp).toBeDefined();
+    const copy = projectCopy(levelUp!);
+    expect(copy).not.toContain("$");
+    expect(copy).not.toMatch(/nelson/i);
+    expect(copy).not.toMatch(/doppler/i);
+    // No phone numbers or street addresses.
+    expect(copy).not.toMatch(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/);
+    expect(copy).not.toMatch(
+      /\d+\s+\w+(\s\w+)*\s(street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|way|court|ct|highway|hwy)\b/i,
+    );
+  });
 
   it("describes Dexter's site with plain listings wording", () => {
     const dexter = projects.find((p) => p.id === "dexter-gordy-realtor");

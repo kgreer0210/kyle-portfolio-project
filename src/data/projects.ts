@@ -16,6 +16,75 @@ export function getPublishedProjects(list: Project[] = projects): Project[] {
 
 export const projects: Project[] = [
   {
+    id: "level-up-media-outlet",
+    title: "Level Up Media Outlet",
+    description:
+      "A custom website for Level Up Media Outlet, a youth sports photography business in Middle Georgia. Families can browse the sports portfolio, request a shoot and book a time, sign a parent permission form online, and buy their photos from a paid gallery.",
+    image: "/projects/level-up-media-outlet/hero.png",
+    technologies: [
+      "Next.js",
+      "TypeScript",
+      "Vercel",
+      "Supabase",
+      "Cloudflare R2",
+      "Stripe",
+      "Cal.com",
+    ],
+    liveUrl: "https://levelupmediaoutlet.com",
+    status: "completed",
+    role: "Design, full-stack development, payments, and photo storage",
+    challenge:
+      "A sports photographer's site has to do more than show off photos. I needed one place where families could find the shots they want, request a shoot and book a time, sign a parent permission form, and pay for their gallery, while the owner could run requests, bookings, galleries, and refunds from a phone. Every uploaded photo also had to be watermarked automatically and have its location data stripped before anyone sees it.",
+    outcome:
+      "The site launched to production on November 24, 2026. Families can browse a 49-photo sports portfolio, book a shoot, sign the permission form, and check out their photo gallery through Stripe, and the owner manages it all from an admin dashboard.",
+    backendShowcase: {
+      available: true,
+      title: "Inside the Site",
+      subtitle:
+        "A closer look at the public site families use to find photos and request a shoot.",
+      description:
+        "A look at the home page, the featured portfolio, and the full sports portfolio built for Level Up Media Outlet.",
+      screenshots: [
+        {
+          id: "mobile-home",
+          title: "Phone view",
+          description:
+            "The home page on a phone, with Find Your Photos and Request Photography buttons at the top.",
+          image: "/projects/level-up-media-outlet/mobile-home.png",
+          features: [
+            "Phone-sized layout of the home page",
+            "Quick path to buy photos",
+            "Quick path to request a shoot and book a time",
+          ],
+        },
+        {
+          id: "featured-portfolio",
+          title: "Featured portfolio",
+          description:
+            "A featured collage on the home page shows sports photos from the portfolio, with a link to the full gallery.",
+          image: "/projects/level-up-media-outlet/featured-portfolio.png",
+          features: [
+            "Featured photos on the home page",
+            "Link to browse the full portfolio",
+            "Uploads watermarked automatically",
+          ],
+        },
+        {
+          id: "portfolio",
+          title: "Sports portfolio",
+          description:
+            "The public portfolio gallery holds 49 sports photos from football, softball, basketball, and baseball.",
+          image: "/projects/level-up-media-outlet/portfolio.png",
+          features: [
+            "49 sports photos",
+            "Photos stored on Cloudflare R2",
+            "Location data stripped from every upload",
+          ],
+        },
+      ],
+    },
+  },
+  {
     id: "dexter-gordy-realtor",
     title: "Dexter Gordy Realtor",
     description:
