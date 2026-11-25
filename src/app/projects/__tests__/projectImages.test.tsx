@@ -72,11 +72,11 @@ describe("/projects/[projectId] page", () => {
     expect(thumb.parentElement).toHaveClass("h-40", "sm:h-48");
   });
 
-  it("frames the Level Up phone view from the top in a narrow column", () => {
+  it("frames the Level Up mobile friendly shot from the top in a narrow column", () => {
     params.projectId = "level-up-media-outlet";
     try {
       render(<ProjectDetailClient />);
-      const thumb = screen.getByRole("img", { name: "Phone view" });
+      const thumb = screen.getByRole("img", { name: "Mobile friendly" });
       expect(thumb).toHaveClass("object-cover", "object-top");
       expect(thumb).toHaveAttribute(
         "sizes",
@@ -95,12 +95,12 @@ describe("/projects/[projectId] page", () => {
     }
   });
 
-  it("shows the whole phone view, not a crop, in the detail modal", () => {
+  it("shows the whole mobile friendly shot, not a crop, in the detail modal", () => {
     params.projectId = "level-up-media-outlet";
     try {
       render(<ProjectDetailClient />);
-      fireEvent.click(screen.getByRole("img", { name: "Phone view" }));
-      const images = screen.getAllByRole("img", { name: "Phone view" });
+      fireEvent.click(screen.getByRole("img", { name: "Mobile friendly" }));
+      const images = screen.getAllByRole("img", { name: "Mobile friendly" });
       const modalImage = images[images.length - 1];
       expect(modalImage).toHaveAttribute("width", "390");
       expect(modalImage).toHaveAttribute("height", "844");
@@ -110,6 +110,30 @@ describe("/projects/[projectId] page", () => {
       params.projectId = "dexter-gordy-realtor";
     }
   });
+
+  it.each(["dexter-gordy-realtor", "level-up-media-outlet"])(
+    "sizes the %s gallery to its cards, not the viewport",
+    (projectId) => {
+      params.projectId = projectId;
+      try {
+        render(<ProjectDetailClient />);
+        const showcase = screen.getByTestId("backend-showcase");
+        // A min-h-screen wrapper leaves a blank band above the footer when
+        // the gallery is shorter than the viewport.
+        expect(showcase.className).not.toMatch(/\bmin-h-(screen|\[)/);
+        expect(showcase).not.toHaveClass("py-20");
+        expect(showcase).not.toHaveClass("pb-20");
+        const project = getPublishedProjects().find((p) => p.id === projectId);
+        const titles = project?.backendShowcase?.screenshots.map((s) => s.title) ?? [];
+        expect(titles.length).toBeGreaterThan(0);
+        for (const title of titles) {
+          expect(screen.getByRole("img", { name: title })).toBeInTheDocument();
+        }
+      } finally {
+        params.projectId = "dexter-gordy-realtor";
+      }
+    },
+  );
 
   it("asks for a message with a link, not a button", () => {
     const { container } = render(<ProjectDetailClient />);
