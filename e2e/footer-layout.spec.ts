@@ -10,23 +10,107 @@ const HEIGHT = 900;
 
 type Box = { left: number; right: number; top: number; bottom: number };
 
-async function scrollToBottom(page: Page) {
-  // Back to top appears on a scroll event, which the page only hears once it
-  // has hydrated, so keep scrolling until both floating buttons are showing.
-  await expect(async () => {
-    await page.evaluate(() => {
-      // The site uses smooth scrolling; measure at the real end of the page.
-      window.scrollTo({ top: 0, behavior: "instant" });
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
-    });
-    await expect(page.getByRole("button", { name: "Back to top" })).toBeVisible({ timeout: 1_000 });
-    await expect(page.getByRole("button", { name: /Chat with my AI/ })).toBeVisible({ timeout: 1_000 });
-  }).toPass({ timeout: 30_000 });
-  // Let entrance animations settle before measuring.
-  await page.waitForTimeout(800);
-  await page.evaluate(() =>
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+const BACK_TO_TOP = { name: "Back to top" } as const;
+const CHAT = { name: /Chat with my AI/ } as const;
+
+/** Resolve after the browser has painted `frames` more frames. */
+function nextFrames(page: Page, frames = 2) {
+  return page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1));
+        step(n);
+      }),
+    frames,
   );
+}
+
+/**
+ * Wait until the page is loaded and hydrated: web fonts are in (they change
+ * the footer's text width) and the chat control, which is client-rendered,
+ * is showing.
+ */
+async function waitForReady(page: Page) {
+  await page.waitForLoadState("load");
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await expect(page.getByRole("button", CHAT)).toBeVisible({ timeout: 15_000 });
+}
+
+/**
+ * Scroll to the end of the page and wait for Back to top. That button mounts
+ * when Motion's scrollY passes 80% of the viewport height, so each attempt
+ * makes exactly one scroll per browser task, separated by painted frames, so
+ * the scroll can't be merged away. The test fails (it never silently passes)
+ * if the button doesn't appear.
+ */
+async function scrollToBottom(page: Page) {
+  await waitForReady(page);
+  await expect(async () => {
+    // Step back up a little, in its own task, so the scroll to the bottom is
+    // always a real change that Motion's observer sees.
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight / 2, behavior: "instant" }),
+    );
+    await nextFrames(page);
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+    );
+    await nextFrames(page);
+    expect(
+      await page.evaluate(() => window.scrollY > window.innerHeight * 0.8),
+      "scrolled past the Back to top threshold",
+    ).toBe(true);
+    await expect(page.getByRole("button", BACK_TO_TOP)).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  await waitForSettled(page);
+}
+
+/**
+ * Wait until nothing being measured is still moving: the page has stopped
+ * growing (late images), the page is at its very bottom, the footer's reveal
+ * has finished, and both floating buttons have finished their entrance.
+ */
+async function waitForSettled(page: Page) {
+  let previous = "";
+  await expect(async () => {
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+    );
+    await nextFrames(page);
+    const snapshot = await page.evaluate(() => {
+      const footer = document.querySelector("footer");
+      if (!footer) throw new Error("no footer");
+      const style = getComputedStyle(footer);
+      const box = (el: Element | null) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return [r.left, r.top, r.width, r.height].map((v) => Math.round(v * 10) / 10);
+      };
+      const buttons = Array.from(document.querySelectorAll("button")).filter((b) =>
+        /Back to top|Chat with my AI/.test(b.getAttribute("aria-label") ?? b.textContent ?? ""),
+      );
+      const de = document.documentElement;
+      return JSON.stringify({
+        atBottom: Math.abs(window.scrollY + window.innerHeight - de.scrollHeight) <= 1,
+        footerOpacity: style.opacity,
+        footerTransform: style.transform,
+        footer: box(footer),
+        buttons: buttons.map(box),
+        height: de.scrollHeight,
+      });
+    });
+    const parsed = JSON.parse(snapshot);
+    expect(parsed.atBottom, "at the bottom of the page").toBe(true);
+    expect(parsed.footerOpacity, "footer reveal finished").toBe("1");
+    expect(["none", "matrix(1, 0, 0, 1, 0, 0)"], "footer reveal finished").toContain(
+      parsed.footerTransform,
+    );
+    // Two identical reads in a row: nothing is still animating.
+    const stable = snapshot === previous;
+    previous = snapshot;
+    expect(stable, "layout stable across two reads").toBe(true);
+  }).toPass({ timeout: 15_000, intervals: [250] });
 }
 
 /** Empty space between the footer's bottom edge and the end of the page. */
@@ -64,9 +148,9 @@ function footerInk(page: Page): Promise<Box[]> {
 
 async function floatingButtons(page: Page): Promise<Box[]> {
   const boxes: Box[] = [];
-  for (const name of ["Back to top", /Chat with my AI/] as const) {
-    const box = await page.getByRole("button", { name }).boundingBox();
-    if (!box) throw new Error(`no box for ${String(name)}`);
+  for (const role of [BACK_TO_TOP, CHAT]) {
+    const box = await page.getByRole("button", role).boundingBox();
+    if (!box) throw new Error(`no box for ${String(role.name)}`);
     boxes.push({ left: box.x, right: box.x + box.width, top: box.y, bottom: box.y + box.height });
   }
   return boxes;
