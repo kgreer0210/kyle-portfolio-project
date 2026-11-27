@@ -192,8 +192,8 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
                 body: "One person, from the first call through launch and after.",
               },
               {
-                title: "Built around how your business works",
-                body: "Not a one-size template. I learn how you take calls, bookings, and questions today, then build the site to fit.",
+                title: "Plain English, no surprises",
+                body: "Clear scope, honest timelines, and straightforward communication. No jargon and no hidden fees.",
               },
               {
                 title: "I don't stop until it works the way you expect",

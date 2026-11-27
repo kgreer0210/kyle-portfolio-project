@@ -198,8 +198,8 @@ export default function Contact({ initialSubject }: ContactProps) {
           >
             {PHONE_DISPLAY}
           </a>
-          , or send details through this form, whatever&apos;s easiest. I work
-          with clients wherever they&apos;re located.
+          , or send details through this form, whatever’s easiest. I work
+          with clients wherever they’re located.
         </p>
 
         <div

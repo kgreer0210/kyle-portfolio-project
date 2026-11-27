@@ -321,13 +321,13 @@ export const projects: Project[] = [
     backendShowcase: {
       available: true,
       description:
-        "The admin tools behind Lexi's Fresh Slate Cleanings: services, booking, staff, and the customer portal.",
+        "The admin tools behind Lexi’s Fresh Slate Cleanings: services, booking, staff, and the customer portal.",
       screenshots: [
         {
           id: "admin-portal-dashboard",
           title: "Admin Portal Dashboard",
           description:
-            "Lexi's home screen. It shows how the business is doing at a glance and links to every admin tool.",
+            "Lexi’s home screen. It shows how the business is doing at a glance and links to every admin tool.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Portal Dashboard.png",
           features: [
@@ -357,7 +357,7 @@ export const projects: Project[] = [
           id: "admin-client-management",
           title: "Admin Client Management",
           description:
-            "Each customer's profile, past bookings, and message history in one place.",
+            "Each customer’s profile, past bookings, and message history in one place.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Client Management.png",
           features: [
@@ -414,7 +414,7 @@ export const projects: Project[] = [
           id: "admin-employee-management",
           title: "Admin Employee Management",
           description:
-            "Where Lexi sees her team's hours, approves time off, and manages the points staff earn and spend on rewards.",
+            "Where Lexi sees her team’s hours, approves time off, and manages the points staff earn and spend on rewards.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Employee Management.png",
           features: [
@@ -505,7 +505,7 @@ export const projects: Project[] = [
     challenge:
       "There was a need for our F3 region to have its own website where we could list out our schedule for workouts and their locations and times with links to the map as well as all of our logos on a rotating carousel on the front page and information about how to join in on the workouts that are free of charge.",
     outcome:
-      "I built a site that lists every workout's schedule and location, with map links and how to join, so anyone can find a free workout and show up.",
+      "I built a site that lists every workout’s schedule and location, with map links and how to join, so anyone can find a free workout and show up.",
     backendShowcase: {
       available: false,
       description: "",

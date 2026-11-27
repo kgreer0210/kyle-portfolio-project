@@ -128,7 +128,7 @@ export default function ProjectsClient() {
             My <span className="text-blue-ncs">Projects</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto text-center">
-            A look at what I&apos;ve built for small businesses, realtors, and organizations in Middle Georgia and beyond, from custom websites to the tools that keep a business running.
+            A look at what I’ve built for small businesses, realtors, and organizations in Middle Georgia and beyond, from custom websites to the tools that keep a business running.
           </p>
         </div>
 
