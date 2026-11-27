@@ -19,7 +19,7 @@ export default function ServicesClient() {
         <Breadcrumb />
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-text-headings mb-6">
-            Strategic <span className="text-blue-ncs">Services</span>
+            <span className="text-blue-ncs">Services</span>
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto">
             A site that brings in leads, a portal your team actually uses, or

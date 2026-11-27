@@ -26,7 +26,7 @@ export default function ContactClient({ initialSubject }: ContactClientProps) {
             Let&apos;s <span className="text-blue-ncs">Talk Business</span>
           </h1>
           <p className="text-base md:text-xl text-text-secondary max-w-2xl mx-auto">
-            Tell me about the idea you&apos;ve been carrying around. The first
+            Tell me what you&apos;re trying to take off your plate. The first
             call is free, and we&apos;ll figure out what it would take.
           </p>
         </div>

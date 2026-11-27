@@ -36,7 +36,7 @@ export default function Hero() {
               className="size-2 shrink-0 rounded-full bg-[#7fd3f0]"
               aria-hidden="true"
             />
-            Strategic Software & Automation Partner
+            Custom websites, apps, and automations
           </p>
 
           <h1 className="text-4xl leading-[1.08] font-bold tracking-tight text-balance text-text-headings! sm:text-5xl xl:text-6xl">

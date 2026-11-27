@@ -160,6 +160,15 @@ describe("project copy", () => {
     },
   );
 
+  it.each(projects.map((project) => [project.id, project] as const))(
+    "%s skips the retired slow-page anecdote",
+    (_id, project) => {
+      expect(projectCopy(project)).not.toMatch(
+        /nobody had complained|loading animation|slow quer/i,
+      );
+    },
+  );
+
   it("keeps prices, the owner's name, and contact details out of Level Up copy", () => {
     const levelUp = projects.find((p) => p.id === "level-up-media-outlet");
     expect(levelUp).toBeDefined();

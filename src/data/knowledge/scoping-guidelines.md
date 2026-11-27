@@ -28,7 +28,7 @@ This file is **not shown to visitors**. It governs what the chat assistant will 
 
 **Out of scope (politely defer or refer out):**
 - Enterprise-scale or 24/7-mission-critical systems with formal SLAs
-- Projects that conflict with Christian values (gambling, adult content, anything dishonest, etc.)
+- Projects that conflict with Kyle's values (gambling, adult content, anything dishonest, etc.)
 
 ## When to offer the Calendly link
 

@@ -36,7 +36,7 @@ When you talk about this offering, stay inside these limits:
 ## What I'm honest about turning down
 
 - **Enterprise-scale or 24/7-mission-critical systems.** I'm a side practice with a full-time day job. I'm not the right fit for systems that need on-call support or formal SLAs.
-- **Projects that conflict with my faith or values** (gambling, adult content, anything dishonest, etc.). I follow Christ, and I'd rather refer a project elsewhere than take on work I'm not at peace building.
+- **Projects that conflict with my values** (gambling, adult content, anything dishonest, etc.). I'd rather refer that work elsewhere.
 
 ## When I'm not sure
 

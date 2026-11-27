@@ -192,8 +192,8 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
                 body: "One person, from the first call through launch and after.",
               },
               {
-                title: "I don't settle for “good enough”",
-                body: "While showing a new client the admin calendar I'd built for Lexi's Fresh Slate Cleanings, I noticed it loading slowly behind a loading animation. Nobody had complained, but it wasn't up to my standard, so I fixed the slow queries anyway.",
+                title: "Built around how your business works",
+                body: "Not a one-size template. I learn how you take calls, bookings, and questions today, then build the site to fit.",
               },
               {
                 title: "I don't stop until it works the way you expect",
@@ -419,8 +419,7 @@ export default function WebsiteDesignMiddleGeorgiaClient() {
             Let&apos;s talk about the site you&apos;ve been picturing
           </h2>
           <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-text-primary">
-            Hard problems welcome. I work with owners across Middle Georgia, or
-            farther away. Book a call, phone me, or send a message through the
+            I work with owners across Middle Georgia, or farther away. Book a call, phone me, or send a message through the
             contact form.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">

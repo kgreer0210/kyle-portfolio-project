@@ -321,13 +321,13 @@ export const projects: Project[] = [
     backendShowcase: {
       available: true,
       description:
-        "Backend architecture for Lexi's Fresh Slate Cleanings, showcasing service management, booking system, staff management, and customer portal.",
+        "The admin tools behind Lexi's Fresh Slate Cleanings: services, booking, staff, and the customer portal.",
       screenshots: [
         {
           id: "admin-portal-dashboard",
           title: "Admin Portal Dashboard",
           description:
-            "Central administrative dashboard providing comprehensive overview of business operations, key metrics, and quick access to all management modules.",
+            "Lexi's home screen. It shows how the business is doing at a glance and links to every admin tool.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Portal Dashboard.png",
           features: [
@@ -342,7 +342,7 @@ export const projects: Project[] = [
           id: "admin-services-management",
           title: "Admin Services Management",
           description:
-            "Complete service catalog management interface for configuring cleaning services, pricing tiers, and service availability.",
+            "Where Lexi adds and edits her cleaning services, sets prices, and controls when each one is offered.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Services Management.png",
           features: [
@@ -357,7 +357,7 @@ export const projects: Project[] = [
           id: "admin-client-management",
           title: "Admin Client Management",
           description:
-            "Comprehensive client relationship management system with detailed profiles, booking history, and communication tracking.",
+            "Each customer's profile, past bookings, and message history in one place.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Client Management.png",
           features: [
@@ -371,7 +371,7 @@ export const projects: Project[] = [
           id: "admin-calendar",
           title: "Admin Calendar Management",
           description:
-            "Advanced scheduling interface for managing appointments, staff assignments, and resource allocation across all locations. While showing this site to a new client, I noticed this page loading slowly behind its loading animation. Nobody had complained, but it wasn't up to my standard, so I fixed the slow queries.",
+            "The schedule for every cleaning appointment. Lexi books jobs here and assigns staff to each one.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Calendar.png",
           features: [
@@ -386,7 +386,7 @@ export const projects: Project[] = [
           id: "admin-cleaning-add-ons",
           title: "Admin Cleaning Add-Ons Management",
           description:
-            "Specialized interface for managing additional cleaning services, premium options, and custom service packages.",
+            "Where Lexi sets up extras customers can add to a cleaning, and what each one costs.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Cleaning Add On Management.png",
           features: [
@@ -400,7 +400,7 @@ export const projects: Project[] = [
           id: "admin-business-settings",
           title: "Admin Business Settings Management",
           description:
-            "Centralized business configuration hub for managing operational settings, business rules, and system preferences.",
+            "Business hours, policies, and notification settings, all in one place.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Business Settings Management.png",
           features: [
@@ -414,7 +414,7 @@ export const projects: Project[] = [
           id: "admin-employee-management",
           title: "Admin Employee Management",
           description:
-            "Comprehensive employee management system allowing Lexi to oversee all aspects of employee operations including time tracking, point system management, time off requests, and point reward approvals.",
+            "Where Lexi sees her team's hours, approves time off, and manages the points staff earn and spend on rewards.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Employee Management.png",
           features: [
@@ -430,7 +430,7 @@ export const projects: Project[] = [
           id: "admin-estimate-request-management",
           title: "Admin Estimate Request Management",
           description:
-            "Streamlined interface for managing customer estimate requests with instant notifications. Features a notification icon that alerts Lexi when new estimate requests are available, ensuring prompt response to potential customers.",
+            "New estimate requests land here. A notification icon tells Lexi when one comes in, so she can reply quickly.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Admin Estimate Request Management.png",
           features: [
@@ -461,7 +461,7 @@ export const projects: Project[] = [
           id: "employee-portal",
           title: "Employee Portal",
           description:
-            "Comprehensive self-service portal for employees to manage their work schedule, track time, request time off, and manage their reward points. Features a detailed calendar view of upcoming appointments with full details.",
+            "Where staff clock in and out, request time off, check their points, and see a calendar of their upcoming jobs with the details.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Employee Portal.png",
           features: [
@@ -477,7 +477,7 @@ export const projects: Project[] = [
           id: "customer-portal",
           title: "Customer Portal",
           description:
-            "Self-service customer portal allowing clients to manage their appointments, update their profile information, edit service addresses, and customize their notification preferences for personalized experience.",
+            "Where customers see their appointments, update their info and service address, and choose how they hear from Lexi.",
           image:
             "/projects/lexis-fresh-slate-cleaning/backend-screenshots/Customer Portal.png",
           features: [
@@ -505,7 +505,7 @@ export const projects: Project[] = [
     challenge:
       "There was a need for our F3 region to have its own website where we could list out our schedule for workouts and their locations and times with links to the map as well as all of our logos on a rotating carousel on the front page and information about how to join in on the workouts that are free of charge.",
     outcome:
-      "Delivered a polished, user-friendly website that effectively showcases workout schedules, locations, and regional information, making it easy for the community to participate in free outdoor fitness activities.",
+      "I built a site that lists every workout's schedule and location, with map links and how to join, so anyone can find a free workout and show up.",
     backendShowcase: {
       available: false,
       description: "",
@@ -533,7 +533,7 @@ export const projects: Project[] = [
     challenge:
       "The association needed a modern replacement for their dated Weebly site that could manage 38 churches across 5 counties, surface events and resources, and give the leadership team an admin portal to keep content current — without requiring technical expertise to operate.",
     outcome:
-      "Delivered a clean, accessible website that makes it easy for the community to find churches, browse events, and download resources, with a protected admin system for staff to manage all content.",
+      "I built an accessible site where people can find churches, browse events, and download resources, plus a protected admin area where staff manage all the content.",
     backendShowcase: {
       available: true,
       description:

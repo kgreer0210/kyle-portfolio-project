@@ -146,7 +146,9 @@ describe("home copy and images", () => {
     const main = container.cloneNode(true) as HTMLElement;
     main.querySelectorAll("figure").forEach((figure) => figure.remove());
     expect(main.textContent).not.toContain('"');
-    expect(main.textContent).toContain("I don’t settle for “good enough.”");
+    expect(main.textContent).toContain("Let’s build the thing you’ve been picturing");
+    expect(main.textContent).not.toContain("good enough");
+    expect(main.textContent).not.toMatch(/hard problems welcome/i);
   });
 
   it.each(["app/HomeClient.tsx", "components/Hero.tsx", "components/HowItWorks.tsx"])(

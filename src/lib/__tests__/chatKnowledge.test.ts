@@ -73,6 +73,14 @@ describe("system prompt copy rules", () => {
     }
   });
 
+  it("keeps the voice warm without heavier faith framing", () => {
+    expect(prompt).toContain("warm, plain-spoken, never inflated, never preachy");
+    expect(prompt).not.toContain("faith-and-relationship-aware");
+    expect(prompt).not.toMatch(/I follow Christ, and that conviction/);
+    expect(prompt).not.toMatch(/conflict with Christian values/);
+    expect(prompt).not.toMatch(/hard problems welcome/i);
+  });
+
   it("keeps the IDX guardrails", () => {
     expect(prompt).toContain("Georgia MLS (GAMLS)");
     expect(prompt).toContain("Central Georgia MLS (CGMLS)");
