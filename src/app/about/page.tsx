@@ -4,7 +4,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "I’m Kyle Greer, founder of KYGR Solutions: a husband, father, and man of faith who turns the ideas people carry around into software that makes their lives easier.",
+    "I’m Kyle Greer, a Middle Georgia software developer and founder of KYGR Solutions. I build custom websites and web apps for small businesses, realtors, and organizations, and I stand behind the work long after launch.",
   alternates: {
     canonical: "/about",
   },

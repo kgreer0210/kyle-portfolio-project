@@ -27,12 +27,58 @@ describe("/about page", () => {
     expect(headings[1]).toHaveTextContent("Who I am");
   });
 
-  it("speaks in first person about where it is headed", () => {
+  it("shows the How I work and What I care about sections with their cards", () => {
+    render(<AboutClient />);
+    const h2s = screen
+      .getAllByRole("heading", { level: 2 })
+      .map((h) => h.textContent);
+    expect(h2s).toEqual([
+      "Who I am",
+      "How I work",
+      "What I care about",
+      "Got an idea you’ve been carrying around?",
+    ]);
+    const h3s = screen
+      .getAllByRole("heading", { level: 3 })
+      .map((h) => h.textContent);
+    expect(h3s).toEqual([
+      "You work directly with me.",
+      "Built around your workflow.",
+      "Plain English, no surprises.",
+      "Still here after launch.",
+      "Craftsmanship.",
+      "Honesty.",
+      "Lasting relationships.",
+    ]);
+  });
+
+  it("speaks in first person in the Who I am copy", () => {
     render(<AboutClient />);
     expect(
-      screen.getByRole("heading", { level: 2, name: "Where I’m headed" }),
+      screen.getByText(/I’m Kyle Greer, a software developer based in Middle Georgia/),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/Where we/)).toBeNull();
+    expect(screen.getByText(/stand behind the work long after launch/)).toBeInTheDocument();
+  });
+
+  it("no longer shows the retired About sections and stories", () => {
+    const { container } = render(<AboutClient />);
+    const text = container.textContent ?? "";
+    for (const gone of [
+      "Why I build",
+      "Mission",
+      "Where I’m headed",
+      "Values",
+      "$138,000",
+      "nobody complained",
+      "Fresh Slate",
+      "Built with Purpose",
+      "People Over Platforms",
+      "Clarity & Craftsmanship",
+      "Trust Through Partnership",
+    ]) {
+      expect(text).not.toContain(gone);
+    }
+    expect(text).not.toMatch(/\bwe\b|the team|real-time/i);
   });
 
   it("uses curly quotes, not straight ones, in body copy", () => {
@@ -60,9 +106,10 @@ describe("/about page", () => {
     expect(container.querySelector("a button")).toBeNull();
   });
 
-  it("has a first-person meta description", () => {
+  it("has a first-person meta description with typographic quotes", () => {
+    expect(metadata.description).not.toMatch(/["']/);
     expect(metadata.description).toBe(
-      "I’m Kyle Greer, founder of KYGR Solutions: a husband, father, and man of faith who turns the ideas people carry around into software that makes their lives easier.",
+      "I’m Kyle Greer, a Middle Georgia software developer and founder of KYGR Solutions. I build custom websites and web apps for small businesses, realtors, and organizations, and I stand behind the work long after launch.",
     );
   });
 });
