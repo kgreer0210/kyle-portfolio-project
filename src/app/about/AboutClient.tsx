@@ -6,6 +6,43 @@ import { Breadcrumb } from "../../components";
 import CallAndMessageCtas from "../../components/CallAndMessageCtas";
 import { useReveal } from "../../lib/motionPresets";
 
+const HOW_I_WORK = [
+  {
+    title: "You work directly with me.",
+    desc: "From the first call to launch day and beyond, you’re talking to the person actually building your site—not an account manager passing notes.",
+  },
+  {
+    title: "Built around your workflow.",
+    desc: "I don’t force every client into the same template. I take the time to understand what’s slowing you down and build software that fits.",
+  },
+  {
+    title: "Plain English, no surprises.",
+    desc: "Clear scope, honest timelines, and straightforward communication—no jargon and no hidden fees.",
+  },
+  {
+    title: "Still here after launch.",
+    desc: "A site shouldn’t be handed off and forgotten. I stick around to keep things running smoothly and grow it as your business does.",
+  },
+];
+
+const WHAT_I_CARE_ABOUT = [
+  {
+    title: "Craftsmanship.",
+    desc: "Clean code, fast load times, and thoughtful design—even on the small details most people never notice.",
+  },
+  {
+    title: "Honesty.",
+    desc: "If a simpler or cheaper option makes more sense for you, I’ll tell you.",
+  },
+  {
+    title: "Lasting relationships.",
+    desc: "Most of my best work comes from clients who come back when they’re ready for the next phase.",
+  },
+];
+
+const CARD_CLASS =
+  "p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors";
+
 export default function AboutClient() {
   const { section } = useReveal();
   return (
@@ -18,7 +55,7 @@ export default function AboutClient() {
           </h1>
         </div>
 
-        {/* Section 1: About Me. Above the fold on load, so it renders
+        {/* Section 1: Who I am. Above the fold on load, so it renders
             visible instead of revealing: it is the mobile LCP. */}
         <section className="mb-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -28,29 +65,24 @@ export default function AboutClient() {
               </h2>
               <div className="space-y-6 text-lg text-text-primary leading-relaxed">
                 <p>
-                  I’m Kyle Greer, a husband, a father of three, a man of
-                  faith, and the founder of KYGR Solutions. My peace comes from
-                  the Lord, so hard problems don’t scare me. They’re
-                  how I grow. I started this business to serve people well,
-                  honor God, and be a faithful steward of the skills I’ve
-                  been given.
+                  I’m Kyle Greer, a software developer based in Middle Georgia
+                  and the founder of KYGR Solutions. I build custom websites and
+                  web apps for small businesses, realtors, and organizations
+                  that want something tailored to how they actually
+                  work—without getting stuck in agency handoffs or
+                  cookie-cutter templates.
                 </p>
                 <p>
-                  I love taking the idea you’ve been carrying around and
-                  guiding it all the way to finished software that does exactly
-                  what you pictured, and then some. I don’t settle for
-                  “good enough.” I sweat the small details nobody else
-                  would notice, because the work should be right. My favorite
-                  part is the moment a client sees it working and realizes their
-                  life just got easier.
+                  Outside of work, I’m a husband, a dad of three, and a man of
+                  faith. That shapes how I run this business: be honest about
+                  what you need, price things fairly, sweat the details, and
+                  stand behind the work long after launch.
                 </p>
               </div>
             </div>
 
             {/* Family Photo Section */}
-            <div
-              className="w-full"
-            >
+            <div className="w-full">
               <Image
                 src="/FamilyPortrait.png"
                 alt="Kyle Greer with his wife and three children"
@@ -63,39 +95,20 @@ export default function AboutClient() {
           </div>
         </section>
 
-        {/* Section: Why I Build */}
+        {/* Section 2: How I work */}
         <section className="mb-20">
-          <motion.div
-            {...section}
-          >
-            <h2 className="text-3xl font-bold text-text-headings mb-6">
-              Why I build
+          <motion.div {...section}>
+            <h2 className="text-3xl font-bold text-text-headings mb-10">
+              How I work
             </h2>
-            <p className="text-xl text-text-primary leading-relaxed max-w-3xl mb-10">
-              Because my peace comes from the Lord, hard things don’t scare
-              me. I turn the ideas people carry around into something real, and
-              serving people that way brings me joy.
-            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[
-                {
-                  title: "$138,000 in 18 months",
-                  desc: "In 2024, my wife and I paid off $138,000 of debt in 18 months. Every month we asked what else we could do, and we even sold a van we’d bought a year earlier. That season taught me one question: “If I had to, what would it take?” Hard things aren’t blockers. They’re there to be overcome, and they help me grow. I bring that same question to every project.",
-                },
-                {
-                  title: "The page nobody complained about",
-                  desc: "While showing a new client a site I’d built for Lexi’s Fresh Slate Cleanings, I noticed the admin calendar page loading slowly. A loading animation covered it, so nobody else would have noticed, but it wasn’t up to my standard. I fixed the slow queries without anyone asking. I could do better, so I did.",
-                },
-              ].map((story) => (
-                <div
-                  key={story.title}
-                  className="p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                >
+              {HOW_I_WORK.map((item) => (
+                <div key={item.title} className={CARD_CLASS}>
                   <h3 className="text-xl font-bold text-blue-ncs mb-3">
-                    {story.title}
+                    {item.title}
                   </h3>
                   <p className="text-text-primary text-lg leading-relaxed">
-                    {story.desc}
+                    {item.desc}
                   </p>
                 </div>
               ))}
@@ -103,70 +116,20 @@ export default function AboutClient() {
           </motion.div>
         </section>
 
-        {/* Section 2: Mission */}
-        <motion.section className="mb-20" {...section}>
-          <div
-            className="bg-blue-ncs/5 p-8 md:p-12 rounded-3xl border border-blue-ncs/10"
-          >
-            <h2 className="text-3xl font-bold text-blue-ncs mb-6">Mission</h2>
-            <p className="text-2xl text-text-primary leading-relaxed font-medium">
-              To help businesses and organizations use technology as a tool —
-              not a burden — by delivering honest, high-quality software
-              solutions that improve efficiency, clarity, and trust.
-            </p>
-          </div>
-          <div
-            className="mt-8 bg-blue-ncs/5 p-8 md:p-12 rounded-3xl border border-blue-ncs/10"
-          >
-            <h2 className="text-3xl font-bold text-blue-ncs mb-6">
-              Where I’m headed
-            </h2>
-            <p className="text-2xl text-text-primary leading-relaxed font-medium">
-              In five years, I want KYGR Solutions known for lasting
-              relationships built by serving people well, with websites and apps
-              that make their lives easier. A business that never settles for
-              mediocre, keeps pushing the envelope, holds firm to its values,
-              and honors the Lord in everything it does.
-            </p>
-          </div>
-        </motion.section>
-
-        {/* Section 3: Values */}
+        {/* Section 3: What I care about */}
         <section className="mb-20">
-          <motion.div
-            {...section}
-          >
+          <motion.div {...section}>
             <h2 className="text-3xl font-bold text-text-headings mb-10">
-              Values
+              What I care about
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[
-                {
-                  title: "Built with Purpose",
-                  desc: "My work is guided by faith, integrity, and stewardship. I want to honor the Lord in how I build, how I price, and how I treat people. Technology should do what it claims to do.",
-                },
-                {
-                  title: "People Over Platforms",
-                  desc: "I don’t push one-size-fits-all software. I focus on understanding how you work and building solutions that fit your needs.",
-                },
-                {
-                  title: "Clarity & Craftsmanship",
-                  desc: "Clean code, thoughtful design, and a strong user experience matter. I don’t settle for “good enough.” If something can be better, even if no one would notice, I make it better.",
-                },
-                {
-                  title: "Trust Through Partnership",
-                  desc: "I want more than a project. I want a lasting relationship, built by serving you well long after launch.",
-                },
-              ].map((value, idx) => (
-                <div
-                  key={idx}
-                  className="p-8 rounded-2xl bg-oxford-blue/30 border border-penn-blue hover:border-blue-ncs/50 transition-colors"
-                >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {WHAT_I_CARE_ABOUT.map((item) => (
+                <div key={item.title} className={CARD_CLASS}>
                   <h3 className="text-xl font-bold text-blue-ncs mb-3">
-                    {value.title}
+                    {item.title}
                   </h3>
                   <p className="text-text-primary text-lg leading-relaxed">
-                    {value.desc}
+                    {item.desc}
                   </p>
                 </div>
               ))}
