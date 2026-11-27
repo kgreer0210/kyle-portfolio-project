@@ -195,7 +195,7 @@ export const idxFaqHeading = "Questions agents usually ask";
 
 export const idxFinalCta = {
   heading: idxOffering.cta,
-  body: "I’m an approved IDX vendor for Georgia MLS and Central Georgia MLS. Hard problems welcome. Tell me about your site and which MLSs you belong to, and I’ll tell you honestly whether a custom build makes sense. Contact for pricing.",
+  body: "I’m an approved IDX vendor for Georgia MLS and Central Georgia MLS. Tell me about your site and which MLSs you belong to, and I’ll tell you honestly whether a custom build makes sense. Contact for pricing.",
 } as const;
 
 /** Every sentence of page-only copy, for the public-copy tests. */

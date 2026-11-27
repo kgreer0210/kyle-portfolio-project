@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     siteName: "KYGR Solutions",
     title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I turn the idea you've been carrying around into software that gives you your time back.",
+      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I build the site, app, or automation you’ve been picturing, so you get your time back.",
     images: [
       {
         url: "/logo.png", // Ensure this path is correct or use a specific OG image
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KYGR Solutions | Custom Software for Growing Businesses",
     description:
-      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I turn the idea you've been carrying around into software that gives you your time back.",
+      "Custom websites, apps, and automations from Georgia, built with care for wherever you are. I build the site, app, or automation you’ve been picturing, so you get your time back.",
     images: ["/logo.png"],
     creator: "@kygrsolutions", // Replace with your actual handle if applicable
   },

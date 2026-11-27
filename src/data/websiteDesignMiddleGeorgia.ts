@@ -8,7 +8,7 @@ export const websiteDesignMgH1 =
   "Website design for Warner Robins, Macon, Perry, and Byron";
 
 export const websiteDesignMgIntro = [
-  "I’m Kyle Greer. I design and build conversion-focused websites for small businesses here in Middle Georgia, and I do the work myself. If you’ve been carrying around an idea for a better site, I’ll help you turn it into something that is fast, clear, and easy to contact — and I don’t stop until it works the way you expect.",
+  "I’m Kyle Greer. I design and build conversion-focused websites for small businesses here in Middle Georgia, and I do the work myself. If you’ve been picturing a better site, I’ll help you turn it into something that is fast, clear, and easy to contact — and I don’t stop until it works the way you expect.",
   "I work with owners in Warner Robins, Macon, Perry, and Byron, and I also take work farther away — down the street or across the country.",
 ] as const;
 

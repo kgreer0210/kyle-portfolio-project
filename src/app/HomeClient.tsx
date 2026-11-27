@@ -112,9 +112,8 @@ export default function HomeClient() {
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
               I build websites, web & mobile apps, and automations that win
-              you more leads and take work off your plate. And I don’t
-              settle for “good enough.” I sweat the details nobody
-              else would notice, because the work should be right.
+              you more leads and take work off your plate. Then I stay
+              with it after launch, because I stand behind what I build.
             </p>
             <p className="text-lg text-text-secondary max-w-3xl mx-auto leading-relaxed mt-4">
               Based in Middle Georgia? See{" "}
@@ -422,7 +421,7 @@ export default function HomeClient() {
             </h2>
             <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
               Let’s build the thing you’ve been picturing, and give
-              you your time back. Hard problems welcome.
+              you your time back.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-6 relative z-10">
               <BookCallLink

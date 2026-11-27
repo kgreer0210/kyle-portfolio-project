@@ -4,7 +4,7 @@
 I take on a small number of projects at a time so I can give each one real attention. Depending on the month, I may have immediate availability or a short waitlist. The 30-minute call is the best way to find out.
 
 ## Do you do this full-time?
-No — I'm a full-time software developer at Robins Financial Credit Union, and KYGR Solutions is the work I take on in my evenings and weekends, for projects I'm genuinely excited about. I'm honest about timelines because of that. Down the road, depending on how interest in my services grows, taking this full-time is something I'd be open to.
+No — KYGR Solutions is the work I take on in my evenings and weekends, for projects I'm genuinely excited about. I also have a full-time software job, and I'm honest about timelines because of that. Down the road, depending on how interest in my services grows, taking this full-time is something I'd be open to.
 
 ## Where are you located? Do you only work with local clients?
 I'm based in Warner Robins, Georgia. Most of my work has been with local businesses in middle Georgia, but I'm fully open to remote clients across the U.S.

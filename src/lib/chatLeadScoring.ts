@@ -68,7 +68,7 @@ Kyle is a part-time independent developer working with small businesses. He buil
 (4) integrations and internal tooling,
 (5) mobile apps for iOS and Android.
 
-He is NOT a fit for enterprise systems with formal SLAs, generic Wix/Squarespace template work, or projects that conflict with Christian values.
+He is NOT a fit for enterprise systems with formal SLAs, generic Wix/Squarespace template work, or projects that conflict with Kyle's values (gambling, adult content, dishonest work).
 
 You will be given a transcript of a chat conversation between a visitor and Kyle's diagnostic chatbot. Extract the structured fields per the schema. Be conservative — when ambiguous, prefer the less-enthusiastic option ('unknown' over guessing, 'none' over 'implicit'). Never invent details that weren't in the transcript.`;
 
